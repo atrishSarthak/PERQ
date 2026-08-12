@@ -7,7 +7,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: pushMock }),
 }));
 
-const { QuizWizard } = await import("@/app/quiz/QuizWizard");
+const { QuizWizard } = await import("@/app/(shell)/quiz/QuizWizard");
 
 const cardOptions = [{ value: "axis-airtel", label: "Axis Airtel" }];
 

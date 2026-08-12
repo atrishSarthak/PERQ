@@ -20,10 +20,10 @@ export default function LoginPage() {
       setError("Couldn't sign you in — check your email and password.");
       return;
     }
-    // /quiz itself redirects to /results if a profile already exists
-    // (§11) — so this one target correctly routes both new and
-    // returning users without this page needing to know which.
-    window.location.href = "/quiz";
+    // /home is the app shell's landing page (sidebar + feature icons) —
+    // navigating into Card Recommender from there is the user's choice,
+    // not an automatic redirect.
+    window.location.href = "/home";
   }
 
   return (

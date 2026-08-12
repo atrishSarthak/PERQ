@@ -1,14 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import type { ResultsCard } from "@/app/results/types";
+import type { ResultsCard } from "@/app/(shell)/results/types";
 import type { QuizAnswers } from "@perq/scoring-engine";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
 
-const { ResultsView } = await import("@/app/results/ResultsView");
+const { ResultsView } = await import("@/app/(shell)/results/ResultsView");
 
 function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
   return {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSSEStream } from "@/app/quiz/parseSSEStream";
+import { parseSSEStream } from "@/app/(shell)/quiz/parseSSEStream";
 
 function streamFromChunks(chunks: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();

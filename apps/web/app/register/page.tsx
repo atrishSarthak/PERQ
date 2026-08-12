@@ -29,14 +29,14 @@ export default function RegisterPage() {
 
       // Registration doesn't establish a session on its own — sign in
       // immediately with the same credentials so the user lands straight
-      // in the quiz instead of hitting a second manual step.
+      // in the app shell instead of hitting a second manual step.
       const signInResult = await signIn("credentials", { email, password, redirect: false });
       if (signInResult?.error) {
         setError("Account created — sign in on the next screen.");
         window.location.href = "/login";
         return;
       }
-      window.location.href = "/quiz";
+      window.location.href = "/home";
     } catch {
       setError("Couldn't create your account — try again.");
     } finally {

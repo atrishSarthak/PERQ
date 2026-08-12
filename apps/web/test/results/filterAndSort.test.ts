@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { emptyFilters, filterCards, sortCards } from "@/app/results/filterAndSort";
-import type { ResultsCard } from "@/app/results/types";
+import { emptyFilters, filterCards, sortCards } from "@/app/(shell)/results/filterAndSort";
+import type { ResultsCard } from "@/app/(shell)/results/types";
 
 function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
   return {

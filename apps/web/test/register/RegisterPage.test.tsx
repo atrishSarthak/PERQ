@@ -19,7 +19,7 @@ describe("RegisterPage", () => {
     (window as unknown as { location: { href: string } }).location = { href: "" };
   });
 
-  it("registers then signs in and redirects to /quiz on success", async () => {
+  it("registers then signs in and redirects to /home on success", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => ({ user: { id: "u1", email: "new@perq.test" } }),
@@ -35,7 +35,7 @@ describe("RegisterPage", () => {
     });
     fireEvent.click(screen.getByText("Create account"));
 
-    await waitFor(() => expect(window.location.href).toBe("/quiz"));
+    await waitFor(() => expect(window.location.href).toBe("/home"));
     expect(fetch).toHaveBeenCalledWith(
       "/api/register",
       expect.objectContaining({ method: "POST" })

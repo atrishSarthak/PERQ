@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Chat } from "@/app/results/Chat";
+import { Chat } from "@/app/(shell)/results/Chat";
 
 describe("Chat (DR7 — unboxed MIMIR responses)", () => {
   beforeEach(() => {

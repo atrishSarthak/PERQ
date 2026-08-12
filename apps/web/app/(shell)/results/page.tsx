@@ -13,11 +13,10 @@ import { ResultsView } from "./ResultsView";
  * the same result set; they aren't separate queries") — never re-queried.
  */
 export default async function ResultsPage() {
+  // Auth is enforced by the (shell) layout — this page only needs the
+  // session for its own data queries, not to gate access.
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-  const userId = session.user.id;
+  const userId = session!.user.id;
 
   const [profile] = await db
     .select({ id: userProfile.id, answers: userProfile.answers })

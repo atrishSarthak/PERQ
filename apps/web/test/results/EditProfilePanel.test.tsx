@@ -8,7 +8,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: refreshMock }),
 }));
 
-const { EditProfilePanel } = await import("@/app/results/EditProfilePanel");
+const { EditProfilePanel } = await import("@/app/(shell)/results/EditProfilePanel");
 
 const answers: QuizAnswers = {
   heldCardIds: [],
