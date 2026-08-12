@@ -64,7 +64,17 @@ export function createMimirTools(ctx: MimirToolContext): ToolDefinition[] {
     },
   };
 
-  const getCardDetails: ToolDefinition = {
+  return [getUserProfile, scoreCards, createGetCardDetailsTool(ctx.dbCardsById)];
+}
+
+/**
+ * Standalone getCardDetails tool (D-edge-case: "chat question about a card
+ * outside the top-N shown" — the tool must stay available mid-conversation,
+ * not just at initial scoring). Extracted so /api/chat can reuse it without
+ * needing quiz-submit's full context (answers/profile/scored) it doesn't have.
+ */
+export function createGetCardDetailsTool(dbCardsById: Map<string, DbCard>): ToolDefinition {
+  return {
     name: "getCardDetails",
     description:
       "Returns full details for one specific card by id — use this to compare trade-offs on the top few cards before writing your explanation.",
@@ -78,7 +88,7 @@ export function createMimirTools(ctx: MimirToolContext): ToolDefinition[] {
       if (typeof cardId !== "string") {
         return { error: "cardId is required" };
       }
-      const dbCard = ctx.dbCardsById.get(cardId);
+      const dbCard = dbCardsById.get(cardId);
       if (!dbCard) {
         return { error: `No card found for id ${cardId}` };
       }
@@ -97,6 +107,4 @@ export function createMimirTools(ctx: MimirToolContext): ToolDefinition[] {
       };
     },
   };
-
-  return [getUserProfile, scoreCards, getCardDetails];
 }

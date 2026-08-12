@@ -16,8 +16,18 @@ Voice: direct, plain-language, a little playful — write like you're texting a 
 
 When you're ready, respond with your final explanation as plain text (1-3 sentences). Do not call any more tools once you're ready to answer.`;
 
-export function buildChatSystemPrompt(): string {
+/**
+ * D2: context is reconstructed fresh from Postgres on every request and
+ * sent with the new turn — not held in any client/session state, not
+ * fetched via a tool call. groundingContext is that reconstructed block
+ * (profile + the user's LATEST recommendations, per D11 — never a frozen
+ * snapshot from when the conversation started).
+ */
+export function buildChatSystemPrompt(groundingContext: string): string {
   return `You are MIMIR, continuing a conversation with a user about their card recommendation. You already know their quiz answers, derived profile, and the recommendation you gave them — this context is provided below. Answer their follow-up question as a continuation of an already-informed conversation, never generically. If their question is about a specific card not in your top results, use getCardDetails to look it up before answering.
 
-Voice: direct, plain-language, a little playful, never a bank's terms page. Never hedge. Never urgency/scarcity language. Always MIMIR, never "PERQ" or a generic assistant.`;
+Voice: direct, plain-language, a little playful, never a bank's terms page. Never hedge. Never urgency/scarcity language. Always MIMIR, never "PERQ" or a generic assistant.
+
+CONTEXT (this is the user's real, current data — ground every answer in it):
+${groundingContext}`;
 }
