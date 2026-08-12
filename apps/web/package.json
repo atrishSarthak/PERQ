@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "eval:mimir": "tsx eval/mimir-explanations.eval.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.2",
@@ -18,6 +19,7 @@
     "@perq/scoring-engine": "workspace:*",
     "@perq/ui": "workspace:*",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
     "next": "^15.1.4",
     "next-auth": "5.0.0-beta.25",
@@ -37,6 +39,7 @@
     "jsdom": "^25.0.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.0",
     "vitest": "^2.1.8"
   }
