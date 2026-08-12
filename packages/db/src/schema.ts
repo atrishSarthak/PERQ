@@ -147,7 +147,11 @@ export const recommendations = pgTable(
     // max(source_updated_at) across active cards at compute time (D10) —
     // invalidates the cache when card data changes underneath an unchanged profile.
     cardsVersion: text("cards_version").notNull(),
-    // 'gemini' | 'fallback_template' (D7) — backend-only, no UI surface (DR2).
+    // 'gemini' | 'fallback_template' (D7) | 'template' — backend-only, no
+    // UI surface (DR2). 'template' marks rank>1 rows, which by design never
+    // attempt a Gemini call (only the #1 pick gets the rich explanation,
+    // Perf-B/D9's cost-guardrail spirit) — distinct from 'fallback_template',
+    // which means Gemini genuinely failed for the #1 pick.
     explanationSource: text("explanation_source").notNull().default("gemini"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },

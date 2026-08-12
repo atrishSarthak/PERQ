@@ -197,4 +197,36 @@ describe("runGeminiAgent", () => {
 
     expect(events).toEqual(["tool_call", "tool_result", "final"]);
   });
+
+  it("includes the tool call's args and result on step events for narration enrichment", async () => {
+    const getCardDetails = vi.fn().mockResolvedValue({ name: "Axis Airtel" });
+    const tools = [makeTool("getCardDetails", getCardDetails)];
+    const callModel: ModelCaller = vi
+      .fn()
+      .mockResolvedValueOnce({
+        type: "function_calls",
+        calls: [{ name: "getCardDetails", args: { cardId: "axis-airtel" } }],
+      })
+      .mockResolvedValueOnce({ type: "text", text: "done" });
+
+    const events: Array<Record<string, unknown>> = [];
+    await runGeminiAgent({
+      systemPrompt: "sys",
+      history: [],
+      tools,
+      callModel,
+      onStep: (e) => events.push(e as unknown as Record<string, unknown>),
+    });
+
+    expect(events[0]).toMatchObject({
+      type: "tool_call",
+      toolName: "getCardDetails",
+      args: { cardId: "axis-airtel" },
+    });
+    expect(events[1]).toMatchObject({
+      type: "tool_result",
+      toolName: "getCardDetails",
+      result: { name: "Axis Airtel" },
+    });
+  });
 });

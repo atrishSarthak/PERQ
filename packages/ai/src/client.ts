@@ -8,9 +8,14 @@ import type {
 
 // PRD §3/§15: pin the exact model identifier and confirm current free-tier
 // quota (RPM/RPD/TPM) in Google AI Studio at implementation time — don't
-// hardcode a number that will go stale. Overridable via GEMINI_MODEL so a
-// quota/model change doesn't require a code change.
-const DEFAULT_MODEL = "gemini-2.0-flash";
+// hardcode a number that will go stale. Verified against the live API
+// (2026-08-12): "gemini-2.0-flash" is already deprecated/removed
+// (404 "no longer available"). "gemini-flash-latest" is Google's own
+// maintained alias to the current recommended Flash-tier model — it
+// resolves the staleness problem structurally rather than requiring a
+// code change every time Google rotates model names. Still overridable
+// via GEMINI_MODEL for a deliberate pin later.
+const DEFAULT_MODEL = "gemini-flash-latest";
 
 // Our own JsonSchema stays SDK-agnostic (types.ts has zero external
 // dependencies) — this is the one place that adapts it to the genai SDK's
@@ -56,6 +61,17 @@ export function createGeminiModelCaller(
           ]
         : []),
     ];
+
+    // Gemini requires at least one content turn — a caller with no chat
+    // history and no tool results yet (the very first call of a fresh
+    // agent run) would otherwise send an empty array and get a 400.
+    // systemInstruction alone isn't a turn.
+    if (contents.length === 0) {
+      contents.push({
+        role: "user" as const,
+        parts: [{ text: "Begin." }],
+      });
+    }
 
     const response = await client.models.generateContent({
       model: modelName,

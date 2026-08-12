@@ -73,10 +73,10 @@ export async function runGeminiAgent(
     // one turn; round the results back in a single follow-up, not one at a
     // time per call).
     for (const call of output.calls) {
-      onStep?.({ type: "tool_call", toolName: call.name, round });
+      onStep?.({ type: "tool_call", toolName: call.name, round, args: call.args });
       const result = await executeTool(tools, call);
       accumulatedToolResults.push({ name: call.name, result });
-      onStep?.({ type: "tool_result", toolName: call.name, round });
+      onStep?.({ type: "tool_result", toolName: call.name, round, result });
     }
   }
 

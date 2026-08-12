@@ -47,6 +47,19 @@ const nextAuth: NextAuthResult = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    // JWT sessions don't carry the DB user id onto session.user by default —
+    // requireAuth() (2A) depends on session.user.id being present, so it
+    // has to be threaded through explicitly here.
+    async jwt({ token, user }) {
+      if (user) token.sub = user.id;
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token.sub) session.user.id = token.sub;
+      return session;
+    },
+  },
 });
 
 export const handlers: NextAuthResult["handlers"] = nextAuth.handlers;

@@ -47,8 +47,8 @@ export interface ModelCallInput {
 export type ModelCaller = (input: ModelCallInput) => Promise<ModelCallOutput>;
 
 export type AgentStepEvent =
-  | { type: "tool_call"; toolName: string; round: number }
-  | { type: "tool_result"; toolName: string; round: number }
+  | { type: "tool_call"; toolName: string; round: number; args: Record<string, unknown> }
+  | { type: "tool_result"; toolName: string; round: number; result: unknown }
   | { type: "final"; round: number };
 
 export interface RunGeminiAgentParams {
