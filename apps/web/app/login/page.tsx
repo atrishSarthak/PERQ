@@ -20,7 +20,10 @@ export default function LoginPage() {
       setError("Couldn't sign you in — check your email and password.");
       return;
     }
-    window.location.href = "/";
+    // /quiz itself redirects to /results if a profile already exists
+    // (§11) — so this one target correctly routes both new and
+    // returning users without this page needing to know which.
+    window.location.href = "/quiz";
   }
 
   return (
@@ -51,6 +54,9 @@ export default function LoginPage() {
           Sign in
         </button>
       </form>
+      <a href="/register" className="font-body text-body-sm text-accent">
+        New here? Create an account
+      </a>
     </main>
   );
 }
