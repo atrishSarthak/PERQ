@@ -167,6 +167,20 @@ describe("computeAndPersistRecommendations — previousTopCard guard (§9.5)", (
     expect(result.explanationSource).toBe("gemini");
   });
 
+  it("D7: falls back to the template explanation when runGeminiAgent throws (429/network error), rather than crashing the whole request", async () => {
+    runGeminiAgentMock.mockRejectedValue(new Error("got status: 429 Too Many Requests"));
+
+    const result = await computeAndPersistRecommendations("user-1", answers);
+
+    expect(result.explanationSource).toBe("fallback_template");
+    expect(result.recommendationCount).toBeGreaterThan(0);
+    const topRow = (
+      dbState.insertedRows as { rank: number; explanation: string; explanationSource: string }[]
+    ).find((r) => r.rank === 1);
+    expect(topRow?.explanationSource).toBe("fallback_template");
+    expect(topRow?.explanation).toContain("MIMIR recommends");
+  });
+
   it("calls Gemini on a fresh quiz-submit with no previousTopCard at all", async () => {
     runGeminiAgentMock.mockResolvedValue({
       finalText: "Fresh explanation",

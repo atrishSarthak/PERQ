@@ -97,27 +97,40 @@ export async function computeAndPersistRecommendations(
   } else {
     const tools = createMimirTools({ answers, profile, scored: eligible, dbCardsById });
 
-    const agentResult = await runGeminiAgent({
-      systemPrompt: EXPLANATION_SYSTEM_PROMPT,
-      history: [
-        {
-          role: "user",
-          content:
-            "Write MIMIR's explanation for this user's #1 recommended card now.",
+    // D7 requires the feature to degrade gracefully on ANY Gemini failure
+    // (network error, 429 quota exhaustion, 5xx) — not just the cappedOut
+    // case. runGeminiAgent's callModel throws on a non-2xx response (the
+    // SDK's own behavior); without this try/catch that exception would
+    // propagate straight out of computeAndPersistRecommendations and crash
+    // the whole request with no ranked list at all, exactly what D7 exists
+    // to prevent. Caught live during E2E verification by genuinely
+    // exhausting the free-tier daily quota mid-session (see T14/T19).
+    let agentResult: Awaited<ReturnType<typeof runGeminiAgent>> | null = null;
+    try {
+      agentResult = await runGeminiAgent({
+        systemPrompt: EXPLANATION_SYSTEM_PROMPT,
+        history: [
+          {
+            role: "user",
+            content:
+              "Write MIMIR's explanation for this user's #1 recommended card now.",
+          },
+        ],
+        tools,
+        callModel: createGeminiModelCaller(requireGeminiKey()),
+        onStep: (event: AgentStepEvent) => {
+          const label = narrationLabelForStep(
+            event,
+            (cardId) => dbCardsById.get(cardId)?.name
+          );
+          if (label) onNarrationStep?.(label);
         },
-      ],
-      tools,
-      callModel: createGeminiModelCaller(requireGeminiKey()),
-      onStep: (event: AgentStepEvent) => {
-        const label = narrationLabelForStep(
-          event,
-          (cardId) => dbCardsById.get(cardId)?.name
-        );
-        if (label) onNarrationStep?.(label);
-      },
-    });
+      });
+    } catch {
+      agentResult = null; // falls through to the D7 fallback below
+    }
 
-    if (agentResult.finalText && !agentResult.cappedOut) {
+    if (agentResult?.finalText && !agentResult.cappedOut) {
       topExplanation = agentResult.finalText;
       explanationSource = "gemini";
     } else {

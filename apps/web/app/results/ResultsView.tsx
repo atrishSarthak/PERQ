@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { ResultsCard } from "./types";
 import { emptyFilters, filterCards, sortCards, type SortMode } from "./filterAndSort";
+import { Chat } from "./Chat";
 
 const NETWORKS = ["Visa", "Mastercard", "RuPay", "Amex"];
 const CATEGORY_TAGS: { key: string; label: string }[] = [
@@ -224,6 +225,8 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
             </ul>
           </>
         )}
+
+        <Chat />
       </main>
     </div>
   );
