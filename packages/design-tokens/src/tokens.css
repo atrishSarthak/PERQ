@@ -1,0 +1,77 @@
+/*
+ * PERQ Design Tokens — locked values from PERQ_Design_System.md.
+ * Imported once, globally, by apps/web. Never invent a new color, font,
+ * or spacing value outside this file (Design System doc, header note).
+ */
+
+:root {
+  /* Primitives (§2, locked) */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-accent: #00a1ff;
+
+  /* Semantic tokens — light mode default (§2) */
+  --bg-base: #ffffff;
+  --bg-surface: #f7f7f8;
+  --text-primary: #000000;
+  --text-secondary: #5c5c63;
+  --accent: #00a1ff;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --border: #e5e5e8;
+
+  /* Typography scale (§3) */
+  --font-display: "Cabinet Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --text-display-size: 48px; /* 40-56px range, mid value */
+  --text-h1-size: 32px;
+  --text-h2-size: 24px;
+  --text-body-lg-size: 18px;
+  --text-body-size: 16px;
+  --text-body-sm-size: 14px;
+  --text-caption-size: 12px;
+
+  /* Spacing scale — 4px base unit (§4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius (§4) — rounded but not pill-shaped */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+/* Dark mode via prefers-color-scheme, honoring an explicit override (§2) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-base: #000000;
+    --bg-surface: #0d0d0f;
+    --text-primary: #ffffff;
+    --text-secondary: #a6a6ad;
+    --accent: #00a1ff;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --border: #232326;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg-base: #000000;
+  --bg-surface: #0d0d0f;
+  --text-primary: #ffffff;
+  --text-secondary: #a6a6ad;
+  --accent: #00a1ff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --border: #232326;
+}
