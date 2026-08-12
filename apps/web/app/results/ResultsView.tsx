@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
 import { emptyFilters, filterCards, sortCards, type ResultsFilters, type SortMode } from "./filterAndSort";
 import { Chat } from "./Chat";
+import { EditProfilePanel } from "./EditProfilePanel";
 
 const NETWORKS = ["Visa", "Mastercard", "RuPay", "Amex"];
 const CATEGORY_TAGS: { key: string; label: string }[] = [
@@ -14,7 +16,7 @@ const CATEGORY_TAGS: { key: string; label: string }[] = [
   { key: "ecommerce", label: "Shopping" },
 ];
 
-export function ResultsView({ cards }: { cards: ResultsCard[] }) {
+export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers: QuizAnswers }) {
   const [filters, setFilters] = useState(emptyFilters());
   const [sortMode, setSortMode] = useState<SortMode>("best-match");
   const [arsenal, setArsenal] = useState<Record<string, "held" | "not_held" | undefined>>(
@@ -69,6 +71,11 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
     (filters.zeroFeeOnly ? 1 : 0) +
     (filters.showHeldOnly ? 1 : 0);
 
+  const cardOptions = useMemo(
+    () => cards.map((c) => ({ value: c.cardId, label: `${c.issuer} ${c.name}` })),
+    [cards]
+  );
+
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6 md:flex-row">
       {/* Desktop: always-visible sidebar (DR8 — unaffected below md, where
@@ -83,6 +90,9 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
       </aside>
 
       <main className="flex-1 space-y-6">
+        {/* §11: "Edit my profile" panel — all 13 answers, independently editable. */}
+        <EditProfilePanel answers={answers} cardOptions={cardOptions} />
+
         <div className="flex items-center justify-between gap-2">
           <div className="flex gap-2" role="tablist">
             {(

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db, cards, recommendations, userCardArsenal, userProfile } from "@perq/db";
+import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
 import { ResultsView } from "./ResultsView";
 
@@ -19,7 +20,7 @@ export default async function ResultsPage() {
   const userId = session.user.id;
 
   const [profile] = await db
-    .select({ id: userProfile.id })
+    .select({ id: userProfile.id, answers: userProfile.answers })
     .from(userProfile)
     .where(eq(userProfile.userId, userId))
     .limit(1);
@@ -57,5 +58,5 @@ export default async function ResultsPage() {
     };
   });
 
-  return <ResultsView cards={resultsCards} />;
+  return <ResultsView cards={resultsCards} answers={profile.answers as QuizAnswers} />;
 }

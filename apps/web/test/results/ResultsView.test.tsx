@@ -1,8 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { ResultsView } from "@/app/results/ResultsView";
 import type { ResultsCard } from "@/app/results/types";
+import type { QuizAnswers } from "@perq/scoring-engine";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+}));
+
+const { ResultsView } = await import("@/app/results/ResultsView");
 
 function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
   return {
@@ -20,31 +26,47 @@ function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
   };
 }
 
+const mockAnswers: QuizAnswers = {
+  heldCardIds: [],
+  annualIncome: "6-12l",
+  flightFrequency: "never",
+  hotelFrequency: "never",
+  gymMembership: { active: false, monthlyCost: null },
+  foodDeliverySpend: "1-3k",
+  ecommerceSpend: "1-3k",
+  grocerySpend: "1-3k",
+  diningOutSpend: "1-3k",
+  fuelSpend: "1-3k",
+  recurringBillsByCard: false,
+  feeTolerant: true,
+  priorityCategories: [],
+};
+
 describe("ResultsView — DR8 mobile filter drawer", () => {
   beforeEach(() => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }));
   });
 
   it("does not show the drawer dialog by default", () => {
-    render(<ResultsView cards={[makeCard()]} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("opens the drawer on clicking the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
     fireEvent.click(screen.getByText(/^Filters/));
     expect(screen.getByRole("dialog", { name: "Filters" })).toBeInTheDocument();
   });
 
   it("closes the drawer on Done", () => {
-    render(<ResultsView cards={[makeCard()]} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
     fireEvent.click(screen.getByText(/^Filters/));
     fireEvent.click(screen.getByText("Done"));
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("closes the drawer on backdrop click", () => {
-    render(<ResultsView cards={[makeCard()]} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const backdrop = dialog.previousElementSibling as HTMLElement;
@@ -59,6 +81,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
           makeCard({ cardId: "a", network: "Visa" }),
           makeCard({ cardId: "b", network: "RuPay", name: "Card B" }),
         ]}
+        answers={mockAnswers}
       />
     );
     fireEvent.click(screen.getByText(/^Filters/));
@@ -75,7 +98,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("shows the active filter count on the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const visaButtons = screen.getAllByText("Visa");
