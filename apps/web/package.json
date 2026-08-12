@@ -1,0 +1,39 @@
+{
+  "name": "@perq/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@auth/core": "0.37.2",
+    "@auth/drizzle-adapter": "^1.7.4",
+    "@perq/ai": "workspace:*",
+    "@perq/db": "workspace:*",
+    "@perq/design-tokens": "workspace:*",
+    "@perq/scoring-engine": "workspace:*",
+    "@perq/ui": "workspace:*",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.38.3",
+    "next": "^15.1.4",
+    "next-auth": "5.0.0-beta.25",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@perq/config": "workspace:*",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  }
+}

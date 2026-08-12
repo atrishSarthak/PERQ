@@ -22,6 +22,10 @@ export const users = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
+  // bcrypt hash, nullable — null for a future Google-OAuth-only user (PRD §6
+  // suggests email/password to start, Google OAuth as an easy low-friction
+  // add later; not a blocking decision either way).
+  passwordHash: text("password_hash"),
 });
 
 export const accounts = pgTable(
