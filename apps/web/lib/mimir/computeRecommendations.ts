@@ -18,14 +18,31 @@ export interface ComputeRecommendationsResult {
   topCardId: string;
   explanationSource: "gemini" | "fallback_template";
   recommendationCount: number;
+  topCardChanged: boolean;
+}
+
+export interface PreviousTopCard {
+  cardId: string;
+  explanation: string;
+  explanationSource: "gemini" | "fallback_template";
 }
 
 /**
  * The shared pipeline behind both quiz-submit (T6) and profile-edit
- * re-scoring (T8): load cards, score deterministically (D1), check the
- * explanation cache (D6/D10), run the Gemini agent only on a cache miss,
- * fall back to a template on failure/cap-exceeded (D7), then delete-and-
- * replace the user's recommendations (D14).
+ * re-scoring (T8): load cards, score deterministically (D1), then decide
+ * whether a fresh Gemini call is needed at all — two independent guards,
+ * per §9.5 and D6:
+ *
+ *   1. previousTopCard (edit flow only): if the #1 card hasn't changed,
+ *      reuse its existing explanation verbatim — no cache lookup, no
+ *      Gemini call, regardless of whether other spend numbers shifted
+ *      slightly. This is the §9.5 guard, and it fires BEFORE the D6 check.
+ *   2. D6/D10 cache (both flows): if the #1 card changed (or this is a
+ *      fresh quiz-submit with no previous state), check whether this exact
+ *      profile+cards combination was already explained before reusing it.
+ *
+ * Falls back to a template on failure/cap-exceeded (D7), then delete-and-
+ * replaces the user's recommendations (D14).
  *
  * onNarrationStep is called with a display label for each real event, in
  * order — the SSE route handler forwards these directly (D3, revised).
@@ -33,7 +50,8 @@ export interface ComputeRecommendationsResult {
 export async function computeAndPersistRecommendations(
   userId: string,
   answers: QuizAnswers,
-  onNarrationStep?: (label: string) => void
+  onNarrationStep?: (label: string) => void,
+  previousTopCard?: PreviousTopCard
 ): Promise<ComputeRecommendationsResult> {
   const activeCards = await db.select().from(cards).where(eq(cards.status, "active"));
   const dbCardsById = new Map<string, DbCard>(activeCards.map((c) => [c.id, c]));
@@ -49,19 +67,31 @@ export async function computeAndPersistRecommendations(
     // empty-recommendations state. Not explicitly specced (edge case beyond
     // the locked plan), so fail soft rather than 500.
     await db.delete(recommendations).where(eq(recommendations.userId, userId));
-    return { topCardId: "", explanationSource: "fallback_template", recommendationCount: 0 };
+    return {
+      topCardId: "",
+      explanationSource: "fallback_template",
+      recommendationCount: 0,
+      topCardChanged: true,
+    };
   }
 
   const profileHash = computeProfileHash(answers);
   const cardsVersion = computeCardsVersion(activeCards);
   const topScored = eligible[0]!;
+  const topCardChanged = previousTopCard ? previousTopCard.cardId !== topScored.card.id : true;
 
   const cached = await findCachedTopExplanation(userId, profileHash, cardsVersion);
 
   let topExplanation: string;
   let explanationSource: "gemini" | "fallback_template";
 
-  if (cached && cached.cardId === topScored.card.id) {
+  if (previousTopCard && !topCardChanged) {
+    // §9.5: #1 unchanged — reuse the existing explanation as-is, don't even
+    // check the D6 cache. Preserves whatever the prior source actually was
+    // (don't relabel a past fallback as a real Gemini explanation).
+    topExplanation = previousTopCard.explanation;
+    explanationSource = previousTopCard.explanationSource;
+  } else if (cached && cached.cardId === topScored.card.id) {
     topExplanation = cached.explanation;
     explanationSource = "gemini"; // a cache hit only ever reuses a prior real explanation
   } else {
@@ -135,6 +165,7 @@ export async function computeAndPersistRecommendations(
     topCardId: topScored.card.id,
     explanationSource,
     recommendationCount: rows.length,
+    topCardChanged,
   };
 }
 
