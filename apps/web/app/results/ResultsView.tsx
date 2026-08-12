@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ResultsCard } from "./types";
-import { emptyFilters, filterCards, sortCards, type SortMode } from "./filterAndSort";
+import { emptyFilters, filterCards, sortCards, type ResultsFilters, type SortMode } from "./filterAndSort";
 import { Chat } from "./Chat";
 
 const NETWORKS = ["Visa", "Mastercard", "RuPay", "Amex"];
@@ -21,6 +21,10 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
     Object.fromEntries(cards.map((c) => [c.cardId, c.arsenalStatus]))
   );
   const [pendingCardId, setPendingCardId] = useState<string | null>(null);
+  // DR8: below 768px, the sidebar becomes a "Filters" button opening a
+  // bottom-sheet drawer instead — irrelevant at md+ where the aside is
+  // always visible inline, so this state simply has no effect there.
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const issuers = useMemo(() => [...new Set(cards.map((c) => c.issuer))].sort(), [cards]);
   const hasHeldCards = useMemo(() => Object.values(arsenal).some((s) => s === "held"), [arsenal]);
@@ -58,135 +62,59 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
     }
   }
 
-  function toggleSetMember(set: Set<string>, value: string): Set<string> {
-    const next = new Set(set);
-    if (next.has(value)) next.delete(value);
-    else next.add(value);
-    return next;
-  }
+  const activeFilterCount =
+    filters.networks.size +
+    filters.issuers.size +
+    filters.categories.size +
+    (filters.zeroFeeOnly ? 1 : 0) +
+    (filters.showHeldOnly ? 1 : 0);
 
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6 md:flex-row">
-      <aside className="w-full shrink-0 space-y-6 md:w-64">
-        <div>
-          <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">
-            Network
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {NETWORKS.map((n) => (
-              <button
-                key={n}
-                onClick={() =>
-                  setFilters((f) => ({ ...f, networks: toggleSetMember(f.networks, n) }))
-                }
-                className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                  filters.networks.has(n) ? "bg-accent text-white" : "text-text-secondary"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">
-            Issuer
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {issuers.map((issuer) => (
-              <button
-                key={issuer}
-                onClick={() =>
-                  setFilters((f) => ({ ...f, issuers: toggleSetMember(f.issuers, issuer) }))
-                }
-                className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                  filters.issuers.has(issuer) ? "bg-accent text-white" : "text-text-secondary"
-                }`}
-              >
-                {issuer}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">
-            Category
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORY_TAGS.map((tag) => (
-              <button
-                key={tag.key}
-                onClick={() =>
-                  setFilters((f) => ({
-                    ...f,
-                    categories: toggleSetMember(f.categories, tag.key),
-                  }))
-                }
-                className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                  filters.categories.has(tag.key) ? "bg-accent text-white" : "text-text-secondary"
-                }`}
-              >
-                {tag.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <label className="flex items-center gap-2 text-body-sm text-text-primary">
-          <input
-            type="checkbox"
-            checked={filters.zeroFeeOnly}
-            onChange={(e) => setFilters((f) => ({ ...f, zeroFeeOnly: e.target.checked }))}
-          />
-          ₹0 joining fee only
-        </label>
-
-        {/* DR3: disabled-with-helper-text empty arsenal state, not hidden */}
-        <label
-          className={`flex items-center gap-2 text-body-sm ${
-            hasHeldCards ? "text-text-primary" : "text-text-secondary"
-          }`}
-        >
-          <input
-            type="checkbox"
-            disabled={!hasHeldCards}
-            checked={filters.showHeldOnly}
-            onChange={(e) => setFilters((f) => ({ ...f, showHeldOnly: e.target.checked }))}
-          />
-          Show cards I already hold
-        </label>
-        {!hasHeldCards && (
-          <p className="text-caption text-text-secondary">
-            Add a card from your results below to start building your arsenal.
-          </p>
-        )}
+      {/* Desktop: always-visible sidebar (DR8 — unaffected below md, where
+          it's hidden in favor of the drawer). */}
+      <aside className="hidden md:block md:w-64 md:shrink-0">
+        <FiltersPanel
+          filters={filters}
+          setFilters={setFilters}
+          issuers={issuers}
+          hasHeldCards={hasHeldCards}
+        />
       </aside>
 
       <main className="flex-1 space-y-6">
-        <div className="flex gap-2" role="tablist">
-          {(
-            [
-              ["best-match", "Best Match"],
-              ["lowest-fee", "Lowest Fee"],
-              ["highest-rewards", "Highest Rewards"],
-            ] as [SortMode, string][]
-          ).map(([mode, label]) => (
-            <button
-              key={mode}
-              role="tab"
-              aria-selected={sortMode === mode}
-              onClick={() => setSortMode(mode)}
-              className={`rounded-md px-3 py-1.5 font-body text-body-sm ${
-                sortMode === mode
-                  ? "bg-accent text-white"
-                  : "border border-border text-text-secondary"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-2" role="tablist">
+            {(
+              [
+                ["best-match", "Best Match"],
+                ["lowest-fee", "Lowest Fee"],
+                ["highest-rewards", "Highest Rewards"],
+              ] as [SortMode, string][]
+            ).map(([mode, label]) => (
+              <button
+                key={mode}
+                role="tab"
+                aria-selected={sortMode === mode}
+                onClick={() => setSortMode(mode)}
+                className={`rounded-md px-3 py-1.5 font-body text-body-sm ${
+                  sortMode === mode
+                    ? "bg-accent text-white"
+                    : "border border-border text-text-secondary"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* DR8: mobile-only "Filters" button, opens the bottom-sheet drawer. */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="rounded-md border border-border px-3 py-1.5 font-body text-body-sm text-text-primary md:hidden"
+          >
+            Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+          </button>
         </div>
 
         {sorted.length === 0 ? (
@@ -228,6 +156,149 @@ export function ResultsView({ cards }: { cards: ResultsCard[] }) {
 
         <Chat />
       </main>
+
+      {/* DR8: mobile bottom-sheet drawer. md:hidden keeps this entirely out
+          of the desktop layout regardless of drawerOpen. */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setDrawerOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            role="dialog"
+            aria-label="Filters"
+            className="absolute inset-x-0 bottom-0 overflow-y-auto rounded-t-lg p-4"
+            style={{ height: "80vh", backgroundColor: "var(--bg-base)" }}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="font-display text-h2 text-text-primary">Filters</h2>
+              <button
+                onClick={() => setDrawerOpen(false)}
+                className="rounded-md border border-border px-3 py-1.5 font-body text-body-sm text-text-primary"
+              >
+                Done
+              </button>
+            </div>
+            <FiltersPanel
+              filters={filters}
+              setFilters={setFilters}
+              issuers={issuers}
+              hasHeldCards={hasHeldCards}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function toggleSetMember(set: Set<string>, value: string): Set<string> {
+  const next = new Set(set);
+  if (next.has(value)) next.delete(value);
+  else next.add(value);
+  return next;
+}
+
+function FiltersPanel({
+  filters,
+  setFilters,
+  issuers,
+  hasHeldCards,
+}: {
+  filters: ResultsFilters;
+  setFilters: (updater: (f: ResultsFilters) => ResultsFilters) => void;
+  issuers: string[];
+  hasHeldCards: boolean;
+}) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Network</h2>
+        <div className="flex flex-wrap gap-2">
+          {NETWORKS.map((n) => (
+            <button
+              key={n}
+              onClick={() =>
+                setFilters((f) => ({ ...f, networks: toggleSetMember(f.networks, n) }))
+              }
+              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
+                filters.networks.has(n) ? "bg-accent text-white" : "text-text-secondary"
+              }`}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Issuer</h2>
+        <div className="flex flex-wrap gap-2">
+          {issuers.map((issuer) => (
+            <button
+              key={issuer}
+              onClick={() =>
+                setFilters((f) => ({ ...f, issuers: toggleSetMember(f.issuers, issuer) }))
+              }
+              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
+                filters.issuers.has(issuer) ? "bg-accent text-white" : "text-text-secondary"
+              }`}
+            >
+              {issuer}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Category</h2>
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_TAGS.map((tag) => (
+            <button
+              key={tag.key}
+              onClick={() =>
+                setFilters((f) => ({ ...f, categories: toggleSetMember(f.categories, tag.key) }))
+              }
+              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
+                filters.categories.has(tag.key) ? "bg-accent text-white" : "text-text-secondary"
+              }`}
+            >
+              {tag.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <label className="flex items-center gap-2 text-body-sm text-text-primary">
+        <input
+          type="checkbox"
+          checked={filters.zeroFeeOnly}
+          onChange={(e) => setFilters((f) => ({ ...f, zeroFeeOnly: e.target.checked }))}
+        />
+        ₹0 joining fee only
+      </label>
+
+      {/* DR3: disabled-with-helper-text empty arsenal state, not hidden */}
+      <label
+        className={`flex items-center gap-2 text-body-sm ${
+          hasHeldCards ? "text-text-primary" : "text-text-secondary"
+        }`}
+      >
+        <input
+          type="checkbox"
+          disabled={!hasHeldCards}
+          checked={filters.showHeldOnly}
+          onChange={(e) => setFilters((f) => ({ ...f, showHeldOnly: e.target.checked }))}
+        />
+        Show cards I already hold
+      </label>
+      {!hasHeldCards && (
+        <p className="text-caption text-text-secondary">
+          Add a card from your results below to start building your arsenal.
+        </p>
+      )}
     </div>
   );
 }
