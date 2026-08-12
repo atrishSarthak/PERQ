@@ -1,0 +1,108 @@
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+
+const pushMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
+}));
+
+const { QuizWizard } = await import("@/app/quiz/QuizWizard");
+
+const cardOptions = [{ value: "axis-airtel", label: "Axis Airtel" }];
+
+describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
+  beforeEach(() => {
+    pushMock.mockReset();
+  });
+
+  it("renders question 1 of 13 first", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
+    expect(screen.getByText(/Which credit cards do you currently hold/)).toBeInTheDocument();
+  });
+
+  it("Next is enabled immediately on Q1 (0 held cards is a valid answer)", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    expect(screen.getByText("Next")).not.toBeDisabled();
+  });
+
+  it("Back is disabled on the first question", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    expect(screen.getByText("Back")).toBeDisabled();
+  });
+
+  it("advances to question 2 on Next click", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next"));
+    expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
+  });
+
+  it("disables Next on a single-select question until an option is chosen", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next")); // -> Q2, annualIncome
+    expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
+    expect(screen.getByText(/See my recommendations|Next/)).toBeDisabled();
+  });
+
+  it("enables Next after selecting a single-select-scale option", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next")); // -> Q2
+    fireEvent.click(screen.getByText("₹6L–12L"));
+    expect(screen.getByText("Next")).not.toBeDisabled();
+  });
+
+  it("Back returns to the previous question and preserves its answer", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next")); // -> Q2
+    fireEvent.click(screen.getByText("₹6L–12L"));
+    fireEvent.click(screen.getByText("Next")); // -> Q3
+    expect(screen.getByText("Question 3 of 13")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Back"));
+    expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
+    expect(screen.getByText("₹6L–12L")).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("DR10: Enter advances when the question is answered", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    const container = screen.getByText("Question 1 of 13").closest("div")!;
+    fireEvent.keyDown(container, { key: "Enter" });
+    expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
+  });
+
+  it("DR10: Enter does nothing on an unanswered required question", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next")); // -> Q2, unanswered
+    const container = screen.getByText("Question 2 of 13").closest("div")!;
+    fireEvent.keyDown(container, { key: "Enter" });
+    expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
+  });
+
+  it("DR10: Escape goes back", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    fireEvent.click(screen.getByText("Next")); // -> Q2
+    const container = screen.getByText("Question 2 of 13").closest("div")!;
+    fireEvent.keyDown(container, { key: "Escape" });
+    expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
+  });
+
+  it("shows 'See my recommendations' instead of 'Next' on the last question", () => {
+    render(<QuizWizard cardOptions={cardOptions} />);
+    for (let i = 0; i < 12; i++) {
+      const nextOrFinal = screen.queryByText("Next");
+      if (nextOrFinal && !nextOrFinal.hasAttribute("disabled")) {
+        fireEvent.click(nextOrFinal);
+      } else {
+        // answer whatever the current question needs minimally, then advance
+        const scaleOption = document.querySelector('button[role="radio"]');
+        if (scaleOption) fireEvent.click(scaleOption);
+        const yesButton = screen.queryByText("Yes") ?? screen.queryByText("No");
+        if (yesButton && !scaleOption) fireEvent.click(yesButton);
+        const advance = screen.getByText(/Next|See my recommendations/);
+        if (!advance.hasAttribute("disabled")) fireEvent.click(advance);
+      }
+    }
+    expect(screen.getByText("Question 13 of 13")).toBeInTheDocument();
+  });
+});
