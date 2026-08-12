@@ -95,9 +95,17 @@ export function QuizWizard({ cardOptions }: { cardOptions: CardOption[] }) {
         annualIncome: answers.annualIncome as QuizAnswers["annualIncome"],
         flightFrequency: answers.flightFrequency as QuizAnswers["flightFrequency"],
         hotelFrequency: answers.hotelFrequency as QuizAnswers["hotelFrequency"],
-        gymMembership: (answers.gymMembership as QuizAnswers["gymMembership"]) ?? {
-          active: false,
-          monthlyCost: null,
+        // The YesNoWithConditional widget's value shape is {active, amount}
+        // (packages/ui, generic — no knowledge of QuizAnswers' field names).
+        // QuizAnswers.gymMembership is {active, monthlyCost}. This must be
+        // an explicit field mapping, not a cast — casting silently drops
+        // monthlyCost from the payload entirely, which is exactly the bug
+        // that produced a real "Quiz submission failed" for a real user:
+        // the server's zod schema requires monthlyCost and got undefined.
+        gymMembership: {
+          active: (answers.gymMembership as { active?: boolean } | undefined)?.active ?? false,
+          monthlyCost:
+            (answers.gymMembership as { amount?: number | null } | undefined)?.amount ?? null,
         },
         foodDeliverySpend: answers.foodDeliverySpend as QuizAnswers["foodDeliverySpend"],
         ecommerceSpend: answers.ecommerceSpend as QuizAnswers["ecommerceSpend"],

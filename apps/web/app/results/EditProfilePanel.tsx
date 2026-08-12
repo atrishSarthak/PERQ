@@ -128,10 +128,25 @@ export function EditProfilePanel({
                   value={
                     q.key === "recurringBillsByCard"
                       ? { active: Boolean(currentValue), amount: null }
-                      : (currentValue as { active: boolean; amount: number | null })
+                      : // The widget's shape is {active, amount}; QuizAnswers.gymMembership
+                        // is {active, monthlyCost} — explicit field mapping, not a cast
+                        // (same bug class as QuizWizard's submit(): a cast here silently
+                        // shows a blank amount even when monthlyCost has a real value).
+                        {
+                          active:
+                            (currentValue as { active?: boolean } | undefined)?.active ?? false,
+                          amount:
+                            (currentValue as { monthlyCost?: number | null } | undefined)
+                              ?.monthlyCost ?? null,
+                        }
                   }
                   onChange={(v) =>
-                    saveField(q.key, q.key === "recurringBillsByCard" ? v.active : v)
+                    saveField(
+                      q.key,
+                      q.key === "recurringBillsByCard"
+                        ? v.active
+                        : { active: v.active, monthlyCost: v.amount }
+                    )
                   }
                   conditionalLabel={q.conditionalLabel}
                   name={q.key}

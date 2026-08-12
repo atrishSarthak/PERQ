@@ -114,4 +114,36 @@ describe("EditProfilePanel (PRD §11)", () => {
     fireEvent.click(screen.getByText("Done"));
     expect(screen.queryByText(/Monthly fuel spend/)).not.toBeInTheDocument();
   });
+
+  it("regression: displays the stored monthlyCost as the widget's amount field (same field-name bug as QuizWizard, read side)", () => {
+    render(
+      <EditProfilePanel
+        answers={{ ...answers, gymMembership: { active: true, monthlyCost: 2200 } }}
+        cardOptions={[]}
+      />
+    );
+    fireEvent.click(screen.getByText("Edit my profile"));
+    expect(screen.getByRole("spinbutton")).toHaveValue(2200);
+  });
+
+  it("regression: PATCHes gymMembership as {active, monthlyCost}, not the widget's {active, amount} shape (write side)", async () => {
+    render(
+      <EditProfilePanel
+        answers={{ ...answers, gymMembership: { active: false, monthlyCost: null } }}
+        cardOptions={[]}
+      />
+    );
+    fireEvent.click(screen.getByText("Edit my profile"));
+    const gymPrompt = screen.getByText(/Active gym\/fitness membership/);
+    const gymSection = gymPrompt.closest("div")!;
+    const yesInSection = screen.getAllByText("Yes").find((el) => gymSection.contains(el))!;
+    fireEvent.click(yesInSection);
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(JSON.parse(options.body)).toEqual({
+      field: "gymMembership",
+      value: { active: true, monthlyCost: null },
+    });
+  });
 });

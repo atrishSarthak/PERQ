@@ -105,4 +105,50 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
     }
     expect(screen.getByText("Question 13 of 13")).toBeInTheDocument();
   });
+
+  it("regression: submits gymMembership as {active, monthlyCost}, not the widget's {active, amount} shape (real bug found live — the server's zod schema requires monthlyCost and silently got undefined)", async () => {
+    function fakeSSEBody() {
+      const encoder = new TextEncoder();
+      return new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(encoder.encode(`data: {"type":"done","topCardId":"x"}\n\n`));
+          controller.close();
+        },
+      });
+    }
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, body: fakeSSEBody() });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<QuizWizard cardOptions={cardOptions} />);
+
+    // Q1 heldCardIds — 0 selections is valid, just advance.
+    fireEvent.click(screen.getByText("Next"));
+    // Q2 annualIncome, Q3 flightFrequency, Q4 hotelFrequency — any scale option.
+    for (let i = 0; i < 3; i++) {
+      fireEvent.click(document.querySelector('button[role="radio"]')!);
+      fireEvent.click(screen.getByText("Next"));
+    }
+    // Q5 gymMembership — click Yes, fill in a real monthly cost.
+    fireEvent.click(screen.getByText("Yes"));
+    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "1500" } });
+    fireEvent.click(screen.getByText("Next"));
+    // Q6-Q10 spend buckets — any scale option each.
+    for (let i = 0; i < 5; i++) {
+      fireEvent.click(document.querySelector('button[role="radio"]')!);
+      fireEvent.click(screen.getByText("Next"));
+    }
+    // Q11 recurringBillsByCard — No.
+    fireEvent.click(screen.getByText("No"));
+    fireEvent.click(screen.getByText("Next"));
+    // Q12 feeTolerant — any scale option.
+    fireEvent.click(document.querySelector('button[role="radio"]')!);
+    fireEvent.click(screen.getByText("Next"));
+    // Q13 priorityCategories — 0 selections valid, submit.
+    fireEvent.click(screen.getByText("See my recommendations"));
+
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
+    const [, options] = fetchMock.mock.calls[0]!;
+    const payload = JSON.parse(options.body);
+    expect(payload.gymMembership).toEqual({ active: true, monthlyCost: 1500 });
+  });
 });
