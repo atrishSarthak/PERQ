@@ -22,4 +22,7 @@ export interface ResultsCard {
     | undefined;
   // Arsenal state (§12) — 'held' | 'not_held' | undefined (never toggled yet)
   arsenalStatus: "held" | "not_held" | undefined;
+  // D15: citation URLs a web-searched card's terms were extracted from —
+  // undefined for a card from the curated DB fallback set (nothing to cite).
+  sourceUrls?: string[] | null;
 }

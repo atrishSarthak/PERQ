@@ -85,6 +85,13 @@ export const userProfile = pgTable("user_profile", {
   // 13 quiz answers, keyed by question_key. See packages/scoring-engine for
   // the domain types this jsonb blob is expected to conform to.
   answers: jsonb("answers").notNull(),
+  // D15: which card set the user's LATEST recommendation compute actually
+  // used — 'web_search' | 'db_fallback' | null (never computed yet). The
+  // results page reads this (+ lastSearchBucketKey) to scope its "browse
+  // all cards" query to exactly the set that was scored, not every active
+  // row in the whole cards table (which now spans many buckets/users).
+  lastCardSourceMode: text("last_card_source_mode"),
+  lastSearchBucketKey: text("last_search_bucket_key"),
   updatedAt: timestamp("updated_at", { mode: "date" })
     .notNull()
     .defaultNow(),
@@ -93,31 +100,54 @@ export const userProfile = pgTable("user_profile", {
 // cards.status: soft-delete (2C). A card the seed script no longer finds in
 // source data is marked 'discontinued', never hard-deleted — arsenal and
 // recommendation history stay intact instead of hitting a dangling reference.
-export const cards = pgTable("cards", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text("name").notNull(),
-  issuer: text("issuer").notNull(),
-  network: text("network").notNull(), // 'Visa' | 'Mastercard' | 'RuPay' | 'Amex'
-  tier: text("tier"),
-  joiningFee: numeric("joining_fee").notNull(),
-  annualFee: numeric("annual_fee").notNull(),
-  feeWaiverCondition: text("fee_waiver_condition"),
-  // per category: dining, travel, hotels, fuel, groceries, e-commerce, utilities, general
-  rewardRates: jsonb("reward_rates").notNull(),
-  milestoneBenefits: jsonb("milestone_benefits"),
-  welcomeBonus: text("welcome_bonus"),
-  loungeAccess: jsonb("lounge_access"),
-  forexMarkupPct: numeric("forex_markup_pct"),
-  redemptionValue: numeric("redemption_value"), // ₹ per point
-  minIncomeEligibility: numeric("min_income_eligibility"),
-  coBrandPartner: text("co_brand_partner"),
-  status: text("status").notNull().default("active"), // 'active' | 'discontinued' (2C)
-  sourceUpdatedAt: timestamp("source_updated_at", { mode: "date" })
-    .notNull()
-    .defaultNow(),
-});
+// The same soft-delete pattern is reused by D15's bucket refresh below.
+export const cards = pgTable(
+  "cards",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: text("name").notNull(),
+    issuer: text("issuer").notNull(),
+    network: text("network").notNull(), // 'Visa' | 'Mastercard' | 'RuPay' | 'Amex'
+    tier: text("tier"),
+    joiningFee: numeric("joining_fee").notNull(),
+    annualFee: numeric("annual_fee").notNull(),
+    feeWaiverCondition: text("fee_waiver_condition"),
+    // per category: dining, travel, hotels, fuel, groceries, e-commerce, utilities, general
+    rewardRates: jsonb("reward_rates").notNull(),
+    milestoneBenefits: jsonb("milestone_benefits"),
+    welcomeBonus: text("welcome_bonus"),
+    loungeAccess: jsonb("lounge_access"),
+    forexMarkupPct: numeric("forex_markup_pct"),
+    redemptionValue: numeric("redemption_value"), // ₹ per point
+    minIncomeEligibility: numeric("min_income_eligibility"),
+    coBrandPartner: text("co_brand_partner"),
+    status: text("status").notNull().default("active"), // 'active' | 'discontinued' (2C)
+    sourceUpdatedAt: timestamp("source_updated_at", { mode: "date" })
+      .notNull()
+      .defaultNow(),
+    // D15: 'seeded' (the curated fallback catalog, PRD §7) | 'web_search'
+    // (MIMIR's live Gemini-grounded search results). searchBucketKey
+    // partitions web_search rows by the coarse profile shape
+    // (computeSearchBucketKey) they were searched for — null for seeded
+    // rows. sourceUrls carries the citation URLs a web_search row's terms
+    // were extracted from (never set for seeded rows) — required at
+    // extraction time (cardSearchSchema) so no web-sourced fact reaches
+    // scoring ungrounded.
+    origin: text("origin").notNull().default("seeded"),
+    searchBucketKey: text("search_bucket_key"),
+    sourceUrls: jsonb("source_urls"),
+  },
+  (t) => ({
+    // D15 bucket-cache lookup: WHERE origin = ? AND search_bucket_key = ? AND status = ?
+    bucketLookupIdx: index("cards_bucket_lookup_idx").on(
+      t.origin,
+      t.searchBucketKey,
+      t.status
+    ),
+  })
+);
 
 // recommendations write path is delete-and-replace per user on every
 // quiz-submit / profile-edit re-score (D14) — never a blind insert, so a
@@ -153,6 +183,11 @@ export const recommendations = pgTable(
     // Perf-B/D9's cost-guardrail spirit) — distinct from 'fallback_template',
     // which means Gemini genuinely failed for the #1 pick.
     explanationSource: text("explanation_source").notNull().default("gemini"),
+    // D15: 'web_search' | 'db_fallback' — which card set this recommendation
+    // was scored against. Auditable the same way explanationSource already
+    // tracks D7's fallback; distinct concern (card SOURCING vs explanation
+    // GENERATION can fail independently).
+    cardSourceMode: text("card_source_mode").notNull().default("db_fallback"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({

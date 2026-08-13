@@ -2,20 +2,20 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { QuizAnswers } from "@perq/scoring-engine";
 
 const dbState = {
-  activeCards: [] as unknown[],
   cachedTop: null as { explanation: string; cardId: string } | null,
   deleteCalls: 0,
   insertedRows: [] as unknown[],
+  profileUpdates: [] as unknown[],
 };
 
 vi.mock("@perq/db", () => {
-  const cardsTable = { status: "status" };
   const recommendationsTable = {
     userId: "userId",
     profileHash: "profileHash",
     cardsVersion: "cardsVersion",
     rank: "rank",
   };
+  const userProfileTable = { userId: "userId" };
 
   function makeSelectChain(result: unknown[]) {
     return {
@@ -28,21 +28,13 @@ vi.mock("@perq/db", () => {
   }
 
   return {
-    cards: cardsTable,
     recommendations: recommendationsTable,
+    userProfile: userProfileTable,
     db: {
-      select: vi.fn((shape?: unknown) => {
-        // findCachedTopExplanation passes a shape object; the active-cards
-        // load doesn't. Distinguish by presence of a shape argument.
-        if (shape) {
-          return makeSelectChain(dbState.cachedTop ? [dbState.cachedTop] : []);
-        }
-        return {
-          from: () => ({
-            where: () => Promise.resolve(dbState.activeCards),
-          }),
-        };
-      }),
+      // The only remaining direct db.select() call in this module's own
+      // path is D6's cache lookup — card sourcing now goes entirely through
+      // the mocked resolveCardSet below.
+      select: vi.fn(() => makeSelectChain(dbState.cachedTop ? [dbState.cachedTop] : [])),
       delete: vi.fn(() => {
         dbState.deleteCalls++;
         return { where: () => Promise.resolve() };
@@ -53,6 +45,12 @@ vi.mock("@perq/db", () => {
           return Promise.resolve();
         },
       })),
+      update: vi.fn(() => ({
+        set: (values: unknown) => {
+          dbState.profileUpdates.push(values);
+          return { where: () => Promise.resolve() };
+        },
+      })),
     },
   };
 });
@@ -61,6 +59,11 @@ const runGeminiAgentMock = vi.fn();
 vi.mock("@perq/ai", () => ({
   runGeminiAgent: (...args: unknown[]) => runGeminiAgentMock(...args),
   createGeminiModelCaller: vi.fn(() => vi.fn()),
+}));
+
+const resolveCardSetMock = vi.fn();
+vi.mock("@/lib/mimir/resolveCardSet", () => ({
+  resolveCardSet: (...args: unknown[]) => resolveCardSetMock(...args),
 }));
 
 const { computeAndPersistRecommendations } = await import(
@@ -111,11 +114,17 @@ describe("computeAndPersistRecommendations — previousTopCard guard (§9.5)", (
     // reads process.env directly before ever calling it — only the two
     // "Gemini actually gets called" tests need this set.
     vi.stubEnv("GEMINI_API_KEY", "test-key");
-    dbState.activeCards = [makeDbCard("card-a", 0.05)];
     dbState.cachedTop = null;
     dbState.deleteCalls = 0;
     dbState.insertedRows = [];
+    dbState.profileUpdates = [];
     runGeminiAgentMock.mockReset();
+    resolveCardSetMock.mockReset();
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "db_fallback",
+      searchBucketKey: "bucket-key-1",
+    });
   });
 
   it("skips Gemini entirely when the #1 card is unchanged, reusing the prior explanation verbatim", async () => {
@@ -215,5 +224,79 @@ describe("computeAndPersistRecommendations — previousTopCard guard (§9.5)", (
       explanationSource: "gemini",
     });
     expect(dbState.deleteCalls).toBe(1);
+  });
+});
+
+describe("computeAndPersistRecommendations — D15 card sourcing", () => {
+  beforeEach(() => {
+    vi.stubEnv("GEMINI_API_KEY", "test-key");
+    dbState.cachedTop = null;
+    dbState.deleteCalls = 0;
+    dbState.insertedRows = [];
+    dbState.profileUpdates = [];
+    runGeminiAgentMock.mockReset();
+    resolveCardSetMock.mockReset();
+  });
+
+  it("stamps cardSourceMode from resolveCardSet onto every inserted recommendation row and the result", async () => {
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "web_search",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    const result = await computeAndPersistRecommendations("user-1", answers);
+
+    expect(result.cardSourceMode).toBe("web_search");
+    expect(
+      (dbState.insertedRows as { cardSourceMode: string }[]).every(
+        (r) => r.cardSourceMode === "web_search"
+      )
+    ).toBe(true);
+  });
+
+  it("persists lastCardSourceMode/lastSearchBucketKey onto userProfile after resolving the card set", async () => {
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "web_search",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    await computeAndPersistRecommendations("user-1", answers);
+
+    expect(dbState.profileUpdates).toContainEqual({
+      lastCardSourceMode: "web_search",
+      lastSearchBucketKey: "bucket-key-1",
+    });
+  });
+
+  it("clears lastSearchBucketKey when the DB fallback was used, even though a bucket key was computed", async () => {
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "db_fallback",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    await computeAndPersistRecommendations("user-1", answers);
+
+    expect(dbState.profileUpdates).toContainEqual({
+      lastCardSourceMode: "db_fallback",
+      lastSearchBucketKey: null,
+    });
   });
 });

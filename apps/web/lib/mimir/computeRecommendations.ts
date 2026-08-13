@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, cards, recommendations, type Card as DbCard } from "@perq/db";
+import { db, recommendations, userProfile, type Card as DbCard } from "@perq/db";
 import {
   buildProfileFromAnswers,
   scoreCards,
@@ -13,12 +13,14 @@ import { createMimirTools } from "./tools";
 import { EXPLANATION_SYSTEM_PROMPT } from "./prompt";
 import { narrationLabelForStep } from "./narrationLabels";
 import { mapDbCardToScoringCard } from "./cardMapper";
+import { resolveCardSet, type CardSourceMode } from "./resolveCardSet";
 
 export interface ComputeRecommendationsResult {
   topCardId: string;
   explanationSource: "gemini" | "fallback_template";
   recommendationCount: number;
   topCardChanged: boolean;
+  cardSourceMode: CardSourceMode;
 }
 
 export interface PreviousTopCard {
@@ -29,7 +31,9 @@ export interface PreviousTopCard {
 
 /**
  * The shared pipeline behind both quiz-submit (T6) and profile-edit
- * re-scoring (T8): load cards, score deterministically (D1), then decide
+ * re-scoring (T8): resolve which card set to score against (D15 —
+ * resolveCardSet: MIMIR's live web search, or the curated DB fallback),
+ * score deterministically (D1) against whichever set won, then decide
  * whether a fresh Gemini call is needed at all — two independent guards,
  * per §9.5 and D6:
  *
@@ -53,16 +57,36 @@ export async function computeAndPersistRecommendations(
   onNarrationStep?: (label: string) => void,
   previousTopCard?: PreviousTopCard
 ): Promise<ComputeRecommendationsResult> {
-  const activeCards = await db.select().from(cards).where(eq(cards.status, "active"));
+  const profile = buildProfileFromAnswers(answers);
+
+  // D15: card sourcing — MIMIR's live web search first, the curated DB
+  // catalog as a fallback that should rarely trigger. Everything after this
+  // point (scoring, tools, D6 caching, delete-and-replace) is unchanged
+  // regardless of which source won, since both land in the same `cards`
+  // row shape.
+  const { activeCards, cardSourceMode, searchBucketKey } = await resolveCardSet(
+    answers,
+    onNarrationStep
+  );
   const dbCardsById = new Map<string, DbCard>(activeCards.map((c) => [c.id, c]));
 
-  const profile = buildProfileFromAnswers(answers);
+  // Records which set this user's latest compute actually used — the
+  // results page reads this back to scope its own "browse all cards" query
+  // to the same set, not every active row across every bucket.
+  await db
+    .update(userProfile)
+    .set({
+      lastCardSourceMode: cardSourceMode,
+      lastSearchBucketKey: cardSourceMode === "web_search" ? searchBucketKey : null,
+    })
+    .where(eq(userProfile.userId, userId));
+
   const scoringCards = activeCards.map((c) => mapDbCardToScoringCard(c));
   const scored = scoreCards(profile, scoringCards);
   const eligible = scored.filter((s) => s.eligible);
 
   if (eligible.length === 0) {
-    // No card in the active database matches this user's income eligibility —
+    // No card in the active set matches this user's income eligibility —
     // still resolve rather than throw; caller can decide how to render an
     // empty-recommendations state. Not explicitly specced (edge case beyond
     // the locked plan), so fail soft rather than 500.
@@ -72,6 +96,7 @@ export async function computeAndPersistRecommendations(
       explanationSource: "fallback_template",
       recommendationCount: 0,
       topCardChanged: true,
+      cardSourceMode,
     };
   }
 
@@ -167,6 +192,7 @@ export async function computeAndPersistRecommendations(
       profileHash,
       cardsVersion,
       explanationSource: rank === 1 ? explanationSource : ("template" as const),
+      cardSourceMode,
     };
   });
 
@@ -179,6 +205,7 @@ export async function computeAndPersistRecommendations(
     explanationSource,
     recommendationCount: rows.length,
     topCardChanged,
+    cardSourceMode,
   };
 }
 

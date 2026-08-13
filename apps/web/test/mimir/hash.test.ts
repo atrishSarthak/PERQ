@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeCardsVersion, computeProfileHash } from "@/lib/mimir/hash";
+import { computeCardsVersion, computeProfileHash, computeSearchBucketKey } from "@/lib/mimir/hash";
 import type { QuizAnswers } from "@perq/scoring-engine";
 
 const baseAnswers: QuizAnswers = {
@@ -57,5 +57,45 @@ describe("computeCardsVersion (D10)", () => {
     const before = computeCardsVersion([{ sourceUpdatedAt: new Date("2026-01-01") }]);
     const after = computeCardsVersion([{ sourceUpdatedAt: new Date("2026-01-02") }]);
     expect(before).not.toBe(after);
+  });
+});
+
+describe("computeSearchBucketKey (D15)", () => {
+  it("produces the same key for identical income/feeTolerant/priorityCategories", () => {
+    expect(computeSearchBucketKey(baseAnswers)).toBe(computeSearchBucketKey({ ...baseAnswers }));
+  });
+
+  it("produces the same key regardless of priorityCategories order", () => {
+    const reordered: QuizAnswers = {
+      ...baseAnswers,
+      priorityCategories: [...baseAnswers.priorityCategories].reverse(),
+    };
+    expect(computeSearchBucketKey(baseAnswers)).toBe(computeSearchBucketKey(reordered));
+  });
+
+  it("ignores exact spend-bucket answers — two users differing only there share a bucket", () => {
+    const otherSpend: QuizAnswers = {
+      ...baseAnswers,
+      foodDeliverySpend: "<1k",
+      grocerySpend: "6k+",
+      fuelSpend: "6k+",
+      flightFrequency: "6+",
+    };
+    expect(computeSearchBucketKey(baseAnswers)).toBe(computeSearchBucketKey(otherSpend));
+  });
+
+  it("changes when annualIncome differs", () => {
+    const edited: QuizAnswers = { ...baseAnswers, annualIncome: "under-3l" };
+    expect(computeSearchBucketKey(baseAnswers)).not.toBe(computeSearchBucketKey(edited));
+  });
+
+  it("changes when feeTolerant differs", () => {
+    const edited: QuizAnswers = { ...baseAnswers, feeTolerant: false };
+    expect(computeSearchBucketKey(baseAnswers)).not.toBe(computeSearchBucketKey(edited));
+  });
+
+  it("changes when priorityCategories differ", () => {
+    const edited: QuizAnswers = { ...baseAnswers, priorityCategories: ["fuel"] };
+    expect(computeSearchBucketKey(baseAnswers)).not.toBe(computeSearchBucketKey(edited));
   });
 });

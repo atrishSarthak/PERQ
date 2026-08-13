@@ -352,6 +352,22 @@ function CardRow({
           <p className="mt-1 font-body text-caption text-text-secondary">
             Annual fee: ₹{card.annualFee}
           </p>
+          {/* D15: web-searched cards must show where their terms came
+              from — a trust requirement, not decoration (PRD §13's "never a
+              vague source" framing applies to sourcing, not just scoring). */}
+          {card.sourceUrls && card.sourceUrls.length > 0 && (
+            <p className="mt-1 font-body text-caption text-text-secondary">
+              Sourced via web search —{" "}
+              <a
+                href={card.sourceUrls[0]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                view source
+              </a>
+            </p>
+          )}
         </div>
         <button
           disabled={pending}

@@ -62,6 +62,19 @@ Last-write-wins on `user_profile.answers`, no version column or optimistic-concu
 ### D14 — Recommendations write is delete-and-replace, not blind insert (post-review gap)
 Every quiz-submit and every profile-edit re-score deletes the user's existing `recommendations` rows and inserts the fresh set inside the same transaction, rather than blind-inserting. Makes "the user's current recommendations" unambiguous — exactly one active set per user at all times — and makes a double-click/double-submit idempotent instead of accumulating duplicate/stale rows silently. Per-row auditability (`profile_snapshot`) is preserved; a full historical log of every past recommendation set is not — the PRD doesn't ask for one.
 
+### D15 — Live web-search card sourcing, with a curated DB fallback (post-launch amendment)
+The card set `scoreCards` runs against is no longer only the seeded DB catalog. `apps/web/lib/mimir/resolveCardSet.ts` now resolves it per compute:
+
+1. **Primary — MIMIR web search.** A Gemini Google Search-grounded call (`packages/ai/src/webSearch.ts::searchGroundedText`) finds real, currently-marketed cards for the user's profile *shape*; a second, non-grounded call (`extractStructuredJson`) turns the cited findings into strict JSON matching the same field shape as the seed data. Any card whose `annualFee`/`rewardRates` can't be attributed to a real citation URL from the grounded call is dropped whole (`apps/web/lib/mimir/cardSearch.ts`) — never partially nulled, and never trusted on an invented source. Capped at 20 cards.
+2. **Cached by profile shape, not per-request.** `computeSearchBucketKey` (`hash.ts`) buckets by income bracket + fee tolerance + priority categories only — not exact spend amounts — so many users share one search instead of triggering one per quiz submission. A bucket's results are reused for 14 days (`SEARCH_CACHE_TTL_MS`) before a refresh is triggered. This is what keeps Gemini usage bounded against the free-tier daily quota (D13's concern extends here).
+3. **Fallback — the curated DB catalog.** On a search failure, or fewer than `MIN_VALID_SEARCH_CARDS` (5) citation-backed results, `resolveCardSet` scores against `cards` where `origin = 'seeded'` instead (the 30-card set in `packages/db/data/cards.json`, PRD §7) — by design a rare path, never silently preferred.
+
+**Storage:** both origins live in the same `cards` table (`origin: 'seeded' | 'web_search'`, `searchBucketKey`, `sourceUrls`), not a separate table — `mapDbCardToScoringCard`, `createMimirTools`, and D6/D10's caching all continue to operate on that one shape unmodified regardless of which origin won. A bucket refresh soft-deletes its prior `web_search` rows (2C's pattern reused, not a hard delete — other users in the same bucket may still hold live `recommendations` FKs to them) before inserting the fresh set.
+
+**Amends D8:** this is the one place a real external network call (Gemini's own search grounding) enters the pipeline — a deliberate, scoped exception to D8's "tools execute in-process, no network hop," not a silent override. It happens once per bucket refresh, before scoring, never inside the in-process explanation-tool loop D8 describes.
+
+**Auditability:** `recommendations.card_source_mode` (`'web_search' | 'db_fallback'`) and `user_profile.last_card_source_mode`/`last_search_bucket_key` make which source won queryable, mirroring how `explanation_source` already tracks D7's fallback — a genuinely different failure mode (sourcing vs. explanation can each fail independently). The results page scopes its "browse all cards" query to exactly this recorded set, not every active row in `cards` table-wide (which now spans every bucket across every user).
+
 ---
 
 ## 2. Code Quality Decisions

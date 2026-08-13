@@ -9,6 +9,19 @@ export interface JsonSchema {
   required?: string[];
 }
 
+// SDK-agnostic response schema for extractStructuredJson (webSearch.ts) —
+// richer than JsonSchema above (nested objects/arrays/enums), since a tool's
+// input parameters and a model's structured output shape are different
+// needs. Keeps apps/web free of any @google/genai dependency (D5) — the
+// conversion to the SDK's own Schema/Type shape happens inside webSearch.ts.
+export interface ResponseSchema {
+  type: "object" | "array" | "string" | "number" | "boolean" | "integer";
+  properties?: Record<string, ResponseSchema>;
+  required?: string[];
+  items?: ResponseSchema;
+  nullable?: boolean;
+}
+
 export interface ToolDefinition<TArgs = unknown, TResult = unknown> {
   name: string;
   description: string;

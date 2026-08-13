@@ -25,3 +25,22 @@ export function computeCardsVersion(cards: Pick<Card, "sourceUpdatedAt">[]): str
   );
   return latest.getTime().toString();
 }
+
+/**
+ * D15: the search-cache partition key — deliberately coarser than
+ * computeProfileHash. Built only from the signals that actually change what
+ * MIMIR should search FOR (income bracket, fee tolerance, and the user's
+ * explicit top-2 priority categories), not exact spend amounts. This is what
+ * lets many users with a similar "shape" of profile share one cached web
+ * search instead of re-searching per user, keeping Gemini calls bounded
+ * against the free-tier daily quota.
+ */
+export function computeSearchBucketKey(answers: QuizAnswers): string {
+  const shape = {
+    annualIncome: answers.annualIncome,
+    feeTolerant: answers.feeTolerant,
+    priorityCategories: [...answers.priorityCategories].sort(),
+  };
+  const normalized = JSON.stringify(shape, Object.keys(shape).sort());
+  return createHash("sha256").update(normalized).digest("hex");
+}
