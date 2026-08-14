@@ -18,6 +18,11 @@
   /* Semantic tokens — light mode default (§2) */
   --bg-base: #ffffff;
   --bg-surface: #f7f7f8;
+  /* A further step beyond --bg-surface, for content nested one level
+     deeper than a card/panel (e.g. the MIMIR explanation box sitting
+     inside a result card) — never a third independent color, always one
+     more step in the same base->surface->surface-2 hierarchy. */
+  --bg-surface-2: #eef0f2;
   --text-primary: #000000;
   --text-secondary: #5c5c63;
   --accent: #00a1ff;
@@ -27,13 +32,15 @@
   --danger: #dc2626;
   --border: #e5e5e8;
 
-  /* Typography scale (§3) */
+  /* Typography scale (§3 marks this "proposed," not locked — widened here
+     for more heading/body contrast; body sizes untouched since shrinking
+     them would cost readability, not gain hierarchy). */
   --font-display: "Cabinet Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-body: "Switzer", sans-serif;
 
-  --text-display-size: 48px; /* 40-56px range, mid value */
-  --text-h1-size: 32px;
-  --text-h2-size: 24px;
+  --text-display-size: 56px; /* top of the doc's stated 40-56px range */
+  --text-h1-size: 36px;
+  --text-h2-size: 26px;
   --text-body-lg-size: 18px;
   --text-body-size: 16px;
   --text-body-sm-size: 14px;
@@ -59,25 +66,32 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg-base: #000000;
-    --bg-surface: #0d0d0f;
+    /* Was #0d0d0f — barely a step above pure black, so cards read as
+       outlined shapes blending into the page rather than separate
+       objects. #18181b is a real, perceptible step up; borders can stay
+       thin/low-contrast because this background difference now does most
+       of the separation work. */
+    --bg-surface: #18181b;
+    --bg-surface-2: #232326;
     --text-primary: #ffffff;
     --text-secondary: #a6a6ad;
     --accent: #00a1ff;
     --success: #22c55e;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --border: #232326;
+    --border: #2c2c30;
   }
 }
 
 :root[data-theme="dark"] {
   --bg-base: #000000;
-  --bg-surface: #0d0d0f;
+  --bg-surface: #18181b;
+  --bg-surface-2: #232326;
   --text-primary: #ffffff;
   --text-secondary: #a6a6ad;
   --accent: #00a1ff;
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --border: #232326;
+  --border: #2c2c30;
 }

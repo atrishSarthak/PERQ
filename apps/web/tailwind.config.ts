@@ -15,6 +15,7 @@ const config: Config = {
       colors: {
         "bg-base": "var(--bg-base)",
         "bg-surface": "var(--bg-surface)",
+        "bg-surface-2": "var(--bg-surface-2)",
         "text-primary": "var(--text-primary)",
         "text-secondary": "var(--text-secondary)",
         accent: "var(--accent)",

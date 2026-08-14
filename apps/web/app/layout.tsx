@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -7,11 +6,6 @@ export const metadata: Metadata = {
   title: "PERQ — MIMIR",
   description: "MIMIR recommends the right credit card for you.",
 };
-
-// Design System §3: Inter for body/UI text. Self-hosted via next/font (no
-// runtime request to Google Fonts), exposed as a CSS variable that
-// globals.css wires into the --font-body token.
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export default function RootLayout({
   children,
@@ -23,15 +17,15 @@ export default function RootLayout({
     // below sets data-theme on this element from localStorage before React
     // hydrates, which SSR has no way to predict — an expected, single-
     // attribute mismatch (the standard next-themes pattern), not a bug.
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Design System §3: Cabinet Grotesk for display type. Not on
-            Google Fonts — loaded from Fontshare, whose stylesheet defines
-            the exact "Cabinet Grotesk" family the --font-display token
-            already names. */}
+        {/* Design System §3: Cabinet Grotesk for display type, Switzer for
+            body/UI text. Neither is on Google Fonts — both loaded from
+            Fontshare in one request, whose stylesheet defines the exact
+            family names --font-display/--font-body already reference. */}
         <link
           rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&display=swap"
+          href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500,600,700&display=swap"
         />
       </head>
       <body>

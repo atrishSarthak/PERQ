@@ -45,7 +45,7 @@ export function ResultCard({
     <div
       className="rounded-lg p-4 md:p-6"
       style={{
-        backgroundColor: "var(--bg-base)",
+        backgroundColor: "var(--bg-surface)",
         borderStyle: "solid",
         borderWidth: isTopPick ? 3 : 1,
         borderColor: isTopPick ? "var(--gold)" : "var(--border)",
@@ -87,7 +87,7 @@ export function ResultCard({
 
       <div
         className="mt-4 rounded-md p-3 font-body text-body-sm text-text-primary"
-        style={{ backgroundColor: "var(--bg-surface)" }}
+        style={{ backgroundColor: "var(--bg-surface-2)" }}
       >
         <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
         {card.recommendation?.explanation ?? "Not yet scored for your profile."}

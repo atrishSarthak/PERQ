@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
@@ -105,6 +104,63 @@ export function ResultsView({
     filters.annualFeeBuckets.size +
     (filters.showHeldOnly ? 1 : 0);
 
+  // Visible summary of what's currently applied — the checkbox groups in
+  // FiltersPanel remain the actual controls; each chip just mirrors one
+  // checked box and can remove it directly.
+  const activeChips = useMemo(() => {
+    const chips: { key: string; label: string; onRemove: () => void }[] = [];
+
+    for (const bucket of ANNUAL_FEE_BUCKETS) {
+      if (filters.annualFeeBuckets.has(bucket.key)) {
+        chips.push({
+          key: `fee-${bucket.key}`,
+          label: bucket.label,
+          onRemove: () =>
+            setFilters((f) => ({
+              ...f,
+              annualFeeBuckets: toggleSetMember(f.annualFeeBuckets, bucket.key),
+            })),
+        });
+      }
+    }
+    for (const network of NETWORKS) {
+      if (filters.networks.has(network.value)) {
+        chips.push({
+          key: `network-${network.value}`,
+          label: network.label,
+          onRemove: () =>
+            setFilters((f) => ({ ...f, networks: toggleSetMember(f.networks, network.value) })),
+        });
+      }
+    }
+    for (const tag of REWARD_TYPES) {
+      if (filters.categories.has(tag.key)) {
+        chips.push({
+          key: `reward-${tag.key}`,
+          label: tag.label,
+          onRemove: () =>
+            setFilters((f) => ({ ...f, categories: toggleSetMember(f.categories, tag.key) })),
+        });
+      }
+    }
+    for (const issuer of filters.issuers) {
+      chips.push({
+        key: `issuer-${issuer}`,
+        label: issuer,
+        onRemove: () =>
+          setFilters((f) => ({ ...f, issuers: toggleSetMember(f.issuers, issuer) })),
+      });
+    }
+    if (filters.showHeldOnly) {
+      chips.push({
+        key: "held",
+        label: "Show cards I already hold",
+        onRemove: () => setFilters((f) => ({ ...f, showHeldOnly: false })),
+      });
+    }
+    return chips;
+  }, [filters]);
+
   const cardOptions = useMemo(
     () => cards.map((c) => ({ value: c.cardId, label: `${c.issuer} ${c.name}` })),
     [cards]
@@ -118,7 +174,6 @@ export function ResultsView({
         className="hidden shrink-0 border-r border-border p-6 md:block md:w-64"
         style={{ backgroundColor: "var(--bg-surface)" }}
       >
-        <PerqWordmark />
         <FiltersPanel
           filters={filters}
           setFilters={setFilters}
@@ -168,6 +223,28 @@ export function ResultsView({
             Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
           </button>
         </div>
+
+        {activeChips.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {activeChips.map((chip) => (
+              <button
+                key={chip.key}
+                onClick={chip.onRemove}
+                className="flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm text-text-primary"
+                style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border)" }}
+              >
+                {chip.label}
+                <span aria-hidden="true">✕</span>
+              </button>
+            ))}
+            <button
+              onClick={() => setFilters(emptyFilters())}
+              className="font-body text-body-sm text-text-secondary underline"
+            >
+              Reset filters
+            </button>
+          </div>
+        )}
 
         <EditProfilePanel answers={answers} cardOptions={cardOptions} />
 
@@ -263,18 +340,6 @@ export function ResultsView({
         </div>
       )}
     </div>
-  );
-}
-
-function PerqWordmark() {
-  return (
-    <Image
-      src="/perq-logo.png"
-      alt="PERQ"
-      width={800}
-      height={304}
-      className="mb-6 h-8 w-auto"
-    />
   );
 }
 

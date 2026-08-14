@@ -11,6 +11,7 @@ export const colors = {
   gold: "var(--gold)",
   bgBase: "var(--bg-base)",
   bgSurface: "var(--bg-surface)",
+  bgSurface2: "var(--bg-surface-2)",
   textPrimary: "var(--text-primary)",
   textSecondary: "var(--text-secondary)",
   success: "var(--success)",
