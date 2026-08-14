@@ -22,10 +22,9 @@ function Stat({ label, value }: { label: string; value: string }) {
  * in "More Matches" — only the border (isTopPick) differs; the "Top Pick"
  * label itself is rendered by the caller, above the card, not inside it.
  *
- * Layout: the card visual and MIMIR's explanation sit stacked in the left
- * column; the name/stats sit in the right column with the arsenal button
- * pinned to its bottom, so the MIMIR box and the arsenal button land at
- * roughly the same row.
+ * Layout: card visual (left) and name/stats (right) sit in a row up top;
+ * MIMIR's explanation runs full-width beneath both, so it stretches all
+ * the way to the same right edge the arsenal button sits at below it.
  */
 export function ResultCard({
   card,
@@ -54,17 +53,7 @@ export function ResultCard({
       }}
     >
       <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-        <div className="flex flex-col gap-4 md:w-80 md:shrink-0">
-          <CardVisual card={card} cardHolderName={cardHolderName} />
-
-          <div
-            className="rounded-md p-3 font-body text-body-sm text-text-primary"
-            style={{ backgroundColor: "var(--bg-surface)" }}
-          >
-            <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
-            {card.recommendation?.explanation ?? "Not yet scored for your profile."}
-          </div>
-        </div>
+        <CardVisual card={card} cardHolderName={cardHolderName} />
 
         <div className="flex flex-1 flex-col">
           <h3 className="font-display text-h2 font-bold text-text-primary">
@@ -82,34 +71,42 @@ export function ResultCard({
               from — a trust requirement, not decoration. */}
           {card.sourceUrls && card.sourceUrls.length > 0 && (
             <p className="mt-4 font-body text-caption text-text-secondary">
-              Sourced via web search —{" "}
+              Sourced via web search.{" "}
               <a
                 href={card.sourceUrls[0]}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline"
               >
-                view source
+                View source
               </a>
             </p>
           )}
-
-          <div className="mt-4 flex flex-1 items-end justify-end">
-            <button
-              disabled={pending}
-              onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
-              className={`font-body text-body-sm font-semibold disabled:opacity-50 ${
-                held ? "rounded-full px-4 py-2" : "rounded-md px-4 py-2"
-              }`}
-              style={{
-                backgroundColor: held ? "var(--success)" : "var(--text-primary)",
-                color: held ? "var(--color-white)" : "var(--bg-base)",
-              }}
-            >
-              {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
-            </button>
-          </div>
         </div>
+      </div>
+
+      <div
+        className="mt-4 rounded-md p-3 font-body text-body-sm text-text-primary"
+        style={{ backgroundColor: "var(--bg-surface)" }}
+      >
+        <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
+        {card.recommendation?.explanation ?? "Not yet scored for your profile."}
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          disabled={pending}
+          onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
+          className={`font-body text-body-sm font-semibold disabled:opacity-50 ${
+            held ? "rounded-full px-4 py-2" : "rounded-md px-4 py-2"
+          }`}
+          style={{
+            backgroundColor: held ? "var(--success)" : "var(--text-primary)",
+            color: held ? "var(--color-white)" : "var(--bg-base)",
+          }}
+        >
+          {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
+        </button>
       </div>
     </div>
   );

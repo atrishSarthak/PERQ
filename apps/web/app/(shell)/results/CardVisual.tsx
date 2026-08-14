@@ -20,7 +20,10 @@ export function CardVisual({
 
   return (
     <div
-      className="relative flex aspect-[1.75/1] w-full shrink-0 flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-80"
+      // self-start: the row-flex parent's default align-items:stretch would
+      // otherwise pull this to match the taller name/stats column next to
+      // it, overriding aspect-[1.75/1] entirely.
+      className="relative flex aspect-[1.75/1] w-full shrink-0 self-start flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-80"
       style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
     >
       <div className="flex items-start justify-between gap-2">

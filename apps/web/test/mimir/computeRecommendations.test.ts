@@ -187,7 +187,10 @@ describe("computeAndPersistRecommendations — previousTopCard guard (§9.5)", (
       dbState.insertedRows as { rank: number; explanation: string; explanationSource: string }[]
     ).find((r) => r.rank === 1);
     expect(topRow?.explanationSource).toBe("fallback_template");
-    expect(topRow?.explanation).toContain("MIMIR recommends");
+    // Grounded in the real card name, not a generic/empty message (Design
+    // System §5) — the exact phrasing is intentionally varied per card
+    // (see explanationTemplate.ts), so this doesn't pin one fixed sentence.
+    expect(topRow?.explanation).toContain("Card card-a");
   });
 
   it("calls Gemini on a fresh quiz-submit with no previousTopCard at all", async () => {
