@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignOutButton } from "./SignOutButton";
 
 interface FeatureLink {
   href: string;
@@ -85,6 +86,10 @@ export function Sidebar() {
           )
         )}
       </ul>
+
+      <div className="mt-auto">
+        <SignOutButton />
+      </div>
     </nav>
   );
 }
