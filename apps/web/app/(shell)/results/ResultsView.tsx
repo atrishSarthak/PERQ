@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
@@ -266,7 +267,15 @@ export function ResultsView({
 }
 
 function PerqWordmark() {
-  return <p className="mb-6 font-display text-h1 font-bold text-text-primary">PERQ</p>;
+  return (
+    <Image
+      src="/perq-logo.png"
+      alt="PERQ"
+      width={800}
+      height={304}
+      className="mb-6 h-8 w-auto"
+    />
+  );
 }
 
 function toggleSetMember<T>(set: Set<T>, value: T): Set<T> {
