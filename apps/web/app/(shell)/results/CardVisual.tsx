@@ -14,7 +14,11 @@ export function CardVisual({ card }: { card: ResultsCard }) {
 
   return (
     <div
-      className="relative flex aspect-[1.6/1] w-full shrink-0 flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-72"
+      // self-start: without it, the row-flex parent's default
+      // align-items:stretch pulls this to match the taller info panel next
+      // to it, overriding aspect-[1.75/1] entirely (it rendered ~1.12:1 —
+      // nearly square — until this was added).
+      className="relative flex aspect-[1.75/1] w-full shrink-0 self-start flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-80"
       style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
     >
       <div className="flex items-start justify-between gap-2">

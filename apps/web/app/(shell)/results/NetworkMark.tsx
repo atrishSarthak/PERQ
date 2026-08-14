@@ -1,8 +1,22 @@
 // Network logos for the card visual's top-right corner. No real logo asset
-// library — these are hand-built text/shape approximations of each
-// network's actual wordmark, matching the reference mockup for the three
-// networks it shows; RuPay follows the same interim treatment since the
-// mockup doesn't include it (PRD adds it as a fourth network here).
+// library — these are hand-built text/shape approximations, not brand-
+// guideline-accurate marks. Verification status per network:
+//
+// - Mastercard: #EB001B / #F79E1B are the widely and consistently cited
+//   circle colors across many independent brand-color references.
+//   mastercard.com's own brand center 403s to automated fetches, so this
+//   is strong triangulation, not a first-party confirmation.
+// - Visa: no color used here (plain white wordmark), so nothing to verify.
+// - Amex: #016FD0 is the most-repeated "logo blue" across independent
+//   aggregators, but Amex has no public brand-guideline page to check it
+//   against — best-available consensus, not a confirmed official value.
+// - RuPay: verified against the official NPCI/RuPay Brand Guidelines PDF
+//   (npci.org.in digital media kit, fetched directly). The real mark is a
+//   solid-color "RuPay" wordmark (never two-tone) plus a *separate*
+//   two-color "fast-forward" chevron: orange #D9782D + green #2B8B4B. The
+//   guideline's own dark-background example reverses the wordmark to white
+//   while keeping the chevron in color — the treatment used below, since
+//   this mark always sits on a colored card gradient, never a light one.
 export function NetworkMark({ network }: { network: string }) {
   switch (network) {
     case "Visa":
@@ -35,8 +49,22 @@ export function NetworkMark({ network }: { network: string }) {
       );
     case "RuPay":
       return (
-        <span className="font-body text-base font-bold italic text-white">
-          Ru<span style={{ color: "#F7A600" }}>Pay</span>
+        <span className="flex items-center gap-0.5" aria-label="RuPay" role="img">
+          <span className="font-body text-base font-bold italic text-white">RuPay</span>
+          <span className="flex" aria-hidden="true">
+            <span
+              className="text-lg font-bold leading-none"
+              style={{ color: "#D9782D" }}
+            >
+              ›
+            </span>
+            <span
+              className="-ml-2 text-lg font-bold leading-none"
+              style={{ color: "#2B8B4B" }}
+            >
+              ›
+            </span>
+          </span>
         </span>
       );
     default:
