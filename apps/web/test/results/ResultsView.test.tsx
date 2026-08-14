@@ -49,25 +49,25 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("does not show the drawer dialog by default", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("opens the drawer on clicking the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
     fireEvent.click(screen.getByText(/^Filters/));
     expect(screen.getByRole("dialog", { name: "Filters" })).toBeInTheDocument();
   });
 
   it("closes the drawer on Done", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
     fireEvent.click(screen.getByText(/^Filters/));
     fireEvent.click(screen.getByText("Done"));
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("closes the drawer on backdrop click", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const backdrop = dialog.previousElementSibling as HTMLElement;
@@ -83,6 +83,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
           makeCard({ cardId: "b", network: "RuPay", name: "Card B" }),
         ]}
         answers={mockAnswers}
+        cardHolderName="Taylor"
       />
     );
     fireEvent.click(screen.getByText(/^Filters/));
@@ -99,7 +100,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("shows the active filter count on the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} />);
+    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const visaButtons = screen.getAllByText("Visa");

@@ -8,21 +8,23 @@ import { NetworkMark } from "./NetworkMark";
  * (top-left) is plain text for now, built so an actual SVG logo asset can
  * drop in later without restructuring this component.
  */
-export function CardVisual({ card }: { card: ResultsCard }) {
+export function CardVisual({
+  card,
+  cardHolderName,
+}: {
+  card: ResultsCard;
+  cardHolderName: string;
+}) {
   const { from, to } = getBankGradient(card.issuer);
   const last4 = getLast4(card.cardId);
 
   return (
     <div
-      // self-start: without it, the row-flex parent's default
-      // align-items:stretch pulls this to match the taller info panel next
-      // to it, overriding aspect-[1.75/1] entirely (it rendered ~1.12:1 —
-      // nearly square — until this was added).
-      className="relative flex aspect-[1.75/1] w-full shrink-0 self-start flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-80"
+      className="relative flex aspect-[1.75/1] w-full shrink-0 flex-col justify-between overflow-hidden rounded-md p-4 text-white md:w-80"
       style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
     >
       <div className="flex items-start justify-between gap-2">
-        <span className="truncate font-body text-[11px] font-semibold uppercase tracking-wide text-white/80">
+        <span className="min-w-0 truncate font-body text-sm font-bold uppercase tracking-wide text-white/90">
           {getBankLabel(card.issuer)}
         </span>
         <NetworkMark network={card.network} />
@@ -34,9 +36,9 @@ export function CardVisual({ card }: { card: ResultsCard }) {
       </div>
 
       <div className="flex items-end justify-between">
-        <div>
+        <div className="min-w-0">
           <p className="text-[9px] uppercase tracking-wide text-white/70">Card Holder</p>
-          <p className="font-body text-sm">Your Name Here</p>
+          <p className="truncate font-body text-sm uppercase">{cardHolderName}</p>
         </div>
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-wide text-white/70">Expires</p>

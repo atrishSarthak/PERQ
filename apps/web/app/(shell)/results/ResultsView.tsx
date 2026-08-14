@@ -41,7 +41,15 @@ const SORT_TABS: [SortMode, string][] = [
   ["highest-rewards", "Highest Rewards"],
 ];
 
-export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers: QuizAnswers }) {
+export function ResultsView({
+  cards,
+  answers,
+  cardHolderName,
+}: {
+  cards: ResultsCard[];
+  answers: QuizAnswers;
+  cardHolderName: string;
+}) {
   const [filters, setFilters] = useState(emptyFilters());
   const [sortMode, setSortMode] = useState<SortMode>("best-match");
   const [arsenal, setArsenal] = useState<Record<string, "held" | "not_held" | undefined>>(
@@ -179,13 +187,17 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
           <>
             {topPick && (
               <div>
-                <p className="mb-3 flex items-center gap-1.5 font-body text-caption font-semibold uppercase tracking-wide text-accent">
+                <p
+                  className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-gold"
+                  style={{ backgroundColor: "rgba(184, 134, 11, 0.12)" }}
+                >
                   <span aria-hidden="true">✦</span> MIMIR&apos;s Top Pick
                 </p>
                 <ResultCard
                   card={topPick}
                   pending={pendingCardId === topPick.cardId}
                   onToggleArsenal={toggleArsenal}
+                  cardHolderName={cardHolderName}
                   isTopPick
                 />
               </div>
@@ -203,6 +215,7 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
                         card={card}
                         pending={pendingCardId === card.cardId}
                         onToggleArsenal={toggleArsenal}
+                        cardHolderName={cardHolderName}
                       />
                     </li>
                   ))}

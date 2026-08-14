@@ -332,7 +332,7 @@
     "id": "axis-flipkart",
     "name": "Flipkart Axis Bank Credit Card",
     "issuer": "Axis Bank",
-    "network": "Mastercard",
+    "network": "Visa",
     "tier": "entry",
     "joiningFee": 500,
     "annualFee": 500,

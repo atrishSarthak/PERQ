@@ -5,6 +5,7 @@ import { db, cards, recommendations, userCardArsenal, userProfile } from "@perq/
 import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
 import { ResultsView } from "./ResultsView";
+import { firstNameFrom } from "./cardHolderName";
 
 /**
  * Perf-A: two queries total (active cards, user's recommendations — plus
@@ -80,5 +81,13 @@ export default async function ResultsPage() {
     };
   });
 
-  return <ResultsView cards={resultsCards} answers={profile.answers as QuizAnswers} />;
+  const cardHolderName = firstNameFrom(session!.user.name, session!.user.email);
+
+  return (
+    <ResultsView
+      cards={resultsCards}
+      answers={profile.answers as QuizAnswers}
+      cardHolderName={cardHolderName}
+    />
+  );
 }

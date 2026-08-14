@@ -21,16 +21,23 @@ function Stat({ label, value }: { label: string; value: string }) {
  * The result card component used for both MIMIR's Top Pick and every card
  * in "More Matches" — only the border (isTopPick) differs; the "Top Pick"
  * label itself is rendered by the caller, above the card, not inside it.
+ *
+ * Layout: the card visual and MIMIR's explanation sit stacked in the left
+ * column; the name/stats sit in the right column with the arsenal button
+ * pinned to its bottom, so the MIMIR box and the arsenal button land at
+ * roughly the same row.
  */
 export function ResultCard({
   card,
   pending,
   onToggleArsenal,
+  cardHolderName,
   isTopPick,
 }: {
   card: ResultsCard;
   pending: boolean;
   onToggleArsenal: (cardId: string, next: "held" | "not_held") => void;
+  cardHolderName: string;
   isTopPick?: boolean;
 }) {
   const held = card.arsenalStatus === "held";
@@ -41,12 +48,23 @@ export function ResultCard({
       style={{
         backgroundColor: "var(--bg-base)",
         borderStyle: "solid",
-        borderWidth: isTopPick ? 2 : 1,
-        borderColor: isTopPick ? "var(--accent)" : "var(--border)",
+        borderWidth: isTopPick ? 3 : 1,
+        borderColor: isTopPick ? "var(--gold)" : "var(--border)",
+        boxShadow: isTopPick ? "0 0 0 4px rgba(184, 134, 11, 0.12)" : undefined,
       }}
     >
       <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-        <CardVisual card={card} />
+        <div className="flex flex-col gap-4 md:w-80 md:shrink-0">
+          <CardVisual card={card} cardHolderName={cardHolderName} />
+
+          <div
+            className="rounded-md p-3 font-body text-body-sm text-text-primary"
+            style={{ backgroundColor: "var(--bg-surface)" }}
+          >
+            <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
+            {card.recommendation?.explanation ?? "Not yet scored for your profile."}
+          </div>
+        </div>
 
         <div className="flex flex-1 flex-col">
           <h3 className="font-display text-h2 font-bold text-text-primary">
@@ -60,18 +78,10 @@ export function ResultCard({
             <Stat label="Fee Waiver" value={card.feeWaiverCondition ?? "None"} />
           </div>
 
-          <div
-            className="mt-4 rounded-md p-3 font-body text-body-sm text-text-primary"
-            style={{ backgroundColor: "var(--bg-surface)" }}
-          >
-            <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
-            {card.recommendation?.explanation ?? "Not yet scored for your profile."}
-          </div>
-
           {/* D15: web-searched cards must show where their terms came
               from — a trust requirement, not decoration. */}
           {card.sourceUrls && card.sourceUrls.length > 0 && (
-            <p className="mt-2 font-body text-caption text-text-secondary">
+            <p className="mt-4 font-body text-caption text-text-secondary">
               Sourced via web search —{" "}
               <a
                 href={card.sourceUrls[0]}

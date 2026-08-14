@@ -9,6 +9,11 @@
   --color-white: #ffffff;
   --color-black: #000000;
   --color-accent: #00a1ff;
+  /* Deliberate, explicit exception to "never invent a color outside this
+     system" — added at the product owner's request specifically for the
+     results page's "MIMIR's Top Pick" highlight, nothing else. Constant
+     across light/dark, same pattern as --color-accent. */
+  --color-gold: #b8860b;
 
   /* Semantic tokens — light mode default (§2) */
   --bg-base: #ffffff;
@@ -16,6 +21,7 @@
   --text-primary: #000000;
   --text-secondary: #5c5c63;
   --accent: #00a1ff;
+  --gold: var(--color-gold);
   --success: #16a34a;
   --warning: #d97706;
   --danger: #dc2626;

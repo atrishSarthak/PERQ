@@ -18,6 +18,7 @@ const config: Config = {
         "text-primary": "var(--text-primary)",
         "text-secondary": "var(--text-secondary)",
         accent: "var(--accent)",
+        gold: "var(--gold)",
         success: "var(--success)",
         warning: "var(--warning)",
         danger: "var(--danger)",

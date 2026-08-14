@@ -8,6 +8,7 @@ export const colors = {
   white: "var(--color-white)",
   black: "var(--color-black)",
   accent: "var(--accent)",
+  gold: "var(--gold)",
   bgBase: "var(--bg-base)",
   bgSurface: "var(--bg-surface)",
   textPrimary: "var(--text-primary)",
