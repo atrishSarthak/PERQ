@@ -121,15 +121,20 @@ async function main() {
     updated++;
   }
 
-  // 2C: soft-delete — active cards not present in this source file are
-  // discontinued, never hard-deleted. Scoped to status='active' so this
-  // is idempotent (never re-touches already-discontinued rows).
+  // 2C: soft-delete — active *seeded* cards not present in this source file
+  // are discontinued, never hard-deleted. Scoped to status='active' so this
+  // is idempotent (never re-touches already-discontinued rows), and to
+  // origin='seeded' so this script — which only ever knows about the
+  // curated fallback set — can never discontinue a D15 web-search-sourced
+  // card just because that card's id isn't in cards.json (it was never
+  // supposed to be).
   const discontinuedResult = await db
     .update(schema.cards)
     .set({ status: "discontinued" })
     .where(
       and(
         eq(schema.cards.status, "active"),
+        eq(schema.cards.origin, "seeded"),
         sourceIds.length > 0 ? notInArray(schema.cards.id, sourceIds) : undefined
       )
     )
