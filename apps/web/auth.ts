@@ -2,12 +2,12 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
 import NextAuth, { type NextAuthResult } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import { db, users } from "@perq/db";
 import { eq } from "drizzle-orm";
 
 // PRD §6: Auth.js (NextAuth), Drizzle adapter, Postgres-backed sessions.
-// Default: email/password to start. Google OAuth is an easy low-friction
-// add later (PRD §15) — not wired here, not a blocking decision.
+// Email/password plus Google OAuth (PRD §15).
 //
 // Explicit NextAuthResult annotation works around a pnpm-monorepo type-
 // portability error (TS2742): without it, TS tries to structurally name
@@ -20,6 +20,17 @@ const nextAuth: NextAuthResult = NextAuth({
     signIn: "/login",
   },
   providers: [
+    Google({
+      // Auth.js v5's zero-config provider inference looks for
+      // AUTH_GOOGLE_ID/AUTH_GOOGLE_SECRET; this project's .env uses
+      // GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET instead, so wire them explicitly.
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // Google verifies email ownership, so it's safe to link a Google
+      // sign-in to an existing credentials account with the same email
+      // instead of throwing OAuthAccountNotLinked.
+      allowDangerousEmailAccountLinking: true,
+    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
