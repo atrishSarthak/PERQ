@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import NextAuth, { type NextAuthResult } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { db, users } from "@perq/db";
+import { db, users, accounts, sessions, verificationTokens } from "@perq/db";
 import { eq } from "drizzle-orm";
 
 // PRD §6: Auth.js (NextAuth), Drizzle adapter, Postgres-backed sessions.
@@ -14,7 +14,16 @@ import { eq } from "drizzle-orm";
 // the inferred return type via a node_modules path that isn't stably
 // importable across the workspace's nested dependency tree.
 const nextAuth: NextAuthResult = NextAuth({
-  adapter: DrizzleAdapter(db),
+  // Without an explicit schema, DrizzleAdapter falls back to its own default
+  // table/column names (e.g. camelCase "userId") instead of this project's
+  // snake_case columns ("user_id"), which broke Google OAuth's account
+  // lookup with "column account.userId does not exist".
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
