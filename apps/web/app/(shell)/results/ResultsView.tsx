@@ -3,17 +3,42 @@
 import { useMemo, useState } from "react";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
-import { emptyFilters, filterCards, sortCards, type ResultsFilters, type SortMode } from "./filterAndSort";
+import {
+  emptyFilters,
+  filterCards,
+  sortCards,
+  type AnnualFeeBucket,
+  type ResultsFilters,
+  type SortMode,
+} from "./filterAndSort";
 import { Chat } from "./Chat";
 import { EditProfilePanel } from "./EditProfilePanel";
+import { ResultCard } from "./ResultCard";
+import { DarkModeToggle } from "./DarkModeToggle";
 
-const NETWORKS = ["Visa", "Mastercard", "RuPay", "Amex"];
-const CATEGORY_TAGS: { key: string; label: string }[] = [
-  { key: "travel", label: "Travel" },
+const ANNUAL_FEE_BUCKETS: { key: AnnualFeeBucket; label: string }[] = [
+  { key: "free", label: "Free (₹0)" },
+  { key: "under1000", label: "Under ₹1,000" },
+  { key: "1000plus", label: "₹1,000+" },
+];
+
+const NETWORKS: { value: string; label: string }[] = [
+  { value: "Visa", label: "Visa" },
+  { value: "Mastercard", label: "Mastercard" },
+  { value: "Amex", label: "American Express" },
+  { value: "RuPay", label: "RuPay" },
+];
+
+const REWARD_TYPES: { key: string; label: string }[] = [
   { key: "general", label: "Cashback" },
-  { key: "dining", label: "Dining" },
-  { key: "fuel", label: "Fuel" },
-  { key: "ecommerce", label: "Shopping" },
+  { key: "travel", label: "Travel points" },
+  { key: "fuel", label: "Fuel surcharge waiver" },
+];
+
+const SORT_TABS: [SortMode, string][] = [
+  ["best-match", "Best Match"],
+  ["lowest-fee", "Lowest Fee"],
+  ["highest-rewards", "Highest Rewards"],
 ];
 
 export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers: QuizAnswers }) {
@@ -68,7 +93,7 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
     filters.networks.size +
     filters.issuers.size +
     filters.categories.size +
-    (filters.zeroFeeOnly ? 1 : 0) +
+    filters.annualFeeBuckets.size +
     (filters.showHeldOnly ? 1 : 0);
 
   const cardOptions = useMemo(
@@ -77,10 +102,14 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
   );
 
   return (
-    <div className="flex min-h-screen flex-col gap-6 p-6 md:flex-row">
+    <div className="flex min-h-screen flex-col md:flex-row">
       {/* Desktop: always-visible sidebar (DR8 — unaffected below md, where
           it's hidden in favor of the drawer). */}
-      <aside className="hidden md:block md:w-64 md:shrink-0">
+      <aside
+        className="hidden shrink-0 border-r border-border p-6 md:block md:w-64"
+        style={{ backgroundColor: "var(--bg-surface)" }}
+      >
+        <PerqWordmark />
         <FiltersPanel
           filters={filters}
           setFilters={setFilters}
@@ -89,29 +118,33 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
         />
       </aside>
 
-      <main className="flex-1 space-y-6">
-        {/* §11: "Edit my profile" panel — all 13 answers, independently editable. */}
-        <EditProfilePanel answers={answers} cardOptions={cardOptions} />
+      <main className="flex-1 space-y-6 p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-display text-display font-bold text-text-primary">
+              {sorted.length} cards matched
+            </h1>
+            <p className="mt-1 font-body text-body text-text-secondary">
+              Ranked by MIMIR for your spending profile
+            </p>
+          </div>
+          <DarkModeToggle />
+        </div>
 
         <div className="flex items-center justify-between gap-2">
           <div className="flex gap-2" role="tablist">
-            {(
-              [
-                ["best-match", "Best Match"],
-                ["lowest-fee", "Lowest Fee"],
-                ["highest-rewards", "Highest Rewards"],
-              ] as [SortMode, string][]
-            ).map(([mode, label]) => (
+            {SORT_TABS.map(([mode, label]) => (
               <button
                 key={mode}
                 role="tab"
                 aria-selected={sortMode === mode}
                 onClick={() => setSortMode(mode)}
-                className={`rounded-md px-3 py-1.5 font-body text-body-sm ${
+                className="rounded-full px-4 py-1.5 font-body text-body-sm font-semibold"
+                style={
                   sortMode === mode
-                    ? "bg-accent text-white"
-                    : "border border-border text-text-secondary"
-                }`}
+                    ? { backgroundColor: "var(--text-primary)", color: "var(--bg-base)" }
+                    : { border: "1px solid var(--border)", color: "var(--text-secondary)" }
+                }
               >
                 {label}
               </button>
@@ -126,6 +159,8 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
             Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
           </button>
         </div>
+
+        <EditProfilePanel answers={answers} cardOptions={cardOptions} />
 
         {sorted.length === 0 ? (
           // DR4: inline message + one-click clear-filters, list stays in place
@@ -143,24 +178,37 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
         ) : (
           <>
             {topPick && (
-              <CardRow
-                card={topPick}
-                pending={pendingCardId === topPick.cardId}
-                onToggleArsenal={toggleArsenal}
-                isTopPick
-              />
+              <div>
+                <p className="mb-3 flex items-center gap-1.5 font-body text-caption font-semibold uppercase tracking-wide text-accent">
+                  <span aria-hidden="true">✦</span> MIMIR&apos;s Top Pick
+                </p>
+                <ResultCard
+                  card={topPick}
+                  pending={pendingCardId === topPick.cardId}
+                  onToggleArsenal={toggleArsenal}
+                  isTopPick
+                />
+              </div>
             )}
-            <ul className="space-y-3">
-              {listCards.map((card) => (
-                <li key={card.cardId}>
-                  <CardRow
-                    card={card}
-                    pending={pendingCardId === card.cardId}
-                    onToggleArsenal={toggleArsenal}
-                  />
-                </li>
-              ))}
-            </ul>
+
+            {listCards.length > 0 && (
+              <div>
+                <p className="mb-3 font-body text-caption font-semibold uppercase tracking-wide text-text-secondary">
+                  More Matches
+                </p>
+                <ul className="space-y-4">
+                  {listCards.map((card) => (
+                    <li key={card.cardId}>
+                      <ResultCard
+                        card={card}
+                        pending={pendingCardId === card.cardId}
+                        onToggleArsenal={toggleArsenal}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         )}
 
@@ -204,11 +252,52 @@ export function ResultsView({ cards, answers }: { cards: ResultsCard[]; answers:
   );
 }
 
-function toggleSetMember(set: Set<string>, value: string): Set<string> {
+function PerqWordmark() {
+  return <p className="mb-6 font-display text-h1 font-bold text-text-primary">PERQ</p>;
+}
+
+function toggleSetMember<T>(set: Set<T>, value: T): Set<T> {
   const next = new Set(set);
   if (next.has(value)) next.delete(value);
   else next.add(value);
   return next;
+}
+
+function FilterGroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="mb-3 font-body text-caption font-semibold uppercase tracking-wide text-text-secondary">
+      {children}
+    </h2>
+  );
+}
+
+function CheckboxRow({
+  label,
+  checked,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label
+      className={`flex items-center gap-2 py-1 font-body text-body ${
+        disabled ? "text-text-secondary" : "text-text-primary"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={onChange}
+        className="h-4 w-4 rounded accent-[var(--accent)]"
+      />
+      {label}
+    </label>
+  );
 }
 
 function FiltersPanel({
@@ -225,157 +314,77 @@ function FiltersPanel({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Network</h2>
-        <div className="flex flex-wrap gap-2">
-          {NETWORKS.map((n) => (
-            <button
-              key={n}
-              onClick={() =>
-                setFilters((f) => ({ ...f, networks: toggleSetMember(f.networks, n) }))
-              }
-              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                filters.networks.has(n) ? "bg-accent text-white" : "text-text-secondary"
-              }`}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+        <FilterGroupLabel>Annual Fee</FilterGroupLabel>
+        {ANNUAL_FEE_BUCKETS.map((bucket) => (
+          <CheckboxRow
+            key={bucket.key}
+            label={bucket.label}
+            checked={filters.annualFeeBuckets.has(bucket.key)}
+            onChange={() =>
+              setFilters((f) => ({
+                ...f,
+                annualFeeBuckets: toggleSetMember(f.annualFeeBuckets, bucket.key),
+              }))
+            }
+          />
+        ))}
       </div>
 
-      <div>
-        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Issuer</h2>
-        <div className="flex flex-wrap gap-2">
-          {issuers.map((issuer) => (
-            <button
-              key={issuer}
-              onClick={() =>
-                setFilters((f) => ({ ...f, issuers: toggleSetMember(f.issuers, issuer) }))
-              }
-              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                filters.issuers.has(issuer) ? "bg-accent text-white" : "text-text-secondary"
-              }`}
-            >
-              {issuer}
-            </button>
-          ))}
-        </div>
+      <div className="border-t border-border pt-6">
+        <FilterGroupLabel>Network</FilterGroupLabel>
+        {NETWORKS.map((network) => (
+          <CheckboxRow
+            key={network.value}
+            label={network.label}
+            checked={filters.networks.has(network.value)}
+            onChange={() =>
+              setFilters((f) => ({ ...f, networks: toggleSetMember(f.networks, network.value) }))
+            }
+          />
+        ))}
       </div>
 
-      <div>
-        <h2 className="mb-2 font-body text-body-sm font-semibold text-text-primary">Category</h2>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORY_TAGS.map((tag) => (
-            <button
-              key={tag.key}
-              onClick={() =>
-                setFilters((f) => ({ ...f, categories: toggleSetMember(f.categories, tag.key) }))
-              }
-              className={`rounded-md border border-border px-2 py-1 text-body-sm ${
-                filters.categories.has(tag.key) ? "bg-accent text-white" : "text-text-secondary"
-              }`}
-            >
-              {tag.label}
-            </button>
-          ))}
-        </div>
+      <div className="border-t border-border pt-6">
+        <FilterGroupLabel>Reward Type</FilterGroupLabel>
+        {REWARD_TYPES.map((tag) => (
+          <CheckboxRow
+            key={tag.key}
+            label={tag.label}
+            checked={filters.categories.has(tag.key)}
+            onChange={() =>
+              setFilters((f) => ({ ...f, categories: toggleSetMember(f.categories, tag.key) }))
+            }
+          />
+        ))}
       </div>
 
-      <label className="flex items-center gap-2 text-body-sm text-text-primary">
-        <input
-          type="checkbox"
-          checked={filters.zeroFeeOnly}
-          onChange={(e) => setFilters((f) => ({ ...f, zeroFeeOnly: e.target.checked }))}
-        />
-        ₹0 joining fee only
-      </label>
+      <div className="border-t border-border pt-6">
+        <FilterGroupLabel>Issuer</FilterGroupLabel>
+        {issuers.map((issuer) => (
+          <CheckboxRow
+            key={issuer}
+            label={issuer}
+            checked={filters.issuers.has(issuer)}
+            onChange={() =>
+              setFilters((f) => ({ ...f, issuers: toggleSetMember(f.issuers, issuer) }))
+            }
+          />
+        ))}
+      </div>
 
-      {/* DR3: disabled-with-helper-text empty arsenal state, not hidden */}
-      <label
-        className={`flex items-center gap-2 text-body-sm ${
-          hasHeldCards ? "text-text-primary" : "text-text-secondary"
-        }`}
-      >
-        <input
-          type="checkbox"
-          disabled={!hasHeldCards}
+      <div className="border-t border-border pt-6">
+        {/* DR3: disabled-with-helper-text empty arsenal state, not hidden */}
+        <CheckboxRow
+          label="Show cards I already hold"
           checked={filters.showHeldOnly}
-          onChange={(e) => setFilters((f) => ({ ...f, showHeldOnly: e.target.checked }))}
+          disabled={!hasHeldCards}
+          onChange={() => setFilters((f) => ({ ...f, showHeldOnly: !f.showHeldOnly }))}
         />
-        Show cards I already hold
-      </label>
-      {!hasHeldCards && (
-        <p className="text-caption text-text-secondary">
-          Add a card from your results below to start building your arsenal.
-        </p>
-      )}
-    </div>
-  );
-}
-
-function CardRow({
-  card,
-  pending,
-  onToggleArsenal,
-  isTopPick,
-}: {
-  card: ResultsCard;
-  pending: boolean;
-  onToggleArsenal: (cardId: string, next: "held" | "not_held") => void;
-  isTopPick?: boolean;
-}) {
-  const held = card.arsenalStatus === "held";
-
-  return (
-    <div
-      className="rounded-lg border p-4"
-      style={{
-        // DR6: held cards get a subtle bg-surface tint, locked tokens only.
-        // Top Pick is visually distinct (border weight) but deliberately
-        // NOT ad-styled — no badge, no highlight color.
-        backgroundColor: held ? "var(--bg-surface)" : "var(--bg-base)",
-        borderColor: "var(--border)",
-        borderWidth: isTopPick ? 2 : 1,
-      }}
-    >
-      {isTopPick && (
-        <p className="mb-1 font-display text-body-sm text-accent">MIMIR&apos;s Top Pick</p>
-      )}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-body text-body font-semibold text-text-primary">
-            {card.issuer} {card.name}
-          </p>
-          <p className="font-body text-body-sm text-text-secondary">
-            {card.recommendation?.explanation ?? "Not yet scored for your profile."}
-          </p>
+        {!hasHeldCards && (
           <p className="mt-1 font-body text-caption text-text-secondary">
-            Annual fee: ₹{card.annualFee}
+            Add a card from your results below to start building your arsenal.
           </p>
-          {/* D15: web-searched cards must show where their terms came
-              from — a trust requirement, not decoration (PRD §13's "never a
-              vague source" framing applies to sourcing, not just scoring). */}
-          {card.sourceUrls && card.sourceUrls.length > 0 && (
-            <p className="mt-1 font-body text-caption text-text-secondary">
-              Sourced via web search —{" "}
-              <a
-                href={card.sourceUrls[0]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline"
-              >
-                view source
-              </a>
-            </p>
-          )}
-        </div>
-        <button
-          disabled={pending}
-          onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
-          className="shrink-0 rounded-md border border-border px-2 py-1 text-body-sm text-text-primary disabled:opacity-50"
-        >
-          {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
-        </button>
+        )}
       </div>
     </div>
   );

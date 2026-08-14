@@ -2,12 +2,14 @@ import type { ResultsCard } from "./types";
 
 export type SortMode = "best-match" | "lowest-fee" | "highest-rewards";
 
+export type AnnualFeeBucket = "free" | "under1000" | "1000plus";
+
 export interface ResultsFilters {
   networks: Set<string>;
   issuers: Set<string>;
   categories: Set<string>; // scoring-engine category keys (dining, travel, ...)
+  annualFeeBuckets: Set<AnnualFeeBucket>;
   showHeldOnly: boolean;
-  zeroFeeOnly: boolean;
 }
 
 export function emptyFilters(): ResultsFilters {
@@ -15,9 +17,15 @@ export function emptyFilters(): ResultsFilters {
     networks: new Set(),
     issuers: new Set(),
     categories: new Set(),
+    annualFeeBuckets: new Set(),
     showHeldOnly: false,
-    zeroFeeOnly: false,
   };
+}
+
+export function annualFeeBucket(fee: number): AnnualFeeBucket {
+  if (fee === 0) return "free";
+  if (fee < 1000) return "under1000";
+  return "1000plus";
 }
 
 /**
@@ -29,7 +37,11 @@ export function filterCards(cardsList: ResultsCard[], filters: ResultsFilters): 
   return cardsList.filter((card) => {
     if (filters.networks.size > 0 && !filters.networks.has(card.network)) return false;
     if (filters.issuers.size > 0 && !filters.issuers.has(card.issuer)) return false;
-    if (filters.zeroFeeOnly && card.joiningFee !== 0) return false;
+    if (
+      filters.annualFeeBuckets.size > 0 &&
+      !filters.annualFeeBuckets.has(annualFeeBucket(card.annualFee))
+    )
+      return false;
     if (filters.showHeldOnly && card.arsenalStatus !== "held") return false;
     if (filters.categories.size > 0) {
       const matchesAnyCategory = [...filters.categories].some(

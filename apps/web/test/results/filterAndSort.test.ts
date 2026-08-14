@@ -12,6 +12,7 @@ function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
     joiningFee: 0,
     rewardRates: { dining: 0.05 },
     loungeAccess: null,
+    feeWaiverCondition: null,
     recommendation: { rank: 1, score: 100, explanation: "test" },
     arsenalStatus: undefined,
     ...overrides,
@@ -42,13 +43,27 @@ describe("filterCards", () => {
     expect(filterCards(cardsList, filters).map((c) => c.cardId)).toEqual(["b"]);
   });
 
-  it("filters to zero joining fee only", () => {
+  it("filters by annual fee bucket", () => {
     const cardsList = [
-      makeCard({ cardId: "a", joiningFee: 0 }),
-      makeCard({ cardId: "b", joiningFee: 500 }),
+      makeCard({ cardId: "a", annualFee: 0 }),
+      makeCard({ cardId: "b", annualFee: 500 }),
+      makeCard({ cardId: "c", annualFee: 1500 }),
     ];
-    const filters = { ...emptyFilters(), zeroFeeOnly: true };
+    const filters = { ...emptyFilters(), annualFeeBuckets: new Set<"free">(["free"]) };
     expect(filterCards(cardsList, filters).map((c) => c.cardId)).toEqual(["a"]);
+  });
+
+  it("combines multiple annual fee buckets with OR semantics", () => {
+    const cardsList = [
+      makeCard({ cardId: "a", annualFee: 0 }),
+      makeCard({ cardId: "b", annualFee: 500 }),
+      makeCard({ cardId: "c", annualFee: 1500 }),
+    ];
+    const filters = {
+      ...emptyFilters(),
+      annualFeeBuckets: new Set<"free" | "under1000">(["free", "under1000"]),
+    };
+    expect(filterCards(cardsList, filters).map((c) => c.cardId)).toEqual(["a", "b"]);
   });
 
   it("filters to held-only cards", () => {
@@ -73,11 +88,15 @@ describe("filterCards", () => {
 
   it("combines multiple filters with AND semantics", () => {
     const cardsList = [
-      makeCard({ cardId: "a", network: "Visa", joiningFee: 0 }),
-      makeCard({ cardId: "b", network: "Visa", joiningFee: 500 }),
-      makeCard({ cardId: "c", network: "RuPay", joiningFee: 0 }),
+      makeCard({ cardId: "a", network: "Visa", annualFee: 0 }),
+      makeCard({ cardId: "b", network: "Visa", annualFee: 500 }),
+      makeCard({ cardId: "c", network: "RuPay", annualFee: 0 }),
     ];
-    const filters = { ...emptyFilters(), networks: new Set(["Visa"]), zeroFeeOnly: true };
+    const filters = {
+      ...emptyFilters(),
+      networks: new Set(["Visa"]),
+      annualFeeBuckets: new Set<"free">(["free"]),
+    };
     expect(filterCards(cardsList, filters).map((c) => c.cardId)).toEqual(["a"]);
   });
 });

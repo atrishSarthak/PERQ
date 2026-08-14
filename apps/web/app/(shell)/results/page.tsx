@@ -71,6 +71,7 @@ export default async function ResultsPage() {
       joiningFee: Number(c.joiningFee),
       rewardRates: (c.rewardRates ?? {}) as Record<string, number>,
       loungeAccess: c.loungeAccess,
+      feeWaiverCondition: c.feeWaiverCondition,
       recommendation: rec
         ? { rank: rec.rank, score: Number(rec.score), explanation: rec.explanation }
         : undefined,

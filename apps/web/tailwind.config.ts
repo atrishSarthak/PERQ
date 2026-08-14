@@ -27,6 +27,19 @@ const config: Config = {
         display: ["var(--font-display)"],
         body: ["var(--font-body)"],
       },
+      // Design System §3 type scale — was previously only defined as raw
+      // CSS vars in tokens.css with no Tailwind utility wired to them, so
+      // classes like `text-h2`/`text-display` used across the app resolved
+      // to nothing and silently fell back to the browser default size.
+      fontSize: {
+        display: ["var(--text-display-size)", { lineHeight: "1.1" }],
+        h1: ["var(--text-h1-size)", { lineHeight: "1.15" }],
+        h2: ["var(--text-h2-size)", { lineHeight: "1.25" }],
+        "body-lg": ["var(--text-body-lg-size)", { lineHeight: "1.5" }],
+        body: ["var(--text-body-size)", { lineHeight: "1.5" }],
+        "body-sm": ["var(--text-body-sm-size)", { lineHeight: "1.45" }],
+        caption: ["var(--text-caption-size)", { lineHeight: "1.3" }],
+      },
       borderRadius: {
         sm: "var(--radius-sm)",
         md: "var(--radius-md)",

@@ -20,6 +20,7 @@ function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
     joiningFee: 0,
     rewardRates: { dining: 0.05 },
     loungeAccess: null,
+    feeWaiverCondition: null,
     recommendation: { rank: 1, score: 100, explanation: "Great for dining" },
     arsenalStatus: undefined,
     ...overrides,
@@ -92,7 +93,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
     const drawerRupay = rupayButtons.find((el) => dialog.contains(el))!;
     fireEvent.click(drawerRupay);
 
-    // CardRow renders "{issuer} {name}" as one combined text node.
+    // ResultCard renders "{issuer} {name}" as one combined text node.
     expect(screen.getByText(/Card B/)).toBeInTheDocument();
     expect(screen.queryByText(/TestBank Test Card/)).not.toBeInTheDocument();
   });

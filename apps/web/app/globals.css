@@ -4,6 +4,12 @@
 
 @import "@perq/design-tokens/src/tokens.css";
 
+:root {
+  /* next/font-loaded Inter (see app/layout.tsx) takes priority over the
+     bare family-name fallback tokens.css declares. */
+  --font-body: var(--font-inter), "Inter", sans-serif;
+}
+
 body {
   background-color: var(--bg-base);
   color: var(--text-primary);

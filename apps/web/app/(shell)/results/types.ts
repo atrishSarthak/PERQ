@@ -10,6 +10,9 @@ export interface ResultsCard {
   joiningFee: number;
   rewardRates: Record<string, number>;
   loungeAccess: unknown;
+  // Result card's "Fee Waiver" stat — grounded per-card text, e.g. "Spend
+  // ₹1,00,000 in a year". Null when the card has no waiver condition.
+  feeWaiverCondition: string | null;
   // Present only for cards MIMIR actually recommends (eligible, per D1) —
   // undefined for a card the user is browsing via filters that wasn't
   // eligible for their profile.

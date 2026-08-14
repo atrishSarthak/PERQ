@@ -1,0 +1,106 @@
+import type { ResultsCard } from "./types";
+import { CardVisual } from "./CardVisual";
+import { getRewardHighlight } from "./rewardHighlight";
+
+function formatRupee(amount: number): string {
+  return `₹${amount.toLocaleString("en-IN")}`;
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="font-body text-caption font-semibold uppercase tracking-wide text-text-secondary">
+        {label}
+      </p>
+      <p className="mt-0.5 font-body text-body font-bold text-text-primary">{value}</p>
+    </div>
+  );
+}
+
+/**
+ * The result card component used for both MIMIR's Top Pick and every card
+ * in "More Matches" — only the border (isTopPick) differs; the "Top Pick"
+ * label itself is rendered by the caller, above the card, not inside it.
+ */
+export function ResultCard({
+  card,
+  pending,
+  onToggleArsenal,
+  isTopPick,
+}: {
+  card: ResultsCard;
+  pending: boolean;
+  onToggleArsenal: (cardId: string, next: "held" | "not_held") => void;
+  isTopPick?: boolean;
+}) {
+  const held = card.arsenalStatus === "held";
+
+  return (
+    <div
+      className="rounded-lg p-4 md:p-6"
+      style={{
+        backgroundColor: "var(--bg-base)",
+        borderStyle: "solid",
+        borderWidth: isTopPick ? 2 : 1,
+        borderColor: isTopPick ? "var(--accent)" : "var(--border)",
+      }}
+    >
+      <div className="flex flex-col gap-4 md:flex-row md:gap-6">
+        <CardVisual card={card} />
+
+        <div className="flex flex-1 flex-col">
+          <h3 className="font-display text-h2 font-bold text-text-primary">
+            {card.issuer} {card.name}
+          </h3>
+
+          <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4">
+            <Stat label="Annual Fee" value={formatRupee(card.annualFee)} />
+            <Stat label="Joining Fee" value={formatRupee(card.joiningFee)} />
+            <Stat label="Reward Highlight" value={getRewardHighlight(card.rewardRates)} />
+            <Stat label="Fee Waiver" value={card.feeWaiverCondition ?? "None"} />
+          </div>
+
+          <div
+            className="mt-4 rounded-md p-3 font-body text-body-sm text-text-primary"
+            style={{ backgroundColor: "var(--bg-surface)" }}
+          >
+            <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
+            {card.recommendation?.explanation ?? "Not yet scored for your profile."}
+          </div>
+
+          {/* D15: web-searched cards must show where their terms came
+              from — a trust requirement, not decoration. */}
+          {card.sourceUrls && card.sourceUrls.length > 0 && (
+            <p className="mt-2 font-body text-caption text-text-secondary">
+              Sourced via web search —{" "}
+              <a
+                href={card.sourceUrls[0]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                view source
+              </a>
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-1 items-end justify-end">
+            <button
+              disabled={pending}
+              onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
+              className={`font-body text-body-sm font-semibold disabled:opacity-50 ${
+                held ? "rounded-full px-4 py-2" : "rounded-md px-4 py-2"
+              }`}
+              style={{
+                backgroundColor: held ? "var(--success)" : "var(--text-primary)",
+                color: held ? "var(--color-white)" : "var(--bg-base)",
+              }}
+            >
+              {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
