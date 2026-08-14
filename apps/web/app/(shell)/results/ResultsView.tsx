@@ -172,7 +172,7 @@ export function ResultsView({
           it's hidden in favor of the drawer). */}
       <aside
         className="hidden shrink-0 border-r border-border p-6 md:block md:w-64"
-        style={{ backgroundColor: "var(--bg-surface)" }}
+        style={{ backgroundColor: "var(--bg-base)" }}
       >
         <FiltersPanel
           filters={filters}
@@ -375,13 +375,39 @@ function CheckboxRow({
         disabled ? "text-text-secondary" : "text-text-primary"
       }`}
     >
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={disabled}
-        onChange={onChange}
-        className="h-4 w-4 rounded accent-[var(--accent)]"
-      />
+      <span
+        // rounded-[5px], not rounded-md: this project's Tailwind config
+        // remaps rounded-md to the design system's 12px --radius-md token,
+        // which on a 16px box reads as a near-circle (radio-button shaped)
+        // rather than a rounded checkbox — misleading here since these are
+        // multi-select checkboxes, not single-select radios.
+        className={`relative flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border ${
+          disabled ? "opacity-50" : ""
+        }`}
+        style={{
+          backgroundColor: checked ? "var(--accent)" : "var(--bg-base)",
+          borderColor: checked ? "var(--accent)" : "var(--border)",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          disabled={disabled}
+          onChange={onChange}
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        />
+        {checked && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path
+              d="M1.5 5L4 7.5L8.5 2"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </span>
       {label}
     </label>
   );

@@ -22,9 +22,9 @@ function Stat({ label, value }: { label: string; value: string }) {
  * in "More Matches" — only the border (isTopPick) differs; the "Top Pick"
  * label itself is rendered by the caller, above the card, not inside it.
  *
- * Layout: card visual (left) and name/stats (right) sit in a row up top;
- * MIMIR's explanation runs full-width beneath both, so it stretches all
- * the way to the same right edge the arsenal button sits at below it.
+ * Layout: card visual (left) and name/stats (right) sit in a row up top,
+ * with the arsenal button at the top-right of that row (same right edge
+ * as the container); MIMIR's explanation runs full-width beneath both.
  */
 export function ResultCard({
   card,
@@ -56,9 +56,25 @@ export function ResultCard({
         <CardVisual card={card} cardHolderName={cardHolderName} />
 
         <div className="flex flex-1 flex-col">
-          <h3 className="font-display text-h2 font-bold text-text-primary">
-            {card.issuer} {card.name}
-          </h3>
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-display text-h2 font-bold text-text-primary">
+              {card.issuer} {card.name}
+            </h3>
+
+            <button
+              disabled={pending}
+              onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
+              className={`shrink-0 font-body text-body-sm font-semibold disabled:opacity-50 ${
+                held ? "rounded-full px-4 py-2" : "rounded-md px-4 py-2"
+              }`}
+              style={{
+                backgroundColor: held ? "var(--success)" : "var(--text-primary)",
+                color: held ? "var(--color-white)" : "var(--bg-base)",
+              }}
+            >
+              {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
+            </button>
+          </div>
 
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4">
             <Stat label="Annual Fee" value={formatRupee(card.annualFee)} />
@@ -91,22 +107,6 @@ export function ResultCard({
       >
         <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
         {card.recommendation?.explanation ?? "Not yet scored for your profile."}
-      </div>
-
-      <div className="mt-4 flex justify-end">
-        <button
-          disabled={pending}
-          onClick={() => onToggleArsenal(card.cardId, held ? "not_held" : "held")}
-          className={`font-body text-body-sm font-semibold disabled:opacity-50 ${
-            held ? "rounded-full px-4 py-2" : "rounded-md px-4 py-2"
-          }`}
-          style={{
-            backgroundColor: held ? "var(--success)" : "var(--text-primary)",
-            color: held ? "var(--color-white)" : "var(--bg-base)",
-          }}
-        >
-          {held ? "✓ In My Arsenal" : "Add to My Arsenal"}
-        </button>
       </div>
     </div>
   );
