@@ -4,6 +4,11 @@
  * the `data: {...}\n\n` frames by hand. Buffers across chunk boundaries
  * since a single `data: ...\n\n` frame is not guaranteed to arrive in one
  * read() call.
+ *
+ * Feature-agnostic despite living under quiz/ — shared by the quiz-submit
+ * SSE stream and MimirChatContext's streamed chat replies. Not moved to a
+ * more neutral location to avoid the import churn; feel free to relocate
+ * if a third consumer shows up.
  */
 export async function* parseSSEStream(
   body: ReadableStream<Uint8Array>

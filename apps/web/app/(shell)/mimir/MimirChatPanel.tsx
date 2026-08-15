@@ -14,7 +14,7 @@ import { useMimirChat, type MimirChatMessage } from "./MimirChatContext";
  * send a message once the conversation is going.
  */
 export function MimirChatPanel() {
-  const { open, setOpen, messages, sending, send } = useMimirChat();
+  const { open, setOpen, messages, sending, awaitingReply, send } = useMimirChat();
   const [input, setInput] = useState("");
 
   async function handleSend() {
@@ -80,15 +80,13 @@ export function MimirChatPanel() {
               return (
                 <BubbleGroup key={i} role={role}>
                   {group.messages.map((m, j) => (
-                    <Message key={j} role={role}>
-                      {m.content}
-                    </Message>
+                    <Message key={j} role={role} content={m.content} />
                   ))}
                 </BubbleGroup>
               );
             })
           )}
-          {sending && (
+          {awaitingReply && (
             <p className="font-body text-body-sm text-text-secondary">MIMIR is thinking…</p>
           )}
         </MessageScroller>

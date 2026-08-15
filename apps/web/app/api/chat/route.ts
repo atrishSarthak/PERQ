@@ -8,10 +8,31 @@ import { buildGroundingContext } from "@/lib/mimir/chatContext";
 import { buildChatSystemPrompt } from "@/lib/mimir/prompt";
 import { createGetCardDetailsTool } from "@/lib/mimir/tools";
 
+export const dynamic = "force-dynamic";
+
 // D9: per-user turn cap — the larger, previously-unbounded Gemini-quota
 // risk identified in the outside-voice review (unlike quiz-submit, chat
 // has no D6/D10 cache and calls Gemini fresh every turn).
 const MAX_CHAT_TURNS = 20;
+
+// Gemini's own tool-calling loop (runGeminiAgent) isn't itself streamed —
+// restructuring it to stream mid-tool-loop would mean streaming partial
+// tool-call reasoning the user shouldn't see. Instead the full reply is
+// computed server-side as before, then re-emitted to the client in small
+// word chunks over SSE (same `data: {...}\n\n` framing as quiz-submit's
+// narration stream) so it reads like a live-streaming reply — the same
+// UX as ChatGPT, just sourced from an already-complete response rather
+// than a token stream from the model itself.
+const WORDS_PER_CHUNK = 3;
+const CHUNK_DELAY_MS = 35;
+
+function sseEvent(data: unknown): string {
+  return `data: ${JSON.stringify(data)}\n\n`;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function POST(req: Request) {
   const authResult = await requireAuth();
@@ -28,81 +49,106 @@ export async function POST(req: Request) {
   }
   const { message } = parsed.data;
 
-  // A turn is one user message (+ its assistant reply) — count only
-  // user-role rows, not all rows, or the real cap would be MAX_CHAT_TURNS/2.
-  const [turnCountRow] = await db
-    .select({ value: count() })
-    .from(chatMessages)
-    .where(and(eq(chatMessages.userId, user.id), eq(chatMessages.role, "user")));
-  const turnCount = turnCountRow?.value ?? 0;
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      const emit = (data: unknown) => controller.enqueue(encoder.encode(sseEvent(data)));
 
-  if (turnCount >= MAX_CHAT_TURNS) {
-    return NextResponse.json(
-      {
-        error:
-          "This conversation has reached its length limit — start a fresh question from your results page.",
-      },
-      { status: 429 }
-    );
-  }
+      try {
+        // A turn is one user message (+ its assistant reply) — count only
+        // user-role rows, not all rows, or the real cap would be MAX_CHAT_TURNS/2.
+        const [turnCountRow] = await db
+          .select({ value: count() })
+          .from(chatMessages)
+          .where(and(eq(chatMessages.userId, user.id), eq(chatMessages.role, "user")));
+        const turnCount = turnCountRow?.value ?? 0;
 
-  const groundingContext = await buildGroundingContext(user.id);
-  if (!groundingContext) {
-    return NextResponse.json(
-      { error: "No profile found — complete the quiz first." },
-      { status: 404 }
-    );
-  }
+        if (turnCount >= MAX_CHAT_TURNS) {
+          emit({
+            type: "error",
+            message:
+              "This conversation has reached its length limit — start a fresh question from your results page.",
+          });
+          return;
+        }
 
-  const priorMessages = await db
-    .select({ role: chatMessages.role, content: chatMessages.content })
-    .from(chatMessages)
-    .where(eq(chatMessages.userId, user.id))
-    .orderBy(asc(chatMessages.createdAt));
+        const groundingContext = await buildGroundingContext(user.id);
+        if (!groundingContext) {
+          emit({ type: "error", message: "No profile found — complete the quiz first." });
+          return;
+        }
 
-  const activeCards = await db.select().from(cards).where(eq(cards.status, "active"));
-  const dbCardsById = new Map<string, DbCard>(activeCards.map((c) => [c.id, c]));
+        const priorMessages = await db
+          .select({ role: chatMessages.role, content: chatMessages.content })
+          .from(chatMessages)
+          .where(eq(chatMessages.userId, user.id))
+          .orderBy(asc(chatMessages.createdAt));
 
-  const history = [
-    ...priorMessages.map((m) => ({
-      role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
-      content: m.content,
-    })),
-    { role: "user" as const, content: message },
-  ];
+        const activeCards = await db.select().from(cards).where(eq(cards.status, "active"));
+        const dbCardsById = new Map<string, DbCard>(activeCards.map((c) => [c.id, c]));
 
-  let agentResult;
-  try {
-    agentResult = await runGeminiAgent({
-      systemPrompt: buildChatSystemPrompt(groundingContext),
-      history,
-      tools: [createGetCardDetailsTool(dbCardsById)],
-      callModel: createGeminiModelCaller(requireGeminiKey()),
-    });
-  } catch (err) {
-    console.error("[/api/chat] runGeminiAgent threw:", err);
-    // Post-outside-voice decision: explicit error, the failed turn is NOT
-    // persisted (it would pollute D2's context reconstruction on retry),
-    // user can just retry with the same message still in their input box.
-    return NextResponse.json(
-      { error: "MIMIR couldn't respond — try again." },
-      { status: 502 }
-    );
-  }
+        const history = [
+          ...priorMessages.map((m) => ({
+            role: m.role === "assistant" ? ("assistant" as const) : ("user" as const),
+            content: m.content,
+          })),
+          { role: "user" as const, content: message },
+        ];
 
-  if (!agentResult.finalText || agentResult.cappedOut) {
-    return NextResponse.json(
-      { error: "MIMIR couldn't respond — try again." },
-      { status: 502 }
-    );
-  }
+        let agentResult;
+        try {
+          agentResult = await runGeminiAgent({
+            systemPrompt: buildChatSystemPrompt(groundingContext),
+            history,
+            tools: [createGetCardDetailsTool(dbCardsById)],
+            callModel: createGeminiModelCaller(requireGeminiKey()),
+          });
+        } catch (err) {
+          console.error("[/api/chat] runGeminiAgent threw:", err);
+          // Post-outside-voice decision: explicit error, the failed turn is
+          // NOT persisted (it would pollute D2's context reconstruction on
+          // retry), user can just retry with the same message.
+          emit({ type: "error", message: "MIMIR couldn't respond — try again." });
+          return;
+        }
 
-  await db.insert(chatMessages).values([
-    { userId: user.id, role: "user", content: message },
-    { userId: user.id, role: "assistant", content: agentResult.finalText },
-  ]);
+        if (!agentResult.finalText || agentResult.cappedOut) {
+          emit({ type: "error", message: "MIMIR couldn't respond — try again." });
+          return;
+        }
 
-  return NextResponse.json({ reply: agentResult.finalText });
+        await db.insert(chatMessages).values([
+          { userId: user.id, role: "user", content: message },
+          { userId: user.id, role: "assistant", content: agentResult.finalText },
+        ]);
+
+        const words = agentResult.finalText.split(" ");
+        for (let i = 0; i < words.length; i += WORDS_PER_CHUNK) {
+          const slice = words.slice(i, i + WORDS_PER_CHUNK).join(" ");
+          const isLast = i + WORDS_PER_CHUNK >= words.length;
+          emit({ type: "chunk", text: isLast ? slice : slice + " " });
+          if (!isLast) await sleep(CHUNK_DELAY_MS);
+        }
+
+        emit({ type: "done" });
+      } catch (err) {
+        emit({
+          type: "error",
+          message: err instanceof Error ? err.message : "Something went wrong",
+        });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+    },
+  });
 }
 
 function requireGeminiKey(): string {
