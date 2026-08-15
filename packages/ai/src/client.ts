@@ -17,6 +17,25 @@ import type {
 // via GEMINI_MODEL for a deliberate pin later.
 const DEFAULT_MODEL = "gemini-flash-latest";
 
+// Gemini's free/shared-tier flash model returns a transient 503
+// ("high demand") often enough in practice that surfacing it to the user
+// on the first attempt is the wrong default — a couple of short retries
+// clears most of them without the user needing to manually hit send again.
+const MAX_TRANSIENT_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 500;
+
+function isTransientServerError(err: unknown): boolean {
+  return (
+    err instanceof Error &&
+    err.name === "ServerError" &&
+    /"status":\s*"UNAVAILABLE"|got status: 503/.test(err.message)
+  );
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // Our own JsonSchema stays SDK-agnostic (types.ts has zero external
 // dependencies) — this is the one place that adapts it to the genai SDK's
 // stricter Schema shape. Tool authors (apps/web/lib/mimir) are responsible
@@ -73,25 +92,36 @@ export function createGeminiModelCaller(
       });
     }
 
-    const response = await client.models.generateContent({
-      model: modelName,
-      contents,
-      config: {
-        systemInstruction: input.systemPrompt,
-        tools:
-          input.toolDeclarations.length > 0
-            ? [
-                {
-                  functionDeclarations: input.toolDeclarations.map((tool) => ({
-                    name: tool.name,
-                    description: tool.description,
-                    parameters: toGenAiSchema(tool.parameters),
-                  })),
-                },
-              ]
-            : undefined,
-      },
-    });
+    let response;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        response = await client.models.generateContent({
+          model: modelName,
+          contents,
+          config: {
+            systemInstruction: input.systemPrompt,
+            tools:
+              input.toolDeclarations.length > 0
+                ? [
+                    {
+                      functionDeclarations: input.toolDeclarations.map((tool) => ({
+                        name: tool.name,
+                        description: tool.description,
+                        parameters: toGenAiSchema(tool.parameters),
+                      })),
+                    },
+                  ]
+                : undefined,
+          },
+        });
+        break;
+      } catch (err) {
+        if (attempt >= MAX_TRANSIENT_RETRIES || !isTransientServerError(err)) {
+          throw err;
+        }
+        await sleep(RETRY_BASE_DELAY_MS * 2 ** attempt);
+      }
+    }
 
     const functionCalls = response.functionCalls;
     if (functionCalls && functionCalls.length > 0) {

@@ -79,7 +79,8 @@ export async function POST(req: Request) {
       tools: [createGetCardDetailsTool(dbCardsById)],
       callModel: createGeminiModelCaller(requireGeminiKey()),
     });
-  } catch {
+  } catch (err) {
+    console.error("[/api/chat] runGeminiAgent threw:", err);
     // Post-outside-voice decision: explicit error, the failed turn is NOT
     // persisted (it would pollute D2's context reconstruction on retry),
     // user can just retry with the same message still in their input box.

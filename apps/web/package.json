@@ -18,13 +18,17 @@
     "@perq/design-tokens": "workspace:*",
     "@perq/scoring-engine": "workspace:*",
     "@perq/ui": "workspace:*",
+    "@radix-ui/react-scroll-area": "^1.2.2",
     "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
     "next": "^15.1.4",
     "next-auth": "5.0.0-beta.25",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

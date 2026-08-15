@@ -36,7 +36,7 @@
      for more heading/body contrast; body sizes untouched since shrinking
      them would cost readability, not gain hierarchy). */
   --font-display: "Cabinet Grotesk", sans-serif;
-  --font-body: "Switzer", sans-serif;
+  --font-body: "Lexend Deca", sans-serif;
 
   --text-display-size: 56px; /* top of the doc's stated 40-56px range */
   --text-h1-size: 36px;

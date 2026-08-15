@@ -11,7 +11,6 @@ import {
   type ResultsFilters,
   type SortMode,
 } from "./filterAndSort";
-import { Chat } from "./Chat";
 import { EditProfilePanel } from "./EditProfilePanel";
 import { ResultCard } from "./ResultCard";
 import { DarkModeToggle } from "./DarkModeToggle";
@@ -302,8 +301,6 @@ export function ResultsView({
             )}
           </>
         )}
-
-        <Chat />
       </main>
 
       {/* DR8: mobile bottom-sheet drawer. md:hidden keeps this entirely out
