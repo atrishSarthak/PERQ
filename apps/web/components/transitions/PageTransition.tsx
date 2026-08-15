@@ -59,17 +59,18 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       }}
       enter={(next) => {
         const tl = gsap.timeline({ onComplete: next });
+        // power2.out (fast start, tapering off), not inOut — inOut's slow
+        // start meant strokeWidth barely moved for the first chunk of the
+        // reveal, so the screen looked stuck at full gold coverage even
+        // though the tween had technically already begun. Starting the
+        // shrink at full speed immediately is what actually fixes the
+        // "held too long" perception, not just a shorter duration.
         tl.to(pathRef.current, {
           drawSVG: "100% 100%",
           strokeWidth: MIN_STROKE_WIDTH,
           duration: ENTER_DURATION,
-          ease: "power2.inOut",
-        })
-          .to(
-            overlayRef.current,
-            { opacity: 0, duration: ENTER_DURATION * 0.6, ease: "power2.inOut" },
-            ENTER_DURATION * 0.4
-          )
+          ease: "power2.out",
+        }, 0).to(overlayRef.current, { opacity: 0, duration: ENTER_DURATION, ease: "power2.out" }, 0)
           .set(pathRef.current, { drawSVG: "0%", strokeWidth: MIN_STROKE_WIDTH });
         return () => {
           tl.kill();
