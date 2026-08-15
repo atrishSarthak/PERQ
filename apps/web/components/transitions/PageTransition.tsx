@@ -12,14 +12,15 @@ gsap.registerPlugin(DrawSVGPlugin);
 // starts (next-transition-router's own model, not something these
 // durations can shrink further), so any time spent here is pure overhead
 // stacked on top of that. The overlay's solid background is what hides the
-// content swap; the SVG stroke is a thin decorative accent on top of it,
-// not the covering mechanism, so it never needs to balloon into a shape
-// large enough to matter for timing.
+// content swap; the SVG stroke is a decorative accent on top of it, not
+// the covering mechanism, so its width stays fixed rather than ballooning
+// up to cover the screen itself — that ballooning (2px -> 300px -> 2px)
+// was what made the old version feel like it lingered forever.
 const LEAVE_DURATION = 0.16;
 const ENTER_DURATION = 0.16;
 
 /**
- * Site-wide page transition: a thin gold line sweeps across a solid
+ * Site-wide page transition: a bold gold line sweeps across a solid
  * overlay on every client-side navigation (next/link clicks, router.push —
  * next-transition-router's `auto` prop patches both). Gold, not accent
  * blue, deliberately — gold is reserved for MIMIR "brand moment"
@@ -77,7 +78,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           <path
             ref={pathRef}
             d="M13.4746 291.27C13.4746 291.27 100.646 -18.6724 255.617 16.8418C410.588 52.356 61.0296 431.197 233.017 546.326C431.659 679.299 444.494 21.0125 652.73 100.784C860.967 180.556 468.663 430.709 617.216 546.326C765.769 661.944 819.097 48.2722 988.501 120.156C1174.21 198.957 809.424 543.841 988.501 636.726C1189.37 740.915 1301.67 149.213 1301.67 149.213"
-            strokeWidth="4"
+            strokeWidth="14"
             strokeLinecap="round"
             strokeLinejoin="round"
             style={{ stroke: "var(--gold)" }}
