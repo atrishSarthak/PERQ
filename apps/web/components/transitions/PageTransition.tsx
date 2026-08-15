@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { TransitionRouter } from "next-transition-router";
 import gsap from "gsap";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
@@ -28,10 +29,18 @@ const MIN_STROKE_WIDTH = 2;
  * blue, deliberately — gold is reserved for MIMIR "brand moment"
  * flourishes (Top Pick badge, this), while blue stays for MIMIR-attributed
  * text/UI, per the existing color split.
+ *
+ * The PERQ wordmark sits centered on a fixed black strip the whole time
+ * the overlay is up, so the transition reads as a branded moment rather
+ * than an abstract shape — black specifically (not var(--bg-base), which
+ * is white in light theme) since the wordmark's own coloring needs a
+ * guaranteed-dark backdrop regardless of theme or where the gold stroke
+ * currently is.
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!pathRef.current) return;
@@ -43,16 +52,18 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       auto
       leave={(next) => {
         const tl = gsap.timeline({ onComplete: next });
-        tl.to(overlayRef.current, { opacity: 1, duration: LEAVE_DURATION * 0.6, ease: "power2.inOut" }, 0).to(
-          pathRef.current,
-          {
-            drawSVG: "100%",
-            strokeWidth: MAX_STROKE_WIDTH,
-            duration: LEAVE_DURATION,
-            ease: "power2.inOut",
-          },
-          0
-        );
+        tl.to(overlayRef.current, { opacity: 1, duration: LEAVE_DURATION * 0.6, ease: "power2.inOut" }, 0)
+          .to(logoRef.current, { opacity: 1, duration: LEAVE_DURATION * 0.6, ease: "power2.inOut" }, 0)
+          .to(
+            pathRef.current,
+            {
+              drawSVG: "100%",
+              strokeWidth: MAX_STROKE_WIDTH,
+              duration: LEAVE_DURATION,
+              ease: "power2.inOut",
+            },
+            0
+          );
         return () => {
           tl.kill();
         };
@@ -65,12 +76,13 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         // though the tween had technically already begun. Starting the
         // shrink at full speed immediately is what actually fixes the
         // "held too long" perception, not just a shorter duration.
-        tl.to(pathRef.current, {
-          drawSVG: "100% 100%",
-          strokeWidth: MIN_STROKE_WIDTH,
-          duration: ENTER_DURATION,
-          ease: "power2.out",
-        }, 0).to(overlayRef.current, { opacity: 0, duration: ENTER_DURATION, ease: "power2.out" }, 0)
+        tl.to(
+          pathRef.current,
+          { drawSVG: "100% 100%", strokeWidth: MIN_STROKE_WIDTH, duration: ENTER_DURATION, ease: "power2.out" },
+          0
+        )
+          .to(overlayRef.current, { opacity: 0, duration: ENTER_DURATION, ease: "power2.out" }, 0)
+          .to(logoRef.current, { opacity: 0, duration: ENTER_DURATION, ease: "power2.out" }, 0)
           .set(pathRef.current, { drawSVG: "0%", strokeWidth: MIN_STROKE_WIDTH });
         return () => {
           tl.kill();
@@ -100,6 +112,15 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
             style={{ stroke: "var(--gold)" }}
           />
         </svg>
+
+        <div
+          ref={logoRef}
+          className="absolute inset-0 z-10 flex items-center justify-center opacity-0"
+        >
+          <div className="rounded-lg bg-black px-6 py-3">
+            <Image src="/perq-logo.png" alt="PERQ" width={800} height={304} className="h-9 w-auto" />
+          </div>
+        </div>
       </div>
       {children}
     </TransitionRouter>
