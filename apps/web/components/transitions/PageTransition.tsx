@@ -115,9 +115,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
         <div
           ref={logoRef}
-          className="absolute inset-0 z-10 flex items-center justify-center opacity-0"
+          className="absolute inset-x-0 top-1/2 z-10 -translate-y-1/2 opacity-0"
         >
-          <div className="rounded-lg bg-black px-6 py-3">
+          <div className="flex w-full items-center justify-center bg-black py-6">
             <Image src="/perq-logo.png" alt="PERQ" width={800} height={304} className="h-9 w-auto" />
           </div>
         </div>
