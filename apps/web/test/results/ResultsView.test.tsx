@@ -29,16 +29,16 @@ function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
 
 const mockAnswers: QuizAnswers = {
   heldCardIds: [],
-  annualIncome: "6-12l",
+  annualIncome: "6-10l",
   flightFrequency: "never",
   hotelFrequency: "never",
-  gymMembership: { active: false, monthlyCost: null },
+  gymMembership: "none",
   foodDeliverySpend: "1-3k",
   ecommerceSpend: "1-3k",
   grocerySpend: "1-3k",
   diningOutSpend: "1-3k",
   fuelSpend: "1-3k",
-  recurringBillsByCard: false,
+  recurringBillsByCard: "no",
   feeTolerant: true,
   priorityCategories: [],
 };

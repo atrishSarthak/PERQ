@@ -2,14 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SearchableMultiSelect,
-  SingleSelectScale,
-  PickUpToNChips,
-  YesNoWithConditional,
-} from "@perq/ui";
+import { SingleSelectScale, PickUpToNChips } from "@perq/ui";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import { QUESTIONS } from "../quiz/questions";
+import { CardSearchField, type CardSearchOption } from "../quiz/CardSearchField";
 
 /**
  * PRD §11: "Edit my profile" panel — all 13 quiz answers individually
@@ -27,7 +23,7 @@ export function EditProfilePanel({
   cardOptions,
 }: {
   answers: QuizAnswers;
-  cardOptions: { value: string; label: string }[];
+  cardOptions: CardSearchOption[];
 }) {
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
@@ -91,8 +87,8 @@ export function EditProfilePanel({
           return (
             <div key={q.key} className={saving ? "opacity-60" : ""}>
               <p className="mb-2 font-body text-body-sm text-text-secondary">{q.prompt}</p>
-              {q.type === "searchable-multi-select" && (
-                <SearchableMultiSelect
+              {q.type === "card-search" && (
+                <CardSearchField
                   options={cardOptions}
                   value={(currentValue as string[]) ?? []}
                   onChange={(v) => saveField(q.key, v)}
@@ -121,35 +117,7 @@ export function EditProfilePanel({
                   onChange={(v) => saveField(q.key, v)}
                   max={q.max}
                   name={q.key}
-                />
-              )}
-              {q.type === "yes-no-with-conditional" && (
-                <YesNoWithConditional
-                  value={
-                    q.key === "recurringBillsByCard"
-                      ? { active: Boolean(currentValue), amount: null }
-                      : // The widget's shape is {active, amount}; QuizAnswers.gymMembership
-                        // is {active, monthlyCost} — explicit field mapping, not a cast
-                        // (same bug class as QuizWizard's submit(): a cast here silently
-                        // shows a blank amount even when monthlyCost has a real value).
-                        {
-                          active:
-                            (currentValue as { active?: boolean } | undefined)?.active ?? false,
-                          amount:
-                            (currentValue as { monthlyCost?: number | null } | undefined)
-                              ?.monthlyCost ?? null,
-                        }
-                  }
-                  onChange={(v) =>
-                    saveField(
-                      q.key,
-                      q.key === "recurringBillsByCard"
-                        ? v.active
-                        : { active: v.active, monthlyCost: v.amount }
-                    )
-                  }
-                  conditionalLabel={q.conditionalLabel}
-                  name={q.key}
+                  noneOption={q.noneOption}
                 />
               )}
             </div>

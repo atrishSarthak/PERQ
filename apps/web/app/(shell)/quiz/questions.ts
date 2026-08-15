@@ -1,18 +1,30 @@
 import type { QuizAnswers } from "@perq/scoring-engine";
 
-// PRD §8's 13 questions, each mapped to exactly one of DR1's four widget
-// types — single source of truth for the wizard's rendering AND its
-// progress indicator ("Question N of 13").
+// Finalized quiz copy (Task 1 spec) — single source of truth for the
+// wizard's rendering AND its progress indicator ("Question N of 13").
 export type QuestionDef =
-  | { key: "heldCardIds"; type: "searchable-multi-select"; prompt: string }
   | {
-      key: "annualIncome" | "flightFrequency" | "hotelFrequency" | keyof QuizAnswers;
+      key: "heldCardIds";
+      type: "card-search";
+      prompt: string;
+      subtext?: string;
+    }
+  | {
+      key: keyof QuizAnswers;
       type: "single-select-scale";
       prompt: string;
+      subtext?: string;
       options: { value: string; label: string }[];
     }
-  | { key: "gymMembership" | "recurringBillsByCard"; type: "yes-no-with-conditional"; prompt: string; conditionalLabel?: string }
-  | { key: "priorityCategories"; type: "pick-up-to-n-chips"; prompt: string; options: { value: string; label: string }[]; max: number };
+  | {
+      key: "priorityCategories";
+      type: "pick-up-to-n-chips";
+      prompt: string;
+      subtext?: string;
+      options: { value: string; label: string }[];
+      max: number;
+      noneOption: { value: string; label: string };
+    };
 
 const spendBucketOptions = [
   { value: "<1k", label: "Under ₹1,000" },
@@ -23,101 +35,119 @@ const spendBucketOptions = [
 
 const frequencyOptions = [
   { value: "never", label: "Never" },
-  { value: "1-2", label: "1–2 / year" },
-  { value: "3-5", label: "3–5 / year" },
-  { value: "6+", label: "6+ / year" },
+  { value: "1-2", label: "1–2 times" },
+  { value: "3-5", label: "3–5 times" },
+  { value: "6+", label: "6+ times" },
 ];
 
 export const QUESTIONS: QuestionDef[] = [
   {
     key: "heldCardIds",
-    type: "searchable-multi-select",
-    prompt: "Which credit cards do you currently hold?",
+    type: "card-search",
+    prompt: "Which cards do you currently have?",
+    subtext: "Search or scroll to select all that apply.",
   },
   {
     key: "annualIncome",
     type: "single-select-scale",
-    prompt: "Approximate annual income",
+    prompt: "What's your annual income, roughly?",
     options: [
       { value: "under-3l", label: "Under ₹3L" },
       { value: "3-6l", label: "₹3L–6L" },
-      { value: "6-12l", label: "₹6L–12L" },
-      { value: "12l+", label: "₹12L+" },
+      { value: "6-10l", label: "₹6L–10L" },
+      { value: "10l+", label: "₹10L+" },
+      { value: "prefer-not-to-say", label: "Prefer not to say" },
     ],
   },
   {
     key: "flightFrequency",
     type: "single-select-scale",
-    prompt: "Flight frequency, domestic + international combined",
+    prompt: "How often do you fly?",
+    subtext: "Domestic + international combined, over a year.",
     options: frequencyOptions,
   },
   {
     key: "hotelFrequency",
     type: "single-select-scale",
-    prompt: "Hotel stays for leisure or work",
+    prompt: "How often do you stay in hotels?",
+    subtext: "For leisure or work.",
     options: frequencyOptions,
   },
   {
     key: "gymMembership",
-    type: "yes-no-with-conditional",
-    prompt: "Active gym/fitness membership?",
-    conditionalLabel: "Roughly how much does it cost monthly? (₹)",
+    type: "single-select-scale",
+    prompt: "Got an active gym or fitness membership?",
+    options: [
+      { value: "under-1500", label: "Yes, under ₹1,500/month" },
+      { value: "1500-plus", label: "Yes, ₹1,500+/month" },
+      { value: "none", label: "No" },
+    ],
   },
   {
     key: "foodDeliverySpend",
     type: "single-select-scale",
-    prompt: "Monthly food delivery spend (Swiggy/Zomato)",
+    prompt: "How much do you spend on food delivery each month?",
+    subtext: "Swiggy, Zomato, that kind of thing.",
     options: spendBucketOptions,
   },
   {
     key: "ecommerceSpend",
     type: "single-select-scale",
-    prompt: "Monthly e-commerce spend (Flipkart/Amazon/Myntra, etc.)",
+    prompt: "How much do you spend shopping online each month?",
+    subtext: "Flipkart, Amazon, Myntra, etc.",
     options: spendBucketOptions,
   },
   {
     key: "grocerySpend",
     type: "single-select-scale",
-    prompt: "Monthly grocery spend",
+    prompt: "How much do you spend on groceries each month?",
     options: spendBucketOptions,
   },
   {
     key: "diningOutSpend",
     type: "single-select-scale",
-    prompt: "Monthly dining-out spend (restaurants, not delivery)",
+    prompt: "How much do you spend dining out each month?",
+    subtext: "Restaurants, not delivery.",
     options: spendBucketOptions,
   },
   {
     key: "fuelSpend",
     type: "single-select-scale",
-    prompt: "Monthly fuel spend",
+    prompt: "How much do you spend on fuel each month?",
     options: spendBucketOptions,
   },
   {
     key: "recurringBillsByCard",
-    type: "yes-no-with-conditional",
-    prompt: "Do you pay recurring bills/subscriptions by card?",
+    type: "single-select-scale",
+    prompt: "Do you pay recurring bills or subscriptions by card?",
+    options: [
+      { value: "yes", label: "Yes" },
+      { value: "no", label: "No" },
+      { value: "some", label: "Some of them" },
+    ],
   },
   {
     key: "feeTolerant",
     type: "single-select-scale",
-    prompt: "Fee tolerance",
+    prompt: "Open to an annual fee if the rewards are worth it?",
     options: [
-      { value: "true", label: "Open to an annual fee if the rewards outweigh it" },
-      { value: "false", label: "₹0-fee only" },
+      { value: "true", label: "Yes, if it pays off" },
+      { value: "false", label: "No, I want ₹0-fee cards only" },
     ],
   },
   {
     key: "priorityCategories",
     type: "pick-up-to-n-chips",
-    prompt: "Top priority — pick up to 2",
+    prompt: "What matters most to you?",
+    subtext: "Pick up to 2.",
     options: [
-      { value: "travel", label: "Travel & lounge" },
+      { value: "travel", label: "Travel & lounge access" },
       { value: "general", label: "Cashback" },
       { value: "dining", label: "Dining" },
       { value: "ecommerce", label: "Online shopping" },
-      { value: "fuel", label: "Fuel" },
+      { value: "fuel", label: "Fuel savings" },
     ],
     max: 2,
+    noneOption: { value: "none", label: "No strong preference" },
   },
 ];

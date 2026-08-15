@@ -146,7 +146,8 @@ export async function computeAndPersistRecommendations(
         onStep: (event: AgentStepEvent) => {
           const label = narrationLabelForStep(
             event,
-            (cardId) => dbCardsById.get(cardId)?.name
+            (cardId) => dbCardsById.get(cardId)?.name,
+            eligible.length
           );
           if (label) onNarrationStep?.(label);
         },

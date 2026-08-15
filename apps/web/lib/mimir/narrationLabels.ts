@@ -14,14 +14,17 @@ import type { AgentStepEvent } from "@perq/ai";
  */
 export function narrationLabelForStep(
   event: AgentStepEvent,
-  resolveCardName?: (cardId: string) => string | undefined
+  resolveCardName?: (cardId: string) => string | undefined,
+  scoredCardCount?: number
 ): string | null {
   if (event.type === "tool_call") {
     switch (event.toolName) {
       case "getUserProfile":
-        return "MIMIR checked your profile";
+        return "MIMIR is reading your profile";
       case "scoreCards":
-        return "MIMIR scored your cards";
+        return typeof scoredCardCount === "number"
+          ? `MIMIR is scoring ${scoredCardCount} cards`
+          : "MIMIR is scoring your cards";
       case "getCardDetails": {
         const cardId = event.args["cardId"];
         const cardName =

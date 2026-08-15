@@ -76,7 +76,20 @@ export interface ScoredCard {
   eligible: boolean; // false if annualIncome is below minIncomeEligibility
 }
 
-export type IncomeBracket = "under-3l" | "3-6l" | "6-12l" | "12l+";
+export type IncomeBracket =
+  | "under-3l"
+  | "3-6l"
+  | "6-10l"
+  | "10l+"
+  | "prefer-not-to-say";
+
+// Q5's finalized copy is a single bucketed pick, not a free-form ₹ amount —
+// gymMembership never feeds the deterministic score (see
+// buildProfileFromAnswers), so a bucket is all downstream code needs.
+export type GymMembershipBucket = "none" | "under-1500" | "1500-plus";
+
+// Q11's finalized copy adds a third "Some of them" state between yes/no.
+export type RecurringBillsAnswer = "yes" | "no" | "some";
 
 // Raw shape of the 13 quiz answers (PRD §8), keyed by question_key — this is
 // what's stored in user_profile.answers jsonb and what a profile edit
@@ -86,13 +99,13 @@ export interface QuizAnswers {
   annualIncome: IncomeBracket; // Q2
   flightFrequency: FrequencyBucket; // Q3
   hotelFrequency: FrequencyBucket; // Q4
-  gymMembership: { active: boolean; monthlyCost: number | null }; // Q5
+  gymMembership: GymMembershipBucket; // Q5
   foodDeliverySpend: SpendBucket; // Q6
   ecommerceSpend: SpendBucket; // Q7
   grocerySpend: SpendBucket; // Q8
   diningOutSpend: SpendBucket; // Q9
   fuelSpend: SpendBucket; // Q10
-  recurringBillsByCard: boolean; // Q11
+  recurringBillsByCard: RecurringBillsAnswer; // Q11
   feeTolerant: boolean; // Q12
-  priorityCategories: SpendCategory[]; // Q13, up to 2
+  priorityCategories: SpendCategory[]; // Q13, up to 2 ("No strong preference" => [])
 }

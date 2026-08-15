@@ -24,9 +24,14 @@ describe("validateFieldValue", () => {
     expect(result.success).toBe(false);
   });
 
-  it("validates the gymMembership object field", () => {
-    const result = validateFieldValue("gymMembership", { active: true, monthlyCost: 1500 });
+  it("validates the gymMembership bucket field", () => {
+    const result = validateFieldValue("gymMembership", "1500-plus");
     expect(result.success).toBe(true);
+  });
+
+  it("rejects a gymMembership value outside the bucket enum", () => {
+    const result = validateFieldValue("gymMembership", "yes-1500");
+    expect(result.success).toBe(false);
   });
 
   it("rejects more than 2 priorityCategories on edit, same as initial submit", () => {

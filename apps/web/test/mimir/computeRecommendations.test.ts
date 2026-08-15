@@ -94,16 +94,16 @@ function makeDbCard(id: string, dining: number) {
 
 const answers: QuizAnswers = {
   heldCardIds: [],
-  annualIncome: "6-12l",
+  annualIncome: "6-10l",
   flightFrequency: "never",
   hotelFrequency: "never",
-  gymMembership: { active: false, monthlyCost: null },
+  gymMembership: "none",
   foodDeliverySpend: "3-6k",
   ecommerceSpend: "<1k",
   grocerySpend: "<1k",
   diningOutSpend: "3-6k",
   fuelSpend: "<1k",
-  recurringBillsByCard: false,
+  recurringBillsByCard: "no",
   feeTolerant: true,
   priorityCategories: [],
 };

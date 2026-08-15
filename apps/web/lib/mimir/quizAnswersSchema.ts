@@ -5,7 +5,9 @@ import { z } from "zod";
 // type itself has zero validation dependency (pure package, no I/O).
 const spendBucket = z.enum(["<1k", "1-3k", "3-6k", "6k+"]);
 const frequencyBucket = z.enum(["never", "1-2", "3-5", "6+"]);
-const incomeBracket = z.enum(["under-3l", "3-6l", "6-12l", "12l+"]);
+const incomeBracket = z.enum(["under-3l", "3-6l", "6-10l", "10l+", "prefer-not-to-say"]);
+const gymMembershipBucket = z.enum(["none", "under-1500", "1500-plus"]);
+const recurringBillsAnswer = z.enum(["yes", "no", "some"]);
 const spendCategory = z.enum([
   "dining",
   "travel",
@@ -22,16 +24,13 @@ export const quizAnswersSchema = z.object({
   annualIncome: incomeBracket,
   flightFrequency: frequencyBucket,
   hotelFrequency: frequencyBucket,
-  gymMembership: z.object({
-    active: z.boolean(),
-    monthlyCost: z.number().nullable(),
-  }),
+  gymMembership: gymMembershipBucket,
   foodDeliverySpend: spendBucket,
   ecommerceSpend: spendBucket,
   grocerySpend: spendBucket,
   diningOutSpend: spendBucket,
   fuelSpend: spendBucket,
-  recurringBillsByCard: z.boolean(),
+  recurringBillsByCard: recurringBillsAnswer,
   feeTolerant: z.boolean(),
   priorityCategories: z.array(spendCategory).max(2),
 });

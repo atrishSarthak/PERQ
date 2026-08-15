@@ -21,13 +21,16 @@ export default async function QuizPage() {
   }
 
   const activeCards = await db
-    .select({ id: cards.id, name: cards.name, issuer: cards.issuer })
+    .select({ id: cards.id, name: cards.name, issuer: cards.issuer, network: cards.network })
     .from(cards)
     .where(eq(cards.status, "active"));
 
   const cardOptions = activeCards.map((c) => ({
     value: c.id,
     label: `${c.issuer} ${c.name}`,
+    name: c.name,
+    issuer: c.issuer,
+    network: c.network,
   }));
 
   return <QuizWizard cardOptions={cardOptions} />;

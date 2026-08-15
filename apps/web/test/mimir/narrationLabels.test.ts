@@ -3,14 +3,19 @@ import { narrationLabelForStep } from "@/lib/mimir/narrationLabels";
 import type { AgentStepEvent } from "@perq/ai";
 
 describe("narrationLabelForStep (D3, revised — event-driven, not scripted)", () => {
-  it("maps getUserProfile tool_call to the profile-checked label", () => {
+  it("maps getUserProfile tool_call to the profile-reading label", () => {
     const event: AgentStepEvent = { type: "tool_call", toolName: "getUserProfile", round: 0, args: {} };
-    expect(narrationLabelForStep(event)).toBe("MIMIR checked your profile");
+    expect(narrationLabelForStep(event)).toBe("MIMIR is reading your profile");
   });
 
-  it("maps scoreCards tool_call to the scored label", () => {
+  it("maps scoreCards tool_call to a generic scoring label without a count", () => {
     const event: AgentStepEvent = { type: "tool_call", toolName: "scoreCards", round: 1, args: {} };
-    expect(narrationLabelForStep(event)).toBe("MIMIR scored your cards");
+    expect(narrationLabelForStep(event)).toBe("MIMIR is scoring your cards");
+  });
+
+  it("includes the scored card count when provided", () => {
+    const event: AgentStepEvent = { type: "tool_call", toolName: "scoreCards", round: 1, args: {} };
+    expect(narrationLabelForStep(event, undefined, 118)).toBe("MIMIR is scoring 118 cards");
   });
 
   it("resolves the real card name for getCardDetails via the provided lookup", () => {

@@ -12,6 +12,7 @@ import {
   type SortMode,
 } from "./filterAndSort";
 import { EditProfilePanel } from "./EditProfilePanel";
+import { RetakeQuizButton } from "./RetakeQuizButton";
 import { ResultCard } from "./ResultCard";
 import { DarkModeToggle } from "./DarkModeToggle";
 
@@ -161,7 +162,14 @@ export function ResultsView({
   }, [filters]);
 
   const cardOptions = useMemo(
-    () => cards.map((c) => ({ value: c.cardId, label: `${c.issuer} ${c.name}` })),
+    () =>
+      cards.map((c) => ({
+        value: c.cardId,
+        label: `${c.issuer} ${c.name}`,
+        name: c.name,
+        issuer: c.issuer,
+        network: c.network,
+      })),
     [cards]
   );
 
@@ -245,7 +253,10 @@ export function ResultsView({
           </div>
         )}
 
-        <EditProfilePanel answers={answers} cardOptions={cardOptions} />
+        <div className="flex flex-wrap items-center gap-2">
+          <EditProfilePanel answers={answers} cardOptions={cardOptions} />
+          <RetakeQuizButton cardOptions={cardOptions} />
+        </div>
 
         {sorted.length === 0 ? (
           // DR4: inline message + one-click clear-filters, list stays in place

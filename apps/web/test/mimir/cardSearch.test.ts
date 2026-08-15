@@ -15,16 +15,16 @@ const { searchCardsForBucket, buildCardSearchQuery, MAX_SEARCH_CARDS } = await i
 
 const answers: QuizAnswers = {
   heldCardIds: [],
-  annualIncome: "6-12l",
+  annualIncome: "6-10l",
   flightFrequency: "3-5",
   hotelFrequency: "1-2",
-  gymMembership: { active: false, monthlyCost: null },
+  gymMembership: "none",
   foodDeliverySpend: "3-6k",
   ecommerceSpend: "1-3k",
   grocerySpend: "1-3k",
   diningOutSpend: "3-6k",
   fuelSpend: "1-3k",
-  recurringBillsByCard: true,
+  recurringBillsByCard: "yes",
   feeTolerant: true,
   priorityCategories: ["dining", "travel"],
 };
@@ -50,7 +50,7 @@ function makeRawCard(overrides: Record<string, unknown> = {}) {
 describe("buildCardSearchQuery", () => {
   it("mentions income bracket, priority categories, and fee tolerance", () => {
     const query = buildCardSearchQuery(answers);
-    expect(query).toContain("6-12l");
+    expect(query).toContain("6-10l");
     expect(query).toContain("dining");
     expect(query).toContain("travel");
     expect(query).toContain("annual fee");

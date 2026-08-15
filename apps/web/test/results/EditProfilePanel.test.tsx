@@ -12,16 +12,16 @@ const { EditProfilePanel } = await import("@/app/(shell)/results/EditProfilePane
 
 const answers: QuizAnswers = {
   heldCardIds: [],
-  annualIncome: "6-12l",
+  annualIncome: "6-10l",
   flightFrequency: "never",
   hotelFrequency: "never",
-  gymMembership: { active: false, monthlyCost: null },
+  gymMembership: "none",
   foodDeliverySpend: "1-3k",
   ecommerceSpend: "1-3k",
   grocerySpend: "1-3k",
   diningOutSpend: "1-3k",
   fuelSpend: "1-3k",
-  recurringBillsByCard: false,
+  recurringBillsByCard: "no",
   feeTolerant: true,
   priorityCategories: [],
 };
@@ -35,15 +35,15 @@ describe("EditProfilePanel (PRD §11)", () => {
   it("starts collapsed, showing only an 'Edit my profile' button", () => {
     render(<EditProfilePanel answers={answers} cardOptions={[]} />);
     expect(screen.getByText("Edit my profile")).toBeInTheDocument();
-    expect(screen.queryByText(/Monthly fuel spend/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/spend on fuel each month/)).not.toBeInTheDocument();
   });
 
   it("expands to show all 13 questions on click", () => {
     render(<EditProfilePanel answers={answers} cardOptions={[]} />);
     fireEvent.click(screen.getByText("Edit my profile"));
-    expect(screen.getByText(/Monthly fuel spend/)).toBeInTheDocument();
-    expect(screen.getByText(/Which credit cards do you currently hold/)).toBeInTheDocument();
-    expect(screen.getByText(/Top priority/)).toBeInTheDocument();
+    expect(screen.getByText(/spend on fuel each month/)).toBeInTheDocument();
+    expect(screen.getByText(/Which cards do you currently have/)).toBeInTheDocument();
+    expect(screen.getByText(/What matters most to you/)).toBeInTheDocument();
   });
 
   it("PATCHes the correct field/value shape when a scale option is changed, then refreshes", async () => {
@@ -51,7 +51,7 @@ describe("EditProfilePanel (PRD §11)", () => {
     fireEvent.click(screen.getByText("Edit my profile"));
     // "₹6,000+" is shared across all 5 spend-bucket questions — scope to
     // the fuel-spend section specifically.
-    const fuelPrompt = screen.getByText(/Monthly fuel spend/);
+    const fuelPrompt = screen.getByText(/spend on fuel each month/);
     const fuelSection = fuelPrompt.closest("div")!;
     const options6k = screen.getAllByText("₹6,000+").find((el) => fuelSection.contains(el))!;
     fireEvent.click(options6k);
@@ -65,28 +65,31 @@ describe("EditProfilePanel (PRD §11)", () => {
   it("maps feeTolerant between its boolean storage and the scale widget's string option values", async () => {
     render(<EditProfilePanel answers={{ ...answers, feeTolerant: true }} cardOptions={[]} />);
     fireEvent.click(screen.getByText("Edit my profile"));
-    fireEvent.click(screen.getByText("₹0-fee only"));
+    fireEvent.click(screen.getByText("No, I want ₹0-fee cards only"));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
     const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
     expect(JSON.parse(options.body)).toEqual({ field: "feeTolerant", value: false });
   });
 
-  it("maps recurringBillsByCard between its boolean storage and the yes/no widget's {active} shape", async () => {
-    render(<EditProfilePanel answers={{ ...answers, recurringBillsByCard: false }} cardOptions={[]} />);
+  it("PATCHes recurringBillsByCard as a plain bucket string", async () => {
+    render(<EditProfilePanel answers={{ ...answers, recurringBillsByCard: "no" }} cardOptions={[]} />);
     fireEvent.click(screen.getByText("Edit my profile"));
-
-    const yesButtons = screen.getAllByText("Yes");
-    // gymMembership and recurringBillsByCard both render a Yes/No pair —
-    // click the one under the recurring-bills prompt.
-    const recurringPrompt = screen.getByText(/pay recurring bills\/subscriptions by card/);
-    const recurringSection = recurringPrompt.closest("div")!;
-    const yesInSection = yesButtons.find((el) => recurringSection.contains(el))!;
-    fireEvent.click(yesInSection);
+    fireEvent.click(screen.getByText("Yes"));
 
     await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
     const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
-    expect(JSON.parse(options.body)).toEqual({ field: "recurringBillsByCard", value: true });
+    expect(JSON.parse(options.body)).toEqual({ field: "recurringBillsByCard", value: "yes" });
+  });
+
+  it("PATCHes gymMembership as a plain bucket string", async () => {
+    render(<EditProfilePanel answers={{ ...answers, gymMembership: "none" }} cardOptions={[]} />);
+    fireEvent.click(screen.getByText("Edit my profile"));
+    fireEvent.click(screen.getByText("Yes, ₹1,500+/month"));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+    const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(JSON.parse(options.body)).toEqual({ field: "gymMembership", value: "1500-plus" });
   });
 
   it("shows an inline error and does NOT refresh on a failed PATCH (2D)", async () => {
@@ -97,7 +100,7 @@ describe("EditProfilePanel (PRD §11)", () => {
 
     render(<EditProfilePanel answers={answers} cardOptions={[]} />);
     fireEvent.click(screen.getByText("Edit my profile"));
-    const fuelPrompt = screen.getByText(/Monthly fuel spend/);
+    const fuelPrompt = screen.getByText(/spend on fuel each month/);
     const fuelSection = fuelPrompt.closest("div")!;
     const options6k = screen.getAllByText("₹6,000+").find((el) => fuelSection.contains(el))!;
     fireEvent.click(options6k);
@@ -112,38 +115,6 @@ describe("EditProfilePanel (PRD §11)", () => {
     render(<EditProfilePanel answers={answers} cardOptions={[]} />);
     fireEvent.click(screen.getByText("Edit my profile"));
     fireEvent.click(screen.getByText("Done"));
-    expect(screen.queryByText(/Monthly fuel spend/)).not.toBeInTheDocument();
-  });
-
-  it("regression: displays the stored monthlyCost as the widget's amount field (same field-name bug as QuizWizard, read side)", () => {
-    render(
-      <EditProfilePanel
-        answers={{ ...answers, gymMembership: { active: true, monthlyCost: 2200 } }}
-        cardOptions={[]}
-      />
-    );
-    fireEvent.click(screen.getByText("Edit my profile"));
-    expect(screen.getByRole("spinbutton")).toHaveValue(2200);
-  });
-
-  it("regression: PATCHes gymMembership as {active, monthlyCost}, not the widget's {active, amount} shape (write side)", async () => {
-    render(
-      <EditProfilePanel
-        answers={{ ...answers, gymMembership: { active: false, monthlyCost: null } }}
-        cardOptions={[]}
-      />
-    );
-    fireEvent.click(screen.getByText("Edit my profile"));
-    const gymPrompt = screen.getByText(/Active gym\/fitness membership/);
-    const gymSection = gymPrompt.closest("div")!;
-    const yesInSection = screen.getAllByText("Yes").find((el) => gymSection.contains(el))!;
-    fireEvent.click(yesInSection);
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-    const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
-    expect(JSON.parse(options.body)).toEqual({
-      field: "gymMembership",
-      value: { active: true, monthlyCost: null },
-    });
+    expect(screen.queryByText(/spend on fuel each month/)).not.toBeInTheDocument();
   });
 });

@@ -1,12 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import {
-  SearchableMultiSelect,
-  SingleSelectScale,
-  PickUpToNChips,
-  YesNoWithConditional,
-} from "../src/quiz-widgets";
+import { SingleSelectScale, PickUpToNChips } from "../src/quiz-widgets";
 
 describe("SingleSelectScale", () => {
   const options = [
@@ -76,107 +71,52 @@ describe("PickUpToNChips", () => {
     );
     expect(screen.getByText("Dining")).not.toBeDisabled();
   });
-});
 
-describe("YesNoWithConditional", () => {
-  it("shows the conditional field only when active is true", () => {
-    const { rerender } = render(
-      <YesNoWithConditional
-        value={{ active: false, amount: null }}
-        onChange={() => {}}
-        conditionalLabel="Monthly cost"
-        name="gym"
-      />
-    );
-    expect(screen.queryByLabelText(/Monthly cost/)).not.toBeInTheDocument();
+  describe("noneOption (Q13's 'No strong preference')", () => {
+    const noneOption = { value: "none", label: "No strong preference" };
 
-    rerender(
-      <YesNoWithConditional
-        value={{ active: true, amount: 1500 }}
-        onChange={() => {}}
-        conditionalLabel="Monthly cost"
-        name="gym"
-      />
-    );
-    expect(screen.getByText(/Monthly cost/)).toBeInTheDocument();
-  });
-
-  it("clears amount to null when switching from Yes to No", () => {
-    const onChange = vi.fn();
-    render(
-      <YesNoWithConditional
-        value={{ active: true, amount: 1500 }}
-        onChange={onChange}
-        conditionalLabel="Monthly cost"
-        name="gym"
-      />
-    );
-    fireEvent.click(screen.getByText("No"));
-    expect(onChange).toHaveBeenCalledWith({ active: false, amount: null });
-  });
-
-  it("never renders a conditional field when conditionalLabel is omitted (Q11, plain yes/no)", () => {
-    render(
-      <YesNoWithConditional
-        value={{ active: true, amount: null }}
-        onChange={() => {}}
-        name="recurringBills"
-      />
-    );
-    expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
-  });
-});
-
-describe("SearchableMultiSelect", () => {
-  const options = [
-    { value: "axis-airtel", label: "Axis Airtel" },
-    { value: "hdfc-regalia", label: "HDFC Regalia" },
-  ];
-
-  it("filters options by search query", () => {
-    render(
-      <SearchableMultiSelect
-        options={options}
-        value={[]}
-        onChange={() => {}}
-        name="q1"
-        emptyOptionLabel="I don't have any yet"
-      />
-    );
-    fireEvent.change(screen.getByPlaceholderText("Search cards…"), {
-      target: { value: "axis" },
+    it("reads as selected whenever the selection is empty", () => {
+      render(
+        <PickUpToNChips
+          options={options}
+          value={[]}
+          onChange={() => {}}
+          max={2}
+          name="q"
+          noneOption={noneOption}
+        />
+      );
+      expect(screen.getByText("No strong preference")).toHaveAttribute("aria-pressed", "true");
     });
-    expect(screen.getByText(/Axis Airtel/)).toBeInTheDocument();
-    expect(screen.queryByText(/HDFC Regalia/)).not.toBeInTheDocument();
-  });
 
-  it("the empty-option button clears the whole selection", () => {
-    const onChange = vi.fn();
-    render(
-      <SearchableMultiSelect
-        options={options}
-        value={["axis-airtel"]}
-        onChange={onChange}
-        name="q1"
-        emptyOptionLabel="I don't have any yet"
-      />
-    );
-    fireEvent.click(screen.getByText("I don't have any yet"));
-    expect(onChange).toHaveBeenCalledWith([]);
-  });
+    it("clicking it clears the selection, without adding a 'none' value", () => {
+      const onChange = vi.fn();
+      render(
+        <PickUpToNChips
+          options={options}
+          value={["dining"]}
+          onChange={onChange}
+          max={2}
+          name="q"
+          noneOption={noneOption}
+        />
+      );
+      fireEvent.click(screen.getByText("No strong preference"));
+      expect(onChange).toHaveBeenCalledWith([]);
+    });
 
-  it("toggles a card into the selection on click", () => {
-    const onChange = vi.fn();
-    render(
-      <SearchableMultiSelect
-        options={options}
-        value={[]}
-        onChange={onChange}
-        name="q1"
-        emptyOptionLabel="I don't have any yet"
-      />
-    );
-    fireEvent.click(screen.getByText(/Axis Airtel/));
-    expect(onChange).toHaveBeenCalledWith(["axis-airtel"]);
+    it("reads as unselected once a real chip is picked", () => {
+      render(
+        <PickUpToNChips
+          options={options}
+          value={["dining"]}
+          onChange={() => {}}
+          max={2}
+          name="q"
+          noneOption={noneOption}
+        />
+      );
+      expect(screen.getByText("No strong preference")).toHaveAttribute("aria-pressed", "false");
+    });
   });
 });

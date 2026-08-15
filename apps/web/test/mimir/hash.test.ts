@@ -4,16 +4,16 @@ import type { QuizAnswers } from "@perq/scoring-engine";
 
 const baseAnswers: QuizAnswers = {
   heldCardIds: [],
-  annualIncome: "6-12l",
+  annualIncome: "6-10l",
   flightFrequency: "3-5",
   hotelFrequency: "1-2",
-  gymMembership: { active: false, monthlyCost: null },
+  gymMembership: "none",
   foodDeliverySpend: "3-6k",
   ecommerceSpend: "1-3k",
   grocerySpend: "1-3k",
   diningOutSpend: "3-6k",
   fuelSpend: "1-3k",
-  recurringBillsByCard: true,
+  recurringBillsByCard: "yes",
   feeTolerant: true,
   priorityCategories: ["dining", "travel"],
 };

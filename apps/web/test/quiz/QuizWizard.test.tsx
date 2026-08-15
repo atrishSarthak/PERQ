@@ -9,7 +9,15 @@ vi.mock("next/navigation", () => ({
 
 const { QuizWizard } = await import("@/app/(shell)/quiz/QuizWizard");
 
-const cardOptions = [{ value: "axis-airtel", label: "Axis Airtel" }];
+const cardOptions = [
+  {
+    value: "axis-airtel",
+    label: "Axis Bank Axis Airtel",
+    name: "Axis Airtel",
+    issuer: "Axis Bank",
+    network: "Visa",
+  },
+];
 
 describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
   beforeEach(() => {
@@ -19,7 +27,7 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
   it("renders question 1 of 13 first", () => {
     render(<QuizWizard cardOptions={cardOptions} />);
     expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
-    expect(screen.getByText(/Which credit cards do you currently hold/)).toBeInTheDocument();
+    expect(screen.getByText(/Which cards do you currently have/)).toBeInTheDocument();
   });
 
   it("Next is enabled immediately on Q1 (0 held cards is a valid answer)", () => {
@@ -42,26 +50,26 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
     render(<QuizWizard cardOptions={cardOptions} />);
     fireEvent.click(screen.getByText("Next")); // -> Q2, annualIncome
     expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
-    expect(screen.getByText(/See my recommendations|Next/)).toBeDisabled();
+    expect(screen.getByText(/Submit|Next/)).toBeDisabled();
   });
 
   it("enables Next after selecting a single-select-scale option", () => {
     render(<QuizWizard cardOptions={cardOptions} />);
     fireEvent.click(screen.getByText("Next")); // -> Q2
-    fireEvent.click(screen.getByText("₹6L–12L"));
+    fireEvent.click(screen.getByText("₹6L–10L"));
     expect(screen.getByText("Next")).not.toBeDisabled();
   });
 
   it("Back returns to the previous question and preserves its answer", () => {
     render(<QuizWizard cardOptions={cardOptions} />);
     fireEvent.click(screen.getByText("Next")); // -> Q2
-    fireEvent.click(screen.getByText("₹6L–12L"));
+    fireEvent.click(screen.getByText("₹6L–10L"));
     fireEvent.click(screen.getByText("Next")); // -> Q3
     expect(screen.getByText("Question 3 of 13")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Back"));
     expect(screen.getByText("Question 2 of 13")).toBeInTheDocument();
-    expect(screen.getByText("₹6L–12L")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("₹6L–10L")).toHaveAttribute("aria-checked", "true");
   });
 
   it("DR10: Enter advances when the question is answered", () => {
@@ -87,7 +95,7 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
     expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
   });
 
-  it("shows 'See my recommendations' instead of 'Next' on the last question", () => {
+  it("shows 'Submit' instead of 'Next' on the last question", () => {
     render(<QuizWizard cardOptions={cardOptions} />);
     for (let i = 0; i < 12; i++) {
       const nextOrFinal = screen.queryByText("Next");
@@ -97,16 +105,14 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
         // answer whatever the current question needs minimally, then advance
         const scaleOption = document.querySelector('button[role="radio"]');
         if (scaleOption) fireEvent.click(scaleOption);
-        const yesButton = screen.queryByText("Yes") ?? screen.queryByText("No");
-        if (yesButton && !scaleOption) fireEvent.click(yesButton);
-        const advance = screen.getByText(/Next|See my recommendations/);
+        const advance = screen.getByText(/Next|Submit/);
         if (!advance.hasAttribute("disabled")) fireEvent.click(advance);
       }
     }
     expect(screen.getByText("Question 13 of 13")).toBeInTheDocument();
   });
 
-  it("regression: submits gymMembership as {active, monthlyCost}, not the widget's {active, amount} shape (real bug found live — the server's zod schema requires monthlyCost and silently got undefined)", async () => {
+  it("submits gymMembership and recurringBillsByCard as plain bucket strings, not objects", async () => {
     function fakeSSEBody() {
       const encoder = new TextEncoder();
       return new ReadableStream<Uint8Array>({
@@ -128,9 +134,8 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
       fireEvent.click(document.querySelector('button[role="radio"]')!);
       fireEvent.click(screen.getByText("Next"));
     }
-    // Q5 gymMembership — click Yes, fill in a real monthly cost.
-    fireEvent.click(screen.getByText("Yes"));
-    fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "1500" } });
+    // Q5 gymMembership — "Yes, ₹1,500+/month".
+    fireEvent.click(screen.getByText("Yes, ₹1,500+/month"));
     fireEvent.click(screen.getByText("Next"));
     // Q6-Q10 spend buckets — any scale option each.
     for (let i = 0; i < 5; i++) {
@@ -144,11 +149,12 @@ describe("QuizWizard (DR10 keyboard contract + navigation)", () => {
     fireEvent.click(document.querySelector('button[role="radio"]')!);
     fireEvent.click(screen.getByText("Next"));
     // Q13 priorityCategories — 0 selections valid, submit.
-    fireEvent.click(screen.getByText("See my recommendations"));
+    fireEvent.click(screen.getByText("Submit"));
 
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
     const [, options] = fetchMock.mock.calls[0]!;
     const payload = JSON.parse(options.body);
-    expect(payload.gymMembership).toEqual({ active: true, monthlyCost: 1500 });
+    expect(payload.gymMembership).toBe("1500-plus");
+    expect(payload.recurringBillsByCard).toBe("no");
   });
 });
