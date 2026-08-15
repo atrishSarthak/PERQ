@@ -8,11 +8,17 @@ import type { CardOption } from "../quiz/QuizWizard";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
 /**
- * The bento grid from design-reference/PERQ Dashboard standalone.html —
- * 12-column grid, 3 fixed row heights, widgets placed via grid-area so
- * every cell tiles with no gaps, matching the mockup exactly:
- *   Card Recommender  1/1/auto/8   Card Arsenal  1/8/3/13 (spans rows 1-2)
- *   Ask MIMIR         2/1/auto/8
+ * The bento grid, adapted from design-reference/PERQ Dashboard
+ * standalone.html — 12-column grid, 3 fixed row heights, widgets placed
+ * via grid-area so every cell tiles with no gaps. Card Arsenal's column
+ * span was narrowed from the mockup's 8/5 split (cols 1-7 / 8-12) to a
+ * 8/4 split (cols 1-8 / 9-12), matching row 3's existing Goal-Based/Chrome
+ * split exactly — a deliberate widened-left/narrowed-right change per
+ * user feedback (arsenal cards now stack one per row instead of a 2-up
+ * grid), which as a side effect makes the whole page's left/right column
+ * rhythm consistent top to bottom:
+ *   Card Recommender  1/1/auto/9   Card Arsenal  1/9/3/13 (spans rows 1-2)
+ *   Ask MIMIR         2/1/auto/9
  *   Goal-Based        3/1/auto/9   MIMIR for Chrome  3/9/auto/13
  */
 export function HomeDashboard({
@@ -35,7 +41,7 @@ export function HomeDashboard({
       <div className="mx-auto max-w-[1400px]">
         <div className="mb-10">
           <h1
-            className="font-display text-[46px] font-bold"
+            className="font-display text-[32px] font-bold"
             style={{ color: C.textPrimary, letterSpacing: "-0.5px" }}
           >
             {greeting}

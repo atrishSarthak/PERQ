@@ -20,7 +20,7 @@ export function AskMimirWidget() {
       onClick={() => setOpen(true)}
       className="flex items-center gap-5 rounded-3xl px-7 py-5 text-left"
       style={{
-        gridArea: "2 / 1 / auto / 8",
+        gridArea: "2 / 1 / auto / 9",
         backgroundColor: C.surface,
         border: `1px solid ${C.surfaceBorder}`,
       }}

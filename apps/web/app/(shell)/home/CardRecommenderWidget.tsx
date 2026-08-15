@@ -53,14 +53,14 @@ export function CardRecommenderWidget({
   return (
     <div
       className="relative flex flex-col overflow-hidden rounded-3xl p-8"
-      style={{ gridArea: "1 / 1 / auto / 8", backgroundColor: C.surface, border: `1px solid ${C.surfaceBorder}` }}
+      style={{ gridArea: "1 / 1 / auto / 9", backgroundColor: C.surface, border: `1px solid ${C.surfaceBorder}` }}
     >
       <h2 className="font-display text-[22px] font-semibold" style={{ color: C.textPrimary }}>
         Card Recommender
       </h2>
 
       {topPick ? (
-        <div className="mt-3 flex flex-1 items-center gap-7">
+        <div className="mt-3 flex min-h-0 flex-1 items-center gap-7">
           <div className="h-24 w-[150px] shrink-0">
             <DashboardCardChip
               cardId={topPick.cardId}
@@ -69,18 +69,24 @@ export function CardRecommenderWidget({
               network={topPick.network}
             />
           </div>
-          <div className="flex flex-1 flex-col gap-2.5">
+          {/* min-w-0 + min-h-0: without them, a flex child defaults to
+              min-width/height:auto, which lets this column (and the
+              line-clamped paragraph inside it) refuse to shrink below its
+              unclamped content size — the actual cause of a long MIMIR
+              explanation overflowing the widget's fixed-height row despite
+              the line-clamp below. */}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5">
             <p
               className="font-body text-[11px] font-semibold uppercase tracking-wide"
               style={{ color: "var(--accent)" }}
             >
               Top pick from MIMIR
             </p>
-            <p className="font-display text-xl font-semibold" style={{ color: C.textPrimary }}>
+            <p className="truncate font-display text-xl font-semibold" style={{ color: C.textPrimary }}>
               {topPick.issuer} {topPick.name}
             </p>
             <p
-              className="font-body text-sm leading-relaxed"
+              className="min-h-0 font-body text-sm leading-relaxed"
               style={{
                 color: C.textSecondary,
                 display: "-webkit-box",
@@ -93,7 +99,7 @@ export function CardRecommenderWidget({
             </p>
             <Link
               href="/results"
-              className="mt-1 w-fit font-body text-sm font-semibold"
+              className="mt-1 w-fit shrink-0 font-body text-sm font-semibold"
               style={{ color: "var(--accent)" }}
             >
               See all recommendations →

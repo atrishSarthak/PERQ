@@ -10,19 +10,20 @@ export interface ArsenalCardData {
 }
 
 /**
- * 2-column grid with vertical overflow scroll — matches
- * design-reference/PERQ Dashboard standalone.html's actual arsenal layout
- * exactly (`grid-template-columns: repeat(2, 1fr); overflow-y: auto`), not
- * a horizontal scroll strip. "Add your first card" links to /results,
- * where arsenal marking already lives (PRD §12) — /results itself
- * redirects to /quiz if there's no profile yet, so this works correctly
- * for a brand-new user too, without a second add-card flow to build.
+ * Single column, one card per row, with vertical overflow scroll —
+ * narrower than the design-reference mockup's original 2-up grid per user
+ * feedback (the widget's own column span was narrowed to match, see
+ * HomeDashboard's grid-area comment). "Add your first card" links to
+ * /results, where arsenal marking already lives (PRD §12) — /results
+ * itself redirects to /quiz if there's no profile yet, so this works
+ * correctly for a brand-new user too, without a second add-card flow to
+ * build.
  */
 export function CardArsenalWidget({ cards }: { cards: ArsenalCardData[] }) {
   return (
     <div
       className="flex flex-col rounded-3xl p-7"
-      style={{ gridArea: "1 / 8 / 3 / 13", backgroundColor: C.surface, border: `1px solid ${C.surfaceBorder}` }}
+      style={{ gridArea: "1 / 9 / 3 / 13", backgroundColor: C.surface, border: `1px solid ${C.surfaceBorder}` }}
     >
       <div className="mb-[18px] flex items-center justify-between">
         <div>
@@ -36,9 +37,9 @@ export function CardArsenalWidget({ cards }: { cards: ArsenalCardData[] }) {
       </div>
 
       {cards.length > 0 ? (
-        <div className="grid flex-1 grid-cols-2 content-start gap-3.5 overflow-y-auto pr-1">
+        <div className="flex flex-1 flex-col gap-3 overflow-y-auto pr-1">
           {cards.map((c) => (
-            <div key={c.cardId} className="h-[88px] w-full">
+            <div key={c.cardId} className="h-[76px] w-full shrink-0">
               <DashboardCardChip cardId={c.cardId} issuer={c.issuer} name={c.name} network={c.network} />
             </div>
           ))}
