@@ -1,37 +1,322 @@
 [
   {
-    "id": "hdfc-regalia",
-    "name": "Regalia",
-    "issuer": "HDFC Bank",
+    "id": "au-altura",
+    "name": "Altura Credit Card",
+    "issuer": "AU Small Finance Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "au-altura-plus",
+    "name": "Altura Plus Credit Card",
+    "issuer": "AU Small Finance Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.04,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "au-lit-card",
+    "name": "LIT Credit Card",
+    "issuer": "AU Small Finance Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000
+  },
+  {
+    "id": "au-vetta",
+    "name": "Vetta Credit Card",
+    "issuer": "AU Small Finance Bank",
+    "network": "RuPay",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "au-zenith",
+    "name": "Zenith Credit Card",
+    "issuer": "AU Small Finance Bank",
     "network": "Visa",
     "tier": "premium",
     "joiningFee": 1000,
     "annualFee": 2500,
-    "feeWaiverCondition": "Spend ₹3,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.033, "hotels": 0.033, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 500000, "bonusValue": 5000 }],
-    "welcomeBonus": "Welcome vouchers worth ~₹2,500",
-    "loungeAccess": { "domestic": 12, "international": 6 },
-    "forexMarkupPct": 2,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.033,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "amex-gold",
+    "name": "Gold Card",
+    "issuer": "American Express",
+    "network": "Amex",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.025,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "amex-membership-rewards",
+    "name": "Membership Rewards Credit Card",
+    "issuer": "American Express",
+    "network": "Amex",
+    "tier": "mid",
+    "joiningFee": 1000,
+    "annualFee": 4500,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 190000,
+        "bonusValue": 2000
+      },
+      {
+        "spendThreshold": 400000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": "4,000 Membership Rewards points",
+    "loungeAccess": {
+      "domestic": 8
+    },
+    "forexMarkupPct": 3.5,
     "redemptionValue": 0.5,
     "minIncomeEligibility": 600000
   },
   {
-    "id": "hdfc-millennia",
-    "name": "Millennia",
-    "issuer": "HDFC Bank",
-    "network": "Visa",
-    "tier": "entry",
+    "id": "amex-platinum-reserve",
+    "name": "Platinum Reserve Credit Card",
+    "issuer": "American Express",
+    "network": "Amex",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.06,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "amex-platinum-travel",
+    "name": "Platinum Travel Credit Card",
+    "issuer": "American Express",
+    "network": "Amex",
+    "tier": "premium",
     "joiningFee": 1000,
-    "annualFee": 1000,
-    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.05, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 100000, "bonusValue": 1000 }],
-    "welcomeBonus": "₹1,000 cashback on activation",
-    "loungeAccess": { "domestic": 8 },
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.033,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "amex-smartearn",
+    "name": "SmartEarn Credit Card",
+    "issuer": "American Express",
+    "network": "Amex",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
     "forexMarkupPct": 3.5,
-    "redemptionValue": 1,
-    "minIncomeEligibility": 360000
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
   },
   {
     "id": "axis-ace",
@@ -42,10 +327,21 @@
     "joiningFee": 499,
     "annualFee": 499,
     "feeWaiverCondition": "Spend ₹2,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.02, "hotels": 0.02, "fuel": 0.02, "groceries": 0.02, "ecommerce": 0.02, "utilities": 0.05, "general": 0.02 },
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.05,
+      "general": 0.02
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
-    "loungeAccess": { "domestic": 4 },
+    "loungeAccess": {
+      "domestic": 4
+    },
     "forexMarkupPct": 3.5,
     "redemptionValue": 1,
     "minIncomeEligibility": 300000
@@ -59,8 +355,22 @@
     "joiningFee": 500,
     "annualFee": 500,
     "feeWaiverCondition": "Spend ₹2,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0.04, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.1, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 200000, "bonusValue": 3000 }],
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.04,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.1,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 200000,
+        "bonusValue": 3000
+      }
+    ],
     "welcomeBonus": "₹500 Airtel voucher",
     "loungeAccess": null,
     "forexMarkupPct": 3.5,
@@ -69,38 +379,1374 @@
     "coBrandPartner": "Airtel"
   },
   {
-    "id": "sbi-simplyclick",
-    "name": "SimplyCLICK",
-    "issuer": "State Bank of India",
+    "id": "axis-flipkart",
+    "name": "Flipkart Axis Bank Credit Card",
+    "issuer": "Axis Bank",
     "network": "Visa",
     "tier": "entry",
-    "joiningFee": 499,
-    "annualFee": 499,
-    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
-    "rewardRates": { "dining": 0.005, "travel": 0.005, "hotels": 0.005, "fuel": 0, "groceries": 0.005, "ecommerce": 0.1, "utilities": 0.005, "general": 0.005 },
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹3,50,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.04,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.05,
+      "utilities": 0.01,
+      "general": 0.015
+    },
     "milestoneBenefits": [],
-    "welcomeBonus": "Amazon gift voucher worth ₹500",
+    "welcomeBonus": "₹500 Flipkart voucher",
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "Flipkart"
+  },
+  {
+    "id": "axis-freecharge-plus",
+    "name": "Freecharge Plus Axis Bank Credit Card",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.02,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
     "loungeAccess": null,
     "forexMarkupPct": 3.5,
     "redemptionValue": 0.25,
-    "minIncomeEligibility": 300000
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": "Freecharge"
   },
   {
-    "id": "sbi-cashback",
-    "name": "Cashback Card",
-    "issuer": "State Bank of India",
+    "id": "axis-indianoil",
+    "name": "IndianOil Axis Bank Credit Card",
+    "issuer": "Axis Bank",
     "network": "Visa",
     "tier": "entry",
-    "joiningFee": 999,
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "IndianOil"
+  },
+  {
+    "id": "axis-magnus",
+    "name": "Magnus",
+    "issuer": "Axis Bank",
+    "network": "Mastercard",
+    "tier": "super-premium",
+    "joiningFee": 12500,
+    "annualFee": 12500,
+    "feeWaiverCondition": "Spend ₹25,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.024,
+      "travel": 0.048,
+      "hotels": 0.048,
+      "fuel": 0,
+      "groceries": 0.012,
+      "ecommerce": 0.012,
+      "utilities": 0.012,
+      "general": 0.024
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1500000,
+        "bonusValue": 25000
+      }
+    ],
+    "welcomeBonus": "25,000 EDGE Reward Points",
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 8
+    },
+    "forexMarkupPct": 2,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 2500000
+  },
+  {
+    "id": "axis-magnus-burgundy",
+    "name": "Magnus for Burgundy",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-my-zone",
+    "name": "My Zone",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.03,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-neo",
+    "name": "Neo",
+    "issuer": "Axis Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-pride",
+    "name": "Pride Signature",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.04,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Indian Armed Forces"
+  },
+  {
+    "id": "axis-privilege",
+    "name": "Privilege",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-reserve",
+    "name": "Reserve",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-select",
+    "name": "Select",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.025,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "axis-vistara-infinite",
+    "name": "Vistara Infinite",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹15,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.03,
+      "hotels": 0.03,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 800000,
+        "bonusValue": 6000
+      }
+    ],
+    "welcomeBonus": "Vistara Gold tier + companion voucher",
+    "loungeAccess": {
+      "domestic": 12,
+      "international": 6
+    },
+    "forexMarkupPct": 2,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": "Vistara"
+  },
+  {
+    "id": "axis-vistara-signature",
+    "name": "Vistara Signature Axis Bank Credit Card",
+    "issuer": "Axis Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Vistara"
+  },
+  {
+    "id": "bob-easy",
+    "name": "Easy Credit Card",
+    "issuer": "Bank of Baroda",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.02,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "bob-eterna",
+    "name": "Eterna Credit Card",
+    "issuer": "Bank of Baroda",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.033,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "bob-premier",
+    "name": "Premier Credit Card",
+    "issuer": "Bank of Baroda",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "bob-select",
+    "name": "Select Credit Card",
+    "issuer": "Bank of Baroda",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "canara-platinum",
+    "name": "Platinum Credit Card",
+    "issuer": "Canara Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.02,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "canara-rupay-select",
+    "name": "RuPay Select Credit Card",
+    "issuer": "Canara Bank",
+    "network": "RuPay",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "dbs-techie",
+    "name": "Techie Credit Card",
+    "issuer": "DBS Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "dbs-vantage",
+    "name": "Vantage Credit Card",
+    "issuer": "DBS Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.033,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "dbs-womans",
+    "name": "Woman's Credit Card",
+    "issuer": "DBS Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.03,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "federal-celesta",
+    "name": "Celesta Credit Card",
+    "issuer": "Federal Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "federal-imperio",
+    "name": "Imperio Credit Card",
+    "issuer": "Federal Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "federal-onecard",
+    "name": "OneCard",
+    "issuer": "Federal Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.05,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 2,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": "FPL Technologies"
+  },
+  {
+    "id": "federal-signet",
+    "name": "Signet Credit Card",
+    "issuer": "Federal Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-6e-rewards",
+    "name": "6E Rewards HDFC Bank Credit Card",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.03,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "IndiGo"
+  },
+  {
+    "id": "hdfc-diners-black",
+    "name": "Diners Club Black",
+    "issuer": "HDFC Bank",
+    "network": "Mastercard",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": "Club Marriott + Amazon Prime membership",
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-diners-privilege",
+    "name": "Diners Club Privilege",
+    "issuer": "HDFC Bank",
+    "network": "Mastercard",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.025,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-freedom",
+    "name": "Freedom",
+    "issuer": "HDFC Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-indianoil",
+    "name": "IndianOil HDFC Bank Credit Card",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "IndianOil"
+  },
+  {
+    "id": "hdfc-infinia",
+    "name": "Infinia",
+    "issuer": "HDFC Bank",
+    "network": "Mastercard",
+    "tier": "super-premium",
+    "joiningFee": 12500,
+    "annualFee": 12500,
+    "feeWaiverCondition": "Spend ₹10,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.033,
+      "travel": 0.066,
+      "hotels": 0.066,
+      "fuel": 0,
+      "groceries": 0.033,
+      "ecommerce": 0.033,
+      "utilities": 0.033,
+      "general": 0.033
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": "Complimentary lifestyle memberships (Amazon Prime, Swiggy One, etc.)",
+    "loungeAccess": {
+      "domestic": "unlimited",
+      "international": "unlimited"
+    },
+    "forexMarkupPct": 2,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 2100000
+  },
+  {
+    "id": "hdfc-marriott-bonvoy",
+    "name": "Marriott Bonvoy HDFC Bank Credit Card",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.015,
+      "hotels": 0.05,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": "Marriott Bonvoy"
+  },
+  {
+    "id": "hdfc-millennia",
+    "name": "Millennia",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 1000,
+    "annualFee": 1000,
+    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.05,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 100000,
+        "bonusValue": 1000
+      }
+    ],
+    "welcomeBonus": "₹1,000 cashback on activation",
+    "loungeAccess": {
+      "domestic": 8
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 360000
+  },
+  {
+    "id": "hdfc-moneyback-plus",
+    "name": "MoneyBack+",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-paytm",
+    "name": "Paytm HDFC Bank Credit Card",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "Paytm"
+  },
+  {
+    "id": "hdfc-regalia",
+    "name": "Regalia",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹3,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.033,
+      "hotels": 0.033,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 500000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": "Welcome vouchers worth ~₹2,500",
+    "loungeAccess": {
+      "domestic": 12,
+      "international": 6
+    },
+    "forexMarkupPct": 2,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 600000
+  },
+  {
+    "id": "hdfc-regalia-gold",
+    "name": "Regalia Gold",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.033,
+      "hotels": 0.05,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hdfc-swiggy",
+    "name": "Swiggy HDFC Bank Credit Card",
+    "issuer": "HDFC Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹2,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.1,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.05,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": "Swiggy One membership for 3 months",
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "Swiggy"
+  },
+  {
+    "id": "hdfc-tata-neu-infinity",
+    "name": "Tata Neu Infinity HDFC Bank",
+    "issuer": "HDFC Bank",
+    "network": "RuPay",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.04,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Tata Neu"
+  },
+  {
+    "id": "hdfc-tata-neu-plus",
+    "name": "Tata Neu Plus HDFC Bank",
+    "issuer": "HDFC Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "Tata Neu"
+  },
+  {
+    "id": "hsbc-cashback",
+    "name": "Cashback Credit Card",
+    "issuer": "HSBC",
+    "network": "Mastercard",
+    "tier": "entry",
+    "joiningFee": 0,
     "annualFee": 999,
     "feeWaiverCondition": "Spend ₹2,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.05, "utilities": 0.01, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.015,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
     "loungeAccess": null,
     "forexMarkupPct": 3.5,
     "redemptionValue": 1,
-    "minIncomeEligibility": 400000
+    "minIncomeEligibility": 300000
+  },
+  {
+    "id": "hsbc-live-plus",
+    "name": "Live+ Credit Card",
+    "issuer": "HSBC",
+    "network": "Mastercard",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.025,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hsbc-premier-mastercard",
+    "name": "Premier Mastercard Credit Card",
+    "issuer": "HSBC",
+    "network": "Mastercard",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "hsbc-visa-platinum",
+    "name": "Visa Platinum Credit Card",
+    "issuer": "HSBC",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
   },
   {
     "id": "icici-amazon-pay",
@@ -111,7 +1757,16 @@
     "joiningFee": 0,
     "annualFee": 0,
     "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0.01, "groceries": 0.01, "ecommerce": 0.05, "utilities": 0.02, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.05,
+      "utilities": 0.02,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": "Amazon Pay balance (varies with Prime status)",
     "loungeAccess": null,
@@ -129,47 +1784,452 @@
     "joiningFee": 500,
     "annualFee": 500,
     "feeWaiverCondition": "Spend ₹1,50,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
-    "loungeAccess": { "domestic": 4 },
+    "loungeAccess": {
+      "domestic": 4
+    },
     "forexMarkupPct": 3.5,
     "redemptionValue": 0.25,
     "minIncomeEligibility": 300000
   },
   {
-    "id": "axis-magnus",
-    "name": "Magnus",
-    "issuer": "Axis Bank",
-    "network": "Mastercard",
-    "tier": "super-premium",
-    "joiningFee": 12500,
-    "annualFee": 12500,
-    "feeWaiverCondition": "Spend ₹25,00,000 in a year",
-    "rewardRates": { "dining": 0.024, "travel": 0.048, "hotels": 0.048, "fuel": 0, "groceries": 0.012, "ecommerce": 0.012, "utilities": 0.012, "general": 0.024 },
-    "milestoneBenefits": [{ "spendThreshold": 1500000, "bonusValue": 25000 }],
-    "welcomeBonus": "25,000 EDGE Reward Points",
-    "loungeAccess": { "domestic": 8, "international": 8 },
-    "forexMarkupPct": 2,
-    "redemptionValue": 0.5,
-    "minIncomeEligibility": 2500000
+    "id": "icici-coral-contactless",
+    "name": "Coral Contactless",
+    "issuer": "ICICI Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.03,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
   },
   {
-    "id": "hdfc-infinia",
-    "name": "Infinia",
-    "issuer": "HDFC Bank",
-    "network": "Mastercard",
+    "id": "icici-emeralde-private-metal",
+    "name": "Emeralde Private Metal",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
     "tier": "super-premium",
-    "joiningFee": 12500,
-    "annualFee": 12500,
-    "feeWaiverCondition": "Spend ₹10,00,000 in a year",
-    "rewardRates": { "dining": 0.033, "travel": 0.066, "hotels": 0.066, "fuel": 0, "groceries": 0.033, "ecommerce": 0.033, "utilities": 0.033, "general": 0.033 },
-    "milestoneBenefits": [],
-    "welcomeBonus": "Complimentary lifestyle memberships (Amazon Prime, Swiggy One, etc.)",
-    "loungeAccess": { "domestic": "unlimited", "international": "unlimited" },
+    "joiningFee": 12000,
+    "annualFee": 12000,
+    "feeWaiverCondition": "By invitation / relationship-based, no spend waiver",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.04,
+      "hotels": 0.04,
+      "fuel": 0,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 800000,
+        "bonusValue": 10000
+      }
+    ],
+    "welcomeBonus": "Complimentary golf and airport transfers",
+    "loungeAccess": {
+      "domestic": "unlimited",
+      "international": "unlimited"
+    },
     "forexMarkupPct": 2,
     "redemptionValue": 1,
-    "minIncomeEligibility": 2100000
+    "minIncomeEligibility": 3600000
+  },
+  {
+    "id": "icici-ferrari-signature",
+    "name": "Ferrari Signature ICICI Bank Credit Card",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": "Ferrari"
+  },
+  {
+    "id": "icici-hpcl-coral",
+    "name": "HPCL Coral",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "HPCL"
+  },
+  {
+    "id": "icici-makemytrip-signature",
+    "name": "MakeMyTrip ICICI Bank Signature Credit Card",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.025,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "MakeMyTrip"
+  },
+  {
+    "id": "icici-manchester-united",
+    "name": "Manchester United ICICI Bank Credit Card",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.04,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Manchester United"
+  },
+  {
+    "id": "icici-platinum-chip",
+    "name": "Platinum Chip",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.02,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "icici-rubyx",
+    "name": "Rubyx",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.025,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "icici-sapphiro",
+    "name": "Sapphiro",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 3500,
+    "annualFee": 3500,
+    "feeWaiverCondition": "Spend ₹4,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 400000,
+        "bonusValue": 4000
+      }
+    ],
+    "welcomeBonus": "Complimentary movie/travel vouchers",
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 750000
+  },
+  {
+    "id": "icici-times-black",
+    "name": "Times Black ICICI Bank Credit Card",
+    "issuer": "ICICI Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.06,
+      "travel": 0.04,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "idbi-royale",
+    "name": "Royale Credit Card",
+    "issuer": "IDBI Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "idbi-rupay-platinum",
+    "name": "RuPay Platinum Credit Card",
+    "issuer": "IDBI Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.02,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "idfc-ashva",
+    "name": "Ashva",
+    "issuer": "IDFC FIRST Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "idfc-first-classic",
+    "name": "FIRST Classic",
+    "issuer": "IDFC FIRST Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
   },
   {
     "id": "idfc-first-millennia",
@@ -180,13 +2240,300 @@
     "joiningFee": 0,
     "annualFee": 0,
     "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.03, "travel": 0.01, "hotels": 0.01, "fuel": 0.01, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.03,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
-    "loungeAccess": { "domestic": 4 },
+    "loungeAccess": {
+      "domestic": 4
+    },
     "forexMarkupPct": 1.5,
     "redemptionValue": 0.25,
     "minIncomeEligibility": 250000
+  },
+  {
+    "id": "idfc-first-select",
+    "name": "FIRST Select",
+    "issuer": "IDFC FIRST Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.025,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "idfc-first-wealth",
+    "name": "FIRST Wealth",
+    "issuer": "IDFC FIRST Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.03,
+      "travel": 0.03,
+      "hotels": 0.03,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": "unlimited",
+      "international": 4
+    },
+    "forexMarkupPct": 1.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 1000000
+  },
+  {
+    "id": "idfc-lic-classic",
+    "name": "LIC Classic IDFC FIRST Bank Credit Card",
+    "issuer": "IDFC FIRST Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.02,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": "LIC"
+  },
+  {
+    "id": "idfc-mayura",
+    "name": "Mayura",
+    "issuer": "IDFC FIRST Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "indusind-legend",
+    "name": "Legend Credit Card",
+    "issuer": "IndusInd Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 2500,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹5,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 500000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 800000
+  },
+  {
+    "id": "indusind-nexxt",
+    "name": "Nexxt Credit Card",
+    "issuer": "IndusInd Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.04,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "indusind-pinnacle",
+    "name": "Pinnacle Credit Card",
+    "issuer": "IndusInd Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.06,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "indusind-platinum-aura-edge",
+    "name": "Platinum Aura Edge Credit Card",
+    "issuer": "IndusInd Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.03
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "indusind-tiger",
+    "name": "Tiger Credit Card",
+    "issuer": "IndusInd Bank",
+    "network": "RuPay",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.025,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
   },
   {
     "id": "kotak-811-dream-different",
@@ -197,7 +2544,409 @@
     "joiningFee": 0,
     "annualFee": 0,
     "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.02, "utilities": 0.01, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000
+  },
+  {
+    "id": "kotak-essentia-platinum",
+    "name": "Essentia Platinum",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.03,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "kotak-indigo-6e-rewards-xl",
+    "name": "IndiGo 6E Rewards XL Kotak Credit Card",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "IndiGo"
+  },
+  {
+    "id": "kotak-league-platinum",
+    "name": "League Platinum",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 999,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹1,50,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 400000
+  },
+  {
+    "id": "kotak-royale-signature",
+    "name": "Royale Signature",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.033,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "kotak-white-reserve",
+    "name": "White Reserve",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.06,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "kotak-zen-signature",
+    "name": "Zen Signature",
+    "issuer": "Kotak Mahindra Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "pnb-platinum",
+    "name": "Platinum Credit Card",
+    "issuer": "Punjab National Bank",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "pnb-rupay-select",
+    "name": "RuPay Select Credit Card",
+    "issuer": "Punjab National Bank",
+    "network": "RuPay",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.025,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "rbl-cookies",
+    "name": "Cookies Credit Card",
+    "issuer": "RBL Bank",
+    "network": "Mastercard",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "rbl-icon",
+    "name": "Icon",
+    "issuer": "RBL Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.05,
+      "travel": 0.033,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "rbl-insignia-preferred",
+    "name": "Insignia Preferred",
+    "issuer": "RBL Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "rbl-popcorn-monster",
+    "name": "Popcorn Monster Credit Card",
+    "issuer": "RBL Bank",
+    "network": "Mastercard",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "rbl-shoprite",
+    "name": "ShopRite Credit Card",
+    "issuer": "RBL Bank",
+    "network": "Mastercard",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.05,
+      "ecommerce": 0.02,
+      "utilities": 0.01,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
     "loungeAccess": null,
@@ -214,33 +2963,59 @@
     "joiningFee": 3000,
     "annualFee": 3000,
     "feeWaiverCondition": "Spend ₹3,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.05, "hotels": 0.05, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 300000, "bonusValue": 3000 }],
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.05,
+      "hotels": 0.05,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 3000
+      }
+    ],
     "welcomeBonus": "Travel voucher worth ~₹3,000",
-    "loungeAccess": { "domestic": 8, "international": 4 },
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
     "forexMarkupPct": 2,
     "redemptionValue": 0.5,
     "minIncomeEligibility": 600000
   },
   {
-    "id": "amex-membership-rewards",
-    "name": "Membership Rewards Credit Card",
-    "issuer": "American Express",
-    "network": "Amex",
-    "tier": "mid",
-    "joiningFee": 1000,
-    "annualFee": 4500,
-    "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [
-      { "spendThreshold": 190000, "bonusValue": 2000 },
-      { "spendThreshold": 400000, "bonusValue": 5000 }
-    ],
-    "welcomeBonus": "4,000 Membership Rewards points",
-    "loungeAccess": { "domestic": 8 },
+    "id": "rbl-ixigo",
+    "name": "ixigo RBL Bank Credit Card",
+    "issuer": "RBL Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.03,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
     "forexMarkupPct": 3.5,
-    "redemptionValue": 0.5,
-    "minIncomeEligibility": 600000
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "ixigo"
   },
   {
     "id": "scb-easemytrip",
@@ -251,7 +3026,16 @@
     "joiningFee": 0,
     "annualFee": 0,
     "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.01, "travel": 0.05, "hotels": 0.05, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.05,
+      "hotels": 0.05,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
     "loungeAccess": null,
@@ -259,6 +3043,245 @@
     "redemptionValue": 1,
     "minIncomeEligibility": 300000,
     "coBrandPartner": "EaseMyTrip"
+  },
+  {
+    "id": "scb-manhattan",
+    "name": "Manhattan Platinum Credit Card",
+    "issuer": "Standard Chartered Bank",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "scb-platinum",
+    "name": "Platinum Rewards Credit Card",
+    "issuer": "Standard Chartered Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.02,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "scb-rewards",
+    "name": "Rewards Credit Card",
+    "issuer": "Standard Chartered Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.03
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "scb-ultimate",
+    "name": "Ultimate Credit Card",
+    "issuer": "Standard Chartered Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.06,
+      "hotels": 0.02,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "sbi-air-india-platinum",
+    "name": "Air India SBI Platinum",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Air India"
+  },
+  {
+    "id": "sbi-aurum",
+    "name": "Aurum",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "sbi-bpcl-octane",
+    "name": "BPCL SBI Card OCTANE",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.03,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "BPCL"
+  },
+  {
+    "id": "sbi-cashback",
+    "name": "Cashback Card",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 999,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹2,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.05,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 1,
+    "minIncomeEligibility": 400000
   },
   {
     "id": "sbi-elite",
@@ -269,13 +3292,117 @@
     "joiningFee": 4999,
     "annualFee": 4999,
     "feeWaiverCondition": "Spend ₹10,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.02, "hotels": 0.02, "fuel": 0, "groceries": 0.01, "ecommerce": 0.04, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 400000, "bonusValue": 5000 }],
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.04,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 400000,
+        "bonusValue": 5000
+      }
+    ],
     "welcomeBonus": "Welcome e-gift vouchers worth ₹5,000",
-    "loungeAccess": { "domestic": "unlimited", "international": 6 },
+    "loungeAccess": {
+      "domestic": "unlimited",
+      "international": 6
+    },
     "forexMarkupPct": 3.5,
     "redemptionValue": 0.25,
     "minIncomeEligibility": 1000000
+  },
+  {
+    "id": "sbi-etihad-guest",
+    "name": "Etihad Guest SBI Card",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": "Etihad Guest"
+  },
+  {
+    "id": "sbi-irctc-platinum",
+    "name": "IRCTC SBI Platinum",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.03,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": "IRCTC"
+  },
+  {
+    "id": "sbi-miles",
+    "name": "Miles",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.04,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
   },
   {
     "id": "sbi-prime",
@@ -286,101 +3413,234 @@
     "joiningFee": 2999,
     "annualFee": 2999,
     "feeWaiverCondition": "Spend ₹3,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.01, "hotels": 0.02, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 300000, "bonusValue": 3000 }],
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.01,
+      "hotels": 0.02,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 3000
+      }
+    ],
     "welcomeBonus": "E-gift voucher worth ₹3,000",
-    "loungeAccess": { "domestic": 8, "international": 2 },
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 2
+    },
     "forexMarkupPct": 3.5,
     "redemptionValue": 0.25,
     "minIncomeEligibility": 600000
   },
   {
-    "id": "icici-sapphiro",
-    "name": "Sapphiro",
-    "issuer": "ICICI Bank",
+    "id": "sbi-pulse",
+    "name": "Pulse",
+    "issuer": "State Bank of India",
     "network": "Visa",
-    "tier": "premium",
-    "joiningFee": 3500,
-    "annualFee": 3500,
-    "feeWaiverCondition": "Spend ₹4,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.02, "hotels": 0.02, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 400000, "bonusValue": 4000 }],
-    "welcomeBonus": "Complimentary movie/travel vouchers",
-    "loungeAccess": { "domestic": 8, "international": 2 },
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 0.25,
-    "minIncomeEligibility": 750000
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.025,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
   },
   {
-    "id": "icici-emeralde-private-metal",
-    "name": "Emeralde Private Metal",
-    "issuer": "ICICI Bank",
-    "network": "Visa",
-    "tier": "super-premium",
-    "joiningFee": 12000,
-    "annualFee": 12000,
-    "feeWaiverCondition": "By invitation / relationship-based, no spend waiver",
-    "rewardRates": { "dining": 0.02, "travel": 0.04, "hotels": 0.04, "fuel": 0, "groceries": 0.02, "ecommerce": 0.02, "utilities": 0.02, "general": 0.02 },
-    "milestoneBenefits": [{ "spendThreshold": 800000, "bonusValue": 10000 }],
-    "welcomeBonus": "Complimentary golf and airport transfers",
-    "loungeAccess": { "domestic": "unlimited", "international": "unlimited" },
-    "forexMarkupPct": 2,
-    "redemptionValue": 1,
-    "minIncomeEligibility": 3600000
-  },
-  {
-    "id": "axis-flipkart",
-    "name": "Flipkart Axis Bank Credit Card",
-    "issuer": "Axis Bank",
+    "id": "sbi-simplyclick",
+    "name": "SimplyCLICK",
+    "issuer": "State Bank of India",
     "network": "Visa",
     "tier": "entry",
-    "joiningFee": 500,
-    "annualFee": 500,
-    "feeWaiverCondition": "Spend ₹3,50,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.04, "hotels": 0.04, "fuel": 0, "groceries": 0.01, "ecommerce": 0.05, "utilities": 0.01, "general": 0.015 },
+    "joiningFee": 499,
+    "annualFee": 499,
+    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
+    "rewardRates": {
+      "dining": 0.005,
+      "travel": 0.005,
+      "hotels": 0.005,
+      "fuel": 0,
+      "groceries": 0.005,
+      "ecommerce": 0.1,
+      "utilities": 0.005,
+      "general": 0.005
+    },
     "milestoneBenefits": [],
-    "welcomeBonus": "₹500 Flipkart voucher",
-    "loungeAccess": { "domestic": 4 },
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 1,
-    "minIncomeEligibility": 300000,
-    "coBrandPartner": "Flipkart"
-  },
-  {
-    "id": "axis-vistara-infinite",
-    "name": "Vistara Infinite",
-    "issuer": "Axis Bank",
-    "network": "Visa",
-    "tier": "premium",
-    "joiningFee": 10000,
-    "annualFee": 10000,
-    "feeWaiverCondition": "Spend ₹15,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.03, "hotels": 0.03, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 800000, "bonusValue": 6000 }],
-    "welcomeBonus": "Vistara Gold tier + companion voucher",
-    "loungeAccess": { "domestic": 12, "international": 6 },
-    "forexMarkupPct": 2,
-    "redemptionValue": 0.5,
-    "minIncomeEligibility": 1800000,
-    "coBrandPartner": "Vistara"
-  },
-  {
-    "id": "hdfc-swiggy",
-    "name": "Swiggy HDFC Bank Credit Card",
-    "issuer": "HDFC Bank",
-    "network": "Visa",
-    "tier": "entry",
-    "joiningFee": 500,
-    "annualFee": 500,
-    "feeWaiverCondition": "Spend ₹2,00,000 in a year",
-    "rewardRates": { "dining": 0.1, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.05, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [],
-    "welcomeBonus": "Swiggy One membership for 3 months",
+    "welcomeBonus": "Amazon gift voucher worth ₹500",
     "loungeAccess": null,
     "forexMarkupPct": 3.5,
-    "redemptionValue": 1,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000
+  },
+  {
+    "id": "sbi-simplysave",
+    "name": "SimplySAVE",
+    "issuer": "State Bank of India",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.03,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
     "minIncomeEligibility": 300000,
-    "coBrandPartner": "Swiggy"
+    "coBrandPartner": null
+  },
+  {
+    "id": "sbi-unnati",
+    "name": "Unnati",
+    "issuer": "State Bank of India",
+    "network": "RuPay",
+    "tier": "entry",
+    "joiningFee": 0,
+    "annualFee": 0,
+    "feeWaiverCondition": null,
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.02
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": null,
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 250000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "union-rupay-select",
+    "name": "RuPay Select Credit Card",
+    "issuer": "Union Bank of India",
+    "network": "RuPay",
+    "tier": "mid",
+    "joiningFee": 500,
+    "annualFee": 999,
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "yes-ace",
+    "name": "Ace Credit Card",
+    "issuer": "YES Bank",
+    "network": "Visa",
+    "tier": "entry",
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverCondition": "Spend ₹150,000 in a year",
+    "rewardRates": {
+      "dining": 0.01,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.03,
+      "general": 0.01
+    },
+    "milestoneBenefits": [],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 2
+    },
+    "forexMarkupPct": 3.5,
+    "redemptionValue": 0.25,
+    "minIncomeEligibility": 300000,
+    "coBrandPartner": null
+  },
+  {
+    "id": "yes-elite-plus",
+    "name": "Elite+ Credit Card",
+    "issuer": "YES Bank",
+    "network": "Visa",
+    "tier": "premium",
+    "joiningFee": 1000,
+    "annualFee": 2500,
+    "feeWaiverCondition": "Spend ₹300,000 in a year",
+    "rewardRates": {
+      "dining": 0.015,
+      "travel": 0.05,
+      "hotels": 0.015,
+      "fuel": 0.015,
+      "groceries": 0.015,
+      "ecommerce": 0.015,
+      "utilities": 0.015,
+      "general": 0.015
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 5000
+      }
+    ],
+    "welcomeBonus": null,
+    "loungeAccess": {
+      "domestic": 8,
+      "international": 4
+    },
+    "forexMarkupPct": 2.5,
+    "redemptionValue": 0.4,
+    "minIncomeEligibility": 700000,
+    "coBrandPartner": null
   },
   {
     "id": "yes-first-exclusive",
@@ -391,132 +3651,93 @@
     "joiningFee": 999,
     "annualFee": 999,
     "feeWaiverCondition": "Spend ₹3,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.02, "hotels": 0.02, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 300000, "bonusValue": 2000 }],
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.02,
+      "hotels": 0.02,
+      "fuel": 0,
+      "groceries": 0.01,
+      "ecommerce": 0.01,
+      "utilities": 0.01,
+      "general": 0.01
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 300000,
+        "bonusValue": 2000
+      }
+    ],
     "welcomeBonus": null,
-    "loungeAccess": { "domestic": 4, "international": 2 },
+    "loungeAccess": {
+      "domestic": 4,
+      "international": 2
+    },
     "forexMarkupPct": 3,
     "redemptionValue": 0.25,
     "minIncomeEligibility": 600000
   },
   {
-    "id": "au-lit-card",
-    "name": "LIT Credit Card",
-    "issuer": "AU Small Finance Bank",
-    "network": "RuPay",
-    "tier": "entry",
-    "joiningFee": 0,
-    "annualFee": 0,
-    "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.02, "travel": 0.01, "hotels": 0.01, "fuel": 0.01, "groceries": 0.01, "ecommerce": 0.02, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [],
+    "id": "yes-marquee",
+    "name": "Marquee Credit Card",
+    "issuer": "YES Bank",
+    "network": "Visa",
+    "tier": "super-premium",
+    "joiningFee": 10000,
+    "annualFee": 10000,
+    "feeWaiverCondition": "Spend ₹1,000,000 in a year",
+    "rewardRates": {
+      "dining": 0.02,
+      "travel": 0.06,
+      "hotels": 0.04,
+      "fuel": 0.02,
+      "groceries": 0.02,
+      "ecommerce": 0.02,
+      "utilities": 0.02,
+      "general": 0.02
+    },
+    "milestoneBenefits": [
+      {
+        "spendThreshold": 1000000,
+        "bonusValue": 20000
+      }
+    ],
     "welcomeBonus": null,
-    "loungeAccess": null,
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 0.25,
-    "minIncomeEligibility": 300000
+    "loungeAccess": {
+      "domestic": 999,
+      "international": 999
+    },
+    "forexMarkupPct": 2.0,
+    "redemptionValue": 0.5,
+    "minIncomeEligibility": 1800000,
+    "coBrandPartner": null
   },
   {
-    "id": "kotak-league-platinum",
-    "name": "League Platinum",
-    "issuer": "Kotak Mahindra Bank",
+    "id": "yes-prosperity-rewards-plus",
+    "name": "Prosperity Rewards Plus Credit Card",
+    "issuer": "YES Bank",
     "network": "Visa",
     "tier": "mid",
-    "joiningFee": 999,
+    "joiningFee": 500,
     "annualFee": 999,
-    "feeWaiverCondition": "Spend ₹1,50,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.01, "ecommerce": 0.02, "utilities": 0.01, "general": 0.01 },
+    "feeWaiverCondition": "Spend ₹100,000 in a year",
+    "rewardRates": {
+      "dining": 0.04,
+      "travel": 0.01,
+      "hotels": 0.01,
+      "fuel": 0.01,
+      "groceries": 0.01,
+      "ecommerce": 0.025,
+      "utilities": 0.01,
+      "general": 0.01
+    },
     "milestoneBenefits": [],
     "welcomeBonus": null,
-    "loungeAccess": { "domestic": 4 },
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 0.25,
-    "minIncomeEligibility": 400000
-  },
-  {
-    "id": "rbl-shoprite",
-    "name": "ShopRite Credit Card",
-    "issuer": "RBL Bank",
-    "network": "Mastercard",
-    "tier": "entry",
-    "joiningFee": 0,
-    "annualFee": 500,
-    "feeWaiverCondition": "Spend ₹1,00,000 in a year",
-    "rewardRates": { "dining": 0.01, "travel": 0.01, "hotels": 0.01, "fuel": 0, "groceries": 0.05, "ecommerce": 0.02, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [],
-    "welcomeBonus": null,
-    "loungeAccess": null,
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 0.25,
-    "minIncomeEligibility": 250000
-  },
-  {
-    "id": "indusind-legend",
-    "name": "Legend Credit Card",
-    "issuer": "IndusInd Bank",
-    "network": "Visa",
-    "tier": "premium",
-    "joiningFee": 2500,
-    "annualFee": 2500,
-    "feeWaiverCondition": "Spend ₹5,00,000 in a year",
-    "rewardRates": { "dining": 0.02, "travel": 0.02, "hotels": 0.02, "fuel": 0, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [{ "spendThreshold": 500000, "bonusValue": 5000 }],
-    "welcomeBonus": null,
-    "loungeAccess": { "domestic": 8, "international": 4 },
-    "forexMarkupPct": 2,
-    "redemptionValue": 0.5,
-    "minIncomeEligibility": 800000
-  },
-  {
-    "id": "hsbc-cashback",
-    "name": "Cashback Credit Card",
-    "issuer": "HSBC",
-    "network": "Mastercard",
-    "tier": "entry",
-    "joiningFee": 0,
-    "annualFee": 999,
-    "feeWaiverCondition": "Spend ₹2,00,000 in a year",
-    "rewardRates": { "dining": 0.015, "travel": 0.015, "hotels": 0.015, "fuel": 0.015, "groceries": 0.015, "ecommerce": 0.015, "utilities": 0.015, "general": 0.015 },
-    "milestoneBenefits": [],
-    "welcomeBonus": null,
-    "loungeAccess": null,
-    "forexMarkupPct": 3.5,
-    "redemptionValue": 1,
-    "minIncomeEligibility": 300000
-  },
-  {
-    "id": "federal-onecard",
-    "name": "OneCard",
-    "issuer": "Federal Bank",
-    "network": "Visa",
-    "tier": "entry",
-    "joiningFee": 0,
-    "annualFee": 0,
-    "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.05, "travel": 0.02, "hotels": 0.02, "fuel": 0.02, "groceries": 0.02, "ecommerce": 0.02, "utilities": 0.02, "general": 0.02 },
-    "milestoneBenefits": [],
-    "welcomeBonus": null,
-    "loungeAccess": null,
-    "forexMarkupPct": 2,
-    "redemptionValue": 1,
-    "minIncomeEligibility": 250000,
-    "coBrandPartner": "FPL Technologies"
-  },
-  {
-    "id": "idfc-first-wealth",
-    "name": "FIRST Wealth",
-    "issuer": "IDFC FIRST Bank",
-    "network": "Visa",
-    "tier": "premium",
-    "joiningFee": 0,
-    "annualFee": 0,
-    "feeWaiverCondition": null,
-    "rewardRates": { "dining": 0.03, "travel": 0.03, "hotels": 0.03, "fuel": 0.01, "groceries": 0.01, "ecommerce": 0.01, "utilities": 0.01, "general": 0.01 },
-    "milestoneBenefits": [],
-    "welcomeBonus": null,
-    "loungeAccess": { "domestic": "unlimited", "international": 4 },
-    "forexMarkupPct": 1.5,
-    "redemptionValue": 0.25,
-    "minIncomeEligibility": 1000000
+    "loungeAccess": {
+      "domestic": 4
+    },
+    "forexMarkupPct": 3.0,
+    "redemptionValue": 0.3,
+    "minIncomeEligibility": 600000,
+    "coBrandPartner": null
   }
 ]

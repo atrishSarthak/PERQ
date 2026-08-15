@@ -302,4 +302,38 @@ describe("computeAndPersistRecommendations — D15 card sourcing", () => {
       lastSearchBucketKey: null,
     });
   });
+
+  it("forwards forceCardRefresh through to resolveCardSet's 3rd argument", async () => {
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "web_search",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    await computeAndPersistRecommendations("user-1", answers, undefined, undefined, true);
+
+    expect(resolveCardSetMock).toHaveBeenCalledWith(answers, undefined, true);
+  });
+
+  it("defaults forceCardRefresh to false when the caller doesn't pass it (the profile-edit path)", async () => {
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: [makeDbCard("card-a", 0.05)],
+      cardSourceMode: "web_search",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    await computeAndPersistRecommendations("user-1", answers);
+
+    expect(resolveCardSetMock).toHaveBeenCalledWith(answers, undefined, false);
+  });
 });

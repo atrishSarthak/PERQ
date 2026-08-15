@@ -49,7 +49,12 @@ export async function POST(req: Request) {
         const result = await computeAndPersistRecommendations(
           user.id,
           answers,
-          (label) => emit({ type: "step", label })
+          (label) => emit({ type: "step", label }),
+          undefined,
+          // A completed quiz (new user or "Retake the Quiz") always gets a
+          // fresh, context-grounded web search rather than a possibly-stale
+          // cached bucket — see resolveCardSet's forceRefresh doc comment.
+          true
         );
 
         emit({ type: "done", ...result });

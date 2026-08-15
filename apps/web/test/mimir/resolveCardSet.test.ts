@@ -159,4 +159,34 @@ describe("resolveCardSet (D15)", () => {
     expect(searchCardsForBucketMock).not.toHaveBeenCalled();
     expect(result.cardSourceMode).toBe("db_fallback");
   });
+
+  describe("forceRefresh (a completed quiz always searches fresh)", () => {
+    it("skips the cache check and searches even when a fresh bucket exists", async () => {
+      dbState.bucketCards = [{ id: "stale-cache-card", sourceUpdatedAt: new Date() }];
+      searchCardsForBucketMock.mockResolvedValue(makeValidResults(6));
+
+      const result = await resolveCardSet(answers, undefined, true);
+
+      expect(searchCardsForBucketMock).toHaveBeenCalledOnce();
+      expect(result.cardSourceMode).toBe("web_search");
+      expect(result.activeCards).toHaveLength(6);
+      // The fresh search result is used, not the pre-existing bucket cache.
+      expect(result.activeCards).not.toEqual(dbState.bucketCards);
+    });
+
+    it("still falls back to the seeded DB set if the forced search fails", async () => {
+      searchCardsForBucketMock.mockRejectedValue(new Error("network error"));
+      // Both set to the same value: with forceRefresh the cache-check select
+      // is skipped, so the fallback select becomes this mock's first (and
+      // only) select call regardless — see dbState's callIndex-based mock.
+      dbState.bucketCards = [{ id: "seeded-card", sourceUpdatedAt: new Date() }];
+      dbState.fallbackCards = [{ id: "seeded-card" }];
+
+      const result = await resolveCardSet(answers, undefined, true);
+
+      expect(result.cardSourceMode).toBe("db_fallback");
+      expect(result.activeCards).toHaveLength(1);
+      expect(result.activeCards[0]!.id).toBe("seeded-card");
+    });
+  });
 });

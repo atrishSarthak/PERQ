@@ -21,36 +21,52 @@ export interface ResolvedCardSet {
 
 /**
  * D15: resolves the card set computeAndPersistRecommendations should score
- * against — MIMIR's live web search first, the curated 30-card DB catalog
- * as a fallback that "should rarely happen" (only on a genuine search
- * failure or too-few-valid-results, never silently preferred). A fresh
- * cache hit for this bucket costs zero Gemini calls; a cache miss/stale
- * bucket costs exactly one bucket refresh (2 calls), not one search per
- * user or per quiz submission.
+ * against — MIMIR's live web search first, the curated DB catalog as a
+ * fallback that "should rarely happen" (only on a genuine search failure
+ * or too-few-valid-results, never silently preferred). A fresh cache hit
+ * for this bucket costs zero Gemini calls; a cache miss/stale bucket costs
+ * exactly one bucket refresh (2 calls), not one search per user or per
+ * quiz submission.
+ *
+ * forceRefresh (added for the "always search fresh right after the quiz"
+ * fix): skips the cache-freshness check below entirely, so a completed
+ * quiz (new user or a "Retake the Quiz") always attempts a live search
+ * grounded in that submission's own context, rather than possibly reusing
+ * up to 14-day-old results. The result still gets written back to the
+ * shared bucket cache (replaceBucketCards) so other users/edits in the
+ * same bucket benefit from it too. Callers should reserve this for the
+ * "user just finished the quiz" moment — the cheap, no-loading-state
+ * profile-edit path (§11/§9.5) should NOT pass this, since that path is
+ * explicitly meant to avoid extra Gemini calls. This does mean quiz
+ * completions cost real quota on every submit — expected and accepted
+ * tradeoff, not a bug.
  */
 export async function resolveCardSet(
   answers: QuizAnswers,
-  onNarrationStep?: (label: string) => void
+  onNarrationStep?: (label: string) => void,
+  forceRefresh = false
 ): Promise<ResolvedCardSet> {
   const searchBucketKey = computeSearchBucketKey(answers);
 
-  const bucketCards = await db
-    .select()
-    .from(cards)
-    .where(
-      and(
-        eq(cards.origin, "web_search"),
-        eq(cards.searchBucketKey, searchBucketKey),
-        eq(cards.status, "active")
-      )
-    );
+  if (!forceRefresh) {
+    const bucketCards = await db
+      .select()
+      .from(cards)
+      .where(
+        and(
+          eq(cards.origin, "web_search"),
+          eq(cards.searchBucketKey, searchBucketKey),
+          eq(cards.status, "active")
+        )
+      );
 
-  const freshCutoff = Date.now() - SEARCH_CACHE_TTL_MS;
-  const isFresh =
-    bucketCards.length > 0 && bucketCards[0]!.sourceUpdatedAt.getTime() > freshCutoff;
+    const freshCutoff = Date.now() - SEARCH_CACHE_TTL_MS;
+    const isFresh =
+      bucketCards.length > 0 && bucketCards[0]!.sourceUpdatedAt.getTime() > freshCutoff;
 
-  if (isFresh) {
-    return { activeCards: bucketCards, cardSourceMode: "web_search", searchBucketKey };
+    if (isFresh) {
+      return { activeCards: bucketCards, cardSourceMode: "web_search", searchBucketKey };
+    }
   }
 
   const apiKey = process.env.GEMINI_API_KEY;

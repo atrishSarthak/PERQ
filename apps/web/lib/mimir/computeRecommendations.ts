@@ -50,12 +50,19 @@ export interface PreviousTopCard {
  *
  * onNarrationStep is called with a display label for each real event, in
  * order — the SSE route handler forwards these directly (D3, revised).
+ *
+ * forceCardRefresh: passed through to resolveCardSet — true for a fresh
+ * quiz submission (new user or retake), so that moment always gets a live,
+ * context-grounded search rather than a possibly-stale cached bucket.
+ * false (default) for the profile-edit path, which stays cache-friendly
+ * per §9.5/§11's cost guardrails.
  */
 export async function computeAndPersistRecommendations(
   userId: string,
   answers: QuizAnswers,
   onNarrationStep?: (label: string) => void,
-  previousTopCard?: PreviousTopCard
+  previousTopCard?: PreviousTopCard,
+  forceCardRefresh = false
 ): Promise<ComputeRecommendationsResult> {
   const profile = buildProfileFromAnswers(answers);
 
@@ -66,7 +73,8 @@ export async function computeAndPersistRecommendations(
   // row shape.
   const { activeCards, cardSourceMode, searchBucketKey } = await resolveCardSet(
     answers,
-    onNarrationStep
+    onNarrationStep,
+    forceCardRefresh
   );
   const dbCardsById = new Map<string, DbCard>(activeCards.map((c) => [c.id, c]));
 

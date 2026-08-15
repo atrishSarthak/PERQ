@@ -73,15 +73,30 @@ describe("computeSearchBucketKey (D15)", () => {
     expect(computeSearchBucketKey(baseAnswers)).toBe(computeSearchBucketKey(reordered));
   });
 
-  it("ignores exact spend-bucket answers — two users differing only there share a bucket", () => {
-    const otherSpend: QuizAnswers = {
+  it("ignores exact spend-bucket answers within the same low/high tier", () => {
+    // baseAnswers: foodDeliverySpend "3-6k" (high), flightFrequency "3-5" (high).
+    // Both changes below stay within their existing tier, so the bucket
+    // shouldn't move even though the exact answers did.
+    const sameTierDifferentValue: QuizAnswers = {
       ...baseAnswers,
-      foodDeliverySpend: "<1k",
-      grocerySpend: "6k+",
-      fuelSpend: "6k+",
-      flightFrequency: "6+",
+      foodDeliverySpend: "6k+", // still "high"
+      flightFrequency: "6+", // still "high"
     };
-    expect(computeSearchBucketKey(baseAnswers)).toBe(computeSearchBucketKey(otherSpend));
+    expect(computeSearchBucketKey(baseAnswers)).toBe(
+      computeSearchBucketKey(sameTierDifferentValue)
+    );
+  });
+
+  it("changes when a spend category crosses from the low tier to the high tier", () => {
+    // baseAnswers.grocerySpend is "1-3k" (low tier).
+    const crossedTier: QuizAnswers = { ...baseAnswers, grocerySpend: "6k+" };
+    expect(computeSearchBucketKey(baseAnswers)).not.toBe(computeSearchBucketKey(crossedTier));
+  });
+
+  it("changes when flight/hotel frequency crosses from the low tier to the high tier", () => {
+    // baseAnswers.hotelFrequency is "1-2" (low tier).
+    const crossedTier: QuizAnswers = { ...baseAnswers, hotelFrequency: "6+" };
+    expect(computeSearchBucketKey(baseAnswers)).not.toBe(computeSearchBucketKey(crossedTier));
   });
 
   it("changes when annualIncome differs", () => {
