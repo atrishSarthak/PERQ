@@ -1,8 +1,29 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
-import { db, userProfile } from "@perq/db";
+import { db, cards, recommendations, userCardArsenal, userProfile } from "@perq/db";
+import { HomeDashboard } from "./HomeDashboard";
+import type { TopPickData } from "./CardRecommenderWidget";
+import type { ArsenalCardData } from "./CardArsenalWidget";
+import type { CardOption } from "../quiz/QuizWizard";
+import { firstNameFrom } from "../results/cardHolderName";
 
+function greetingFor(name: string): string {
+  const hour = new Date().getHours();
+  const period = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
+  return `Good ${period}, ${name}`;
+}
+
+/**
+ * The dashboard's data needs, in one page: does the user have a profile
+ * (quiz taken), their #1 recommendation if so (Card Recommender widget),
+ * and their held arsenal cards (Card Arsenal widget). cardOptions (the
+ * seeded card catalog for Q1's search) is only fetched when there's no
+ * profile yet — it's only needed to open the quiz modal from the
+ * "not taken" state.
+ */
 export default async function HomePage() {
+  // Auth is enforced by the (shell) layout — this page only needs the
+  // session for its own data queries, not to gate access.
   const session = await auth();
   const userId = session!.user.id;
 
@@ -12,22 +33,65 @@ export default async function HomePage() {
     .where(eq(userProfile.userId, userId))
     .limit(1);
 
+  let topPick: TopPickData | null = null;
+  let cardOptions: CardOption[] = [];
+
+  if (profile) {
+    const [topRec] = await db
+      .select({
+        cardId: recommendations.cardId,
+        explanation: recommendations.explanation,
+        name: cards.name,
+        issuer: cards.issuer,
+        network: cards.network,
+      })
+      .from(recommendations)
+      .innerJoin(cards, eq(cards.id, recommendations.cardId))
+      .where(and(eq(recommendations.userId, userId), eq(recommendations.rank, 1)))
+      .limit(1);
+
+    topPick = topRec ?? null;
+  } else {
+    const seededCards = await db
+      .select({ id: cards.id, name: cards.name, issuer: cards.issuer, network: cards.network })
+      .from(cards)
+      .where(and(eq(cards.origin, "seeded"), eq(cards.status, "active")));
+
+    cardOptions = seededCards.map((c) => ({
+      value: c.id,
+      label: `${c.issuer} ${c.name}`,
+      name: c.name,
+      issuer: c.issuer,
+      network: c.network,
+    }));
+  }
+
+  const arsenalCards: ArsenalCardData[] = await db
+    .select({
+      cardId: userCardArsenal.cardId,
+      name: cards.name,
+      issuer: cards.issuer,
+      network: cards.network,
+    })
+    .from(userCardArsenal)
+    .innerJoin(cards, eq(cards.id, userCardArsenal.cardId))
+    .where(and(eq(userCardArsenal.userId, userId), eq(userCardArsenal.status, "held")));
+
+  const name = firstNameFrom(session!.user.name, session!.user.email);
+  const dateString = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="font-display text-h1 text-text-primary">
-        {profile ? "Welcome back" : "Welcome to MIMIR"}
-      </h1>
-      <p className="max-w-md text-center font-body text-body text-text-secondary">
-        {profile
-          ? "Pick up right where you left off — open Card Recommender from the sidebar to see your latest recommendations."
-          : "Pick a feature from the sidebar to get started. Card Recommender is ready — it's a quick quiz, then MIMIR ranks the right card for you."}
-      </p>
-      <a
-        href="/quiz"
-        className="rounded-md bg-accent px-4 py-2 font-body text-body text-white"
-      >
-        {profile ? "View my recommendations" : "Start the quiz"}
-      </a>
-    </main>
+    <HomeDashboard
+      greeting={greetingFor(name)}
+      dateString={dateString}
+      quizTaken={Boolean(profile)}
+      topPick={topPick}
+      arsenalCards={arsenalCards}
+      cardOptions={cardOptions}
+    />
   );
 }

@@ -10,10 +10,14 @@
   --color-black: #000000;
   --color-accent: #00a1ff;
   /* Deliberate, explicit exception to "never invent a color outside this
-     system" — added at the product owner's request specifically for the
-     results page's "MIMIR's Top Pick" highlight, nothing else. Constant
-     across light/dark, same pattern as --color-accent. */
-  --color-gold: #b8860b;
+     system" — added at the product owner's request specifically for MIMIR
+     "brand moment" highlights (originally the results page's "MIMIR's Top
+     Pick" badge, now also the dashboard). Constant across light/dark, same
+     pattern as --color-accent. Updated to #E5B567 (from #B8860B) to match
+     the pixel-accurate PERQ Dashboard mockup (design-reference/) — the
+     same conceptual token, refined value, applied globally rather than
+     left inconsistent between pages. */
+  --color-gold: #e5b567;
 
   /* Semantic tokens — light mode default (§2) */
   --bg-base: #ffffff;
