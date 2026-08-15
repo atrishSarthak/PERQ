@@ -7,20 +7,24 @@ import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
 gsap.registerPlugin(DrawSVGPlugin);
 
+// Kept short and roughly symmetric on purpose — the actual route's data
+// fetch/render happens AFTER `leave`'s next() fires and BEFORE `enter`
+// starts (next-transition-router's own model, not something these
+// durations can shrink further), so any time spent here is pure overhead
+// stacked on top of that. The overlay's solid background is what hides the
+// content swap; the SVG stroke is a thin decorative accent on top of it,
+// not the covering mechanism, so it never needs to balloon into a shape
+// large enough to matter for timing.
+const LEAVE_DURATION = 0.16;
+const ENTER_DURATION = 0.16;
+
 /**
- * Site-wide page transition: a gold drawn-line wipe over a full-screen
- * overlay, played on every client-side navigation (next/link clicks,
- * router.push/back — next-transition-router's `auto` prop patches both).
- * Gold, not accent blue, deliberately — gold is reserved for MIMIR "brand
- * moment" flourishes (Top Pick badge, this), while blue stays for
- * MIMIR-attributed text/UI, per the existing color split.
- *
- * Technique: an SVG path animates from an invisible hairline (drawSVG 0%,
- * strokeWidth 2) to a full-bleed solid stroke (drawSVG 100%, strokeWidth
- * 300) during `leave`, which — layered on the fading-in overlay behind it
- * — fully covers the outgoing page before Next.js swaps in the new route
- * (the `next()` callback is only called once that timeline completes).
- * `enter` reverses it once the new page has mounted underneath.
+ * Site-wide page transition: a thin gold line sweeps across a solid
+ * overlay on every client-side navigation (next/link clicks, router.push —
+ * next-transition-router's `auto` prop patches both). Gold, not accent
+ * blue, deliberately — gold is reserved for MIMIR "brand moment"
+ * flourishes (Top Pick badge, this), while blue stays for MIMIR-attributed
+ * text/UI, per the existing color split.
  */
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -28,7 +32,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!pathRef.current) return;
-    gsap.set(pathRef.current, { drawSVG: "0%", strokeWidth: 2 });
+    gsap.set(pathRef.current, { drawSVG: "0%" });
   }, []);
 
   return (
@@ -36,9 +40,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       auto
       leave={(next) => {
         const tl = gsap.timeline({ onComplete: next });
-        tl.to(overlayRef.current, { opacity: 1, duration: 0.4, ease: "power2.inOut" }).to(
+        tl.to(overlayRef.current, { opacity: 1, duration: LEAVE_DURATION, ease: "power1.inOut" }, 0).to(
           pathRef.current,
-          { drawSVG: "100%", strokeWidth: 300, duration: 1.1, ease: "power2.inOut" },
+          { drawSVG: "100%", duration: LEAVE_DURATION, ease: "power1.inOut" },
           0
         );
         return () => {
@@ -47,9 +51,9 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
       }}
       enter={(next) => {
         const tl = gsap.timeline({ onComplete: next });
-        tl.to(pathRef.current, { drawSVG: "100% 100%", strokeWidth: 2, duration: 1.1, ease: "power2.inOut" })
-          .to(overlayRef.current, { opacity: 0, duration: 0.4, ease: "power2.inOut" }, 0.7)
-          .set(pathRef.current, { drawSVG: "0%", strokeWidth: 2 });
+        tl.to(overlayRef.current, { opacity: 0, duration: ENTER_DURATION, ease: "power1.inOut" }, 0)
+          .to(pathRef.current, { drawSVG: "100% 100%", duration: ENTER_DURATION, ease: "power1.inOut" }, 0)
+          .set(pathRef.current, { drawSVG: "0%" });
         return () => {
           tl.kill();
         };
@@ -73,7 +77,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
           <path
             ref={pathRef}
             d="M13.4746 291.27C13.4746 291.27 100.646 -18.6724 255.617 16.8418C410.588 52.356 61.0296 431.197 233.017 546.326C431.659 679.299 444.494 21.0125 652.73 100.784C860.967 180.556 468.663 430.709 617.216 546.326C765.769 661.944 819.097 48.2722 988.501 120.156C1174.21 198.957 809.424 543.841 988.501 636.726C1189.37 740.915 1301.67 149.213 1301.67 149.213"
-            strokeWidth="2"
+            strokeWidth="4"
             strokeLinecap="round"
             strokeLinejoin="round"
             style={{ stroke: "var(--gold)" }}
