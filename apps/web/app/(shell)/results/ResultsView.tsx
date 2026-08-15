@@ -192,11 +192,11 @@ export function ResultsView({
       <main className="flex-1 space-y-6 p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-display font-bold text-text-primary">
-              {sorted.length} cards matched
+            <h1 className="font-display text-h1 font-bold text-text-primary">
+              MIMIR&apos;s Picks For You
             </h1>
             <p className="mt-1 font-body text-body text-text-secondary">
-              Ranked by MIMIR for your spending profile
+              Top {sorted.length} cards, ranked for your spending profile
             </p>
           </div>
           <DarkModeToggle />

@@ -1,6 +1,7 @@
 import type { ResultsCard } from "./types";
 import { CardVisual } from "./CardVisual";
 import { getRewardHighlight } from "./rewardHighlight";
+import { useMimirChat } from "../mimir/MimirChatContext";
 
 function formatRupee(amount: number): string {
   return `₹${amount.toLocaleString("en-IN")}`;
@@ -40,6 +41,13 @@ export function ResultCard({
   isTopPick?: boolean;
 }) {
   const held = card.arsenalStatus === "held";
+  const { send } = useMimirChat();
+
+  function askMimirToElaborate() {
+    void send(
+      `Tell me more about the ${card.issuer} ${card.name}. Why does it fit my profile, and what should I know before applying?`
+    );
+  }
 
   return (
     <div
@@ -105,8 +113,19 @@ export function ResultCard({
         className="mt-4 rounded-md p-3 font-body text-body-sm text-text-primary"
         style={{ backgroundColor: "var(--bg-surface-2)" }}
       >
-        <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
-        {card.recommendation?.explanation ?? "Not yet scored for your profile."}
+        <p>
+          <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
+          {card.recommendation?.explanation ?? "Not yet scored for your profile."}
+        </p>
+        {card.recommendation && (
+          <button
+            type="button"
+            onClick={askMimirToElaborate}
+            className="mt-2 font-body text-caption text-accent opacity-70 underline decoration-dotted underline-offset-2 hover:opacity-100"
+          >
+            Learn more
+          </button>
+        )}
       </div>
     </div>
   );

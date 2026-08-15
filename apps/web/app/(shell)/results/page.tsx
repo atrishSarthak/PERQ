@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { auth } from "@/auth";
 import { db, cards, recommendations, userCardArsenal, userProfile } from "@perq/db";
 import type { QuizAnswers } from "@perq/scoring-engine";
@@ -8,17 +8,14 @@ import { ResultsView } from "./ResultsView";
 import { firstNameFrom } from "./cardHolderName";
 
 /**
- * Perf-A: two queries total (active cards, user's recommendations — plus
- * arsenal state), merged and returned to the client once. Filters and sort
- * tabs then operate entirely in-memory client-side (§10: "these re-sort
- * the same result set; they aren't separate queries") — never re-queried.
- *
- * D15: "active cards" is no longer literally every active row in the whole
- * table — with web-search results partitioned by searchBucketKey and shared
- * across users, that would mix in every other bucket's cards too. Instead
- * this scopes to exactly the set userProfile.lastCardSourceMode/
- * lastSearchBucketKey says this user's latest recommendation compute
- * actually used (set by computeAndPersistRecommendations/resolveCardSet).
+ * MIMIR only ever recommends its actual top picks (computeAndPersistRecommendations
+ * caps this at MAX_RECOMMENDATIONS — currently 20), not every card in
+ * whatever source set was scored against, which can now run into the
+ * hundreds (D15 + the expanded seeded catalog). So this page fetches the
+ * user's recommendations first, then looks up only those cards by id —
+ * never "every active row in the resolved set." Filters and sort tabs
+ * still operate entirely in-memory client-side afterward (§10) — never
+ * re-queried.
  */
 export default async function ResultsPage() {
   // Auth is enforced by the (shell) layout — this page only needs the
@@ -27,12 +24,7 @@ export default async function ResultsPage() {
   const userId = session!.user.id;
 
   const [profile] = await db
-    .select({
-      id: userProfile.id,
-      answers: userProfile.answers,
-      lastCardSourceMode: userProfile.lastCardSourceMode,
-      lastSearchBucketKey: userProfile.lastSearchBucketKey,
-    })
+    .select({ id: userProfile.id, answers: userProfile.answers })
     .from(userProfile)
     .where(eq(userProfile.userId, userId))
     .limit(1);
@@ -43,20 +35,13 @@ export default async function ResultsPage() {
     redirect("/quiz");
   }
 
-  const cardSetCondition =
-    profile.lastCardSourceMode === "web_search" && profile.lastSearchBucketKey
-      ? and(
-          eq(cards.origin, "web_search"),
-          eq(cards.searchBucketKey, profile.lastSearchBucketKey),
-          eq(cards.status, "active")
-        )
-      : and(eq(cards.origin, "seeded"), eq(cards.status, "active"));
-
-  const [activeCards, recs, arsenalRows] = await Promise.all([
-    db.select().from(cards).where(cardSetCondition),
+  const [recs, arsenalRows] = await Promise.all([
     db.select().from(recommendations).where(eq(recommendations.userId, userId)),
     db.select().from(userCardArsenal).where(eq(userCardArsenal.userId, userId)),
   ]);
+
+  const cardIds = recs.map((r) => r.cardId);
+  const activeCards = cardIds.length > 0 ? await db.select().from(cards).where(inArray(cards.id, cardIds)) : [];
 
   const recsByCardId = new Map(recs.map((r) => [r.cardId, r]));
   const arsenalByCardId = new Map(arsenalRows.map((a) => [a.cardId, a.status]));

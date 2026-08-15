@@ -4,19 +4,22 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// DR7's visual identity, ported from the old Chat.tsx: user messages get a
-// simple --bg-surface bubble (right-aligned); MIMIR's responses are
-// unboxed text — reads as advice spoken directly, not a boxed chatbot
-// reply.
-const messageVariants = cva("max-w-[85%] whitespace-pre-wrap font-body text-body text-text-primary", {
-  variants: {
-    role: {
-      user: "self-end rounded-lg px-3 py-2",
-      assistant: "self-start",
+// Both roles now render as boxed bubbles, color-coded by voice: MIMIR's
+// replies in accent blue (the "MIMIR-attributed" color used everywhere
+// else — the "✦ MIMIR:" label, narration), the user's own messages in
+// gold, so the two voices are visually distinct at a glance.
+const messageVariants = cva(
+  "max-w-[85%] whitespace-pre-wrap rounded-lg px-3 py-2 font-body text-body text-white",
+  {
+    variants: {
+      role: {
+        user: "self-end",
+        assistant: "self-start",
+      },
     },
-  },
-  defaultVariants: { role: "assistant" },
-});
+    defaultVariants: { role: "assistant" },
+  }
+);
 
 export interface MessageProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "role">,
@@ -27,7 +30,10 @@ export const Message = React.forwardRef<HTMLDivElement, MessageProps>(
     <div
       ref={ref}
       className={cn(messageVariants({ role }), className)}
-      style={role === "user" ? { backgroundColor: "var(--bg-surface-2)", ...style } : style}
+      style={{
+        backgroundColor: role === "user" ? "var(--gold)" : "var(--accent)",
+        ...style,
+      }}
       {...props}
     />
   )

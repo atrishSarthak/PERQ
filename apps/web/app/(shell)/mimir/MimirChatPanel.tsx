@@ -38,7 +38,7 @@ export function MimirChatPanel() {
       <aside
         role="dialog"
         aria-label="Chat with MIMIR"
-        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col shadow-xl"
+        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col shadow-xl"
         style={{ backgroundColor: "var(--bg-surface)", borderLeft: "1px solid var(--border)" }}
       >
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
@@ -106,13 +106,14 @@ export function MimirChatPanel() {
             }}
             placeholder="Why not the travel card?"
             disabled={sending}
-            className="flex-1 rounded-md border px-3 py-2 font-body text-body text-text-primary"
-            style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-base)" }}
+            className="flex-1 rounded-md border-2 px-3 py-2 font-body text-body text-text-primary outline-none"
+            style={{ borderColor: "var(--gold)", backgroundColor: "var(--bg-base)" }}
           />
           <button
             onClick={() => void handleSend()}
             disabled={sending || !input.trim()}
-            className="rounded-md bg-accent px-3 py-2 font-body text-body-sm text-white disabled:opacity-40"
+            className="rounded-md px-3 py-2 font-body text-body-sm font-semibold text-white disabled:opacity-40"
+            style={{ backgroundColor: "var(--gold)" }}
           >
             {sending ? "…" : "Send"}
           </button>

@@ -8,12 +8,19 @@ import {
 import { runGeminiAgent, createGeminiModelCaller, type AgentStepEvent } from "@perq/ai";
 import { computeCardsVersion, computeProfileHash } from "./hash";
 import { findCachedTopExplanation } from "./cache";
-import { buildTemplateExplanation } from "./explanationTemplate";
+import { buildTemplateExplanation, buildTopPickTemplateExplanation } from "./explanationTemplate";
 import { createMimirTools } from "./tools";
 import { EXPLANATION_SYSTEM_PROMPT } from "./prompt";
 import { narrationLabelForStep } from "./narrationLabels";
 import { mapDbCardToScoringCard } from "./cardMapper";
 import { resolveCardSet, type CardSourceMode } from "./resolveCardSet";
+
+// MIMIR only ever recommends its actual top picks, not every eligible card
+// in whatever set it scored against (which can now run into the hundreds —
+// see D15/packages/db/data). Ranks beyond this never get a recommendations
+// row at all, so the results page (which now only shows cards with a
+// recommendation) naturally shows at most this many.
+const MAX_RECOMMENDATIONS = 20;
 
 export interface ComputeRecommendationsResult {
   topCardId: string;
@@ -110,7 +117,8 @@ export async function computeAndPersistRecommendations(
 
   const profileHash = computeProfileHash(answers);
   const cardsVersion = computeCardsVersion(activeCards);
-  const topScored = eligible[0]!;
+  const topEligible = eligible.slice(0, MAX_RECOMMENDATIONS);
+  const topScored = topEligible[0]!;
   const topCardChanged = previousTopCard ? previousTopCard.cardId !== topScored.card.id : true;
 
   const cached = await findCachedTopExplanation(userId, profileHash, cardsVersion);
@@ -128,7 +136,7 @@ export async function computeAndPersistRecommendations(
     topExplanation = cached.explanation;
     explanationSource = "gemini"; // a cache hit only ever reuses a prior real explanation
   } else {
-    const tools = createMimirTools({ answers, profile, scored: eligible, dbCardsById });
+    const tools = createMimirTools({ answers, profile, scored: topEligible, dbCardsById });
 
     // D7 requires the feature to degrade gracefully on ANY Gemini failure
     // (network error, 429 quota exhaustion, 5xx) — not just the cappedOut
@@ -155,7 +163,7 @@ export async function computeAndPersistRecommendations(
           const label = narrationLabelForStep(
             event,
             (cardId) => dbCardsById.get(cardId)?.name,
-            eligible.length
+            topEligible.length
           );
           if (label) onNarrationStep?.(label);
         },
@@ -170,8 +178,10 @@ export async function computeAndPersistRecommendations(
     } else {
       // D7: Gemini failed, quota exhausted, or the tool-loop cap (D13) was
       // exceeded — still ship the ranked list, never block the feature.
+      // The top pick gets the longer, richer template (buildTopPickTemplate
+      // Explanation) even in the fallback case — ranks 2+ never do.
       const dbCard = dbCardsById.get(topScored.card.id);
-      topExplanation = buildTemplateExplanation(topScored, dbCard?.name ?? "your top card");
+      topExplanation = buildTopPickTemplateExplanation(topScored, dbCard?.name ?? "your top card");
       explanationSource = "fallback_template";
     }
   }
@@ -185,7 +195,7 @@ export async function computeAndPersistRecommendations(
   // than silently assumed atomic.
   await db.delete(recommendations).where(eq(recommendations.userId, userId));
 
-  const rows = eligible.map((s, index) => {
+  const rows = topEligible.map((s, index) => {
     const rank = index + 1;
     const dbCard = dbCardsById.get(s.card.id);
     const explanation =

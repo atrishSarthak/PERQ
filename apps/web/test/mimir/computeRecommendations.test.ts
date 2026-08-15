@@ -336,4 +336,29 @@ describe("computeAndPersistRecommendations — D15 card sourcing", () => {
 
     expect(resolveCardSetMock).toHaveBeenCalledWith(answers, undefined, false);
   });
+
+  it("caps recommendations at 20 even when far more cards are eligible", async () => {
+    const manyCards = Array.from({ length: 45 }, (_, i) => makeDbCard(`card-${i}`, 0.01 + i * 0.001));
+    resolveCardSetMock.mockResolvedValue({
+      activeCards: manyCards,
+      cardSourceMode: "db_fallback",
+      searchBucketKey: "bucket-key-1",
+    });
+    runGeminiAgentMock.mockResolvedValue({
+      finalText: "Explanation",
+      roundsUsed: 1,
+      cappedOut: false,
+    });
+
+    const result = await computeAndPersistRecommendations("user-1", answers);
+
+    expect(result.recommendationCount).toBe(20);
+    expect(dbState.insertedRows).toHaveLength(20);
+    // The top-ranked (highest dining rate) card is still rank 1 among the
+    // capped set — capping doesn't change which card wins.
+    expect((dbState.insertedRows as { rank: number; cardId: string }[])[0]).toMatchObject({
+      rank: 1,
+      cardId: "card-44",
+    });
+  });
 });

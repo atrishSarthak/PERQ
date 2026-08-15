@@ -9,6 +9,17 @@ vi.mock("next/navigation", () => ({
 }));
 
 const { ResultsView } = await import("@/app/(shell)/results/ResultsView");
+const { MimirChatProvider } = await import("@/app/(shell)/mimir/MimirChatContext");
+
+// ResultCard's "Learn more" button uses useMimirChat(), so every render
+// needs a MimirChatProvider ancestor, same as the real (shell) layout.
+function renderResultsView(props: React.ComponentProps<typeof ResultsView>) {
+  return render(
+    <MimirChatProvider>
+      <ResultsView {...props} />
+    </MimirChatProvider>
+  );
+}
 
 function makeCard(overrides: Partial<ResultsCard> = {}): ResultsCard {
   return {
@@ -49,25 +60,25 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("does not show the drawer dialog by default", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
+    renderResultsView({ cards: [makeCard()], answers: mockAnswers, cardHolderName: "Taylor" });
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("opens the drawer on clicking the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
+    renderResultsView({ cards: [makeCard()], answers: mockAnswers, cardHolderName: "Taylor" });
     fireEvent.click(screen.getByText(/^Filters/));
     expect(screen.getByRole("dialog", { name: "Filters" })).toBeInTheDocument();
   });
 
   it("closes the drawer on Done", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
+    renderResultsView({ cards: [makeCard()], answers: mockAnswers, cardHolderName: "Taylor" });
     fireEvent.click(screen.getByText(/^Filters/));
     fireEvent.click(screen.getByText("Done"));
     expect(screen.queryByRole("dialog", { name: "Filters" })).not.toBeInTheDocument();
   });
 
   it("closes the drawer on backdrop click", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
+    renderResultsView({ cards: [makeCard()], answers: mockAnswers, cardHolderName: "Taylor" });
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const backdrop = dialog.previousElementSibling as HTMLElement;
@@ -76,16 +87,14 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("the drawer's filter controls affect the same result set as the desktop sidebar (shared state, not a separate copy)", () => {
-    render(
-      <ResultsView
-        cards={[
-          makeCard({ cardId: "a", network: "Visa" }),
-          makeCard({ cardId: "b", network: "RuPay", name: "Card B" }),
-        ]}
-        answers={mockAnswers}
-        cardHolderName="Taylor"
-      />
-    );
+    renderResultsView({
+      cards: [
+        makeCard({ cardId: "a", network: "Visa" }),
+        makeCard({ cardId: "b", network: "RuPay", name: "Card B" }),
+      ],
+      answers: mockAnswers,
+      cardHolderName: "Taylor",
+    });
     fireEvent.click(screen.getByText(/^Filters/));
     // Two "RuPay" buttons exist (desktop sidebar is present in the DOM,
     // just visually hidden via md:hidden) — click the one inside the drawer.
@@ -100,7 +109,7 @@ describe("ResultsView — DR8 mobile filter drawer", () => {
   });
 
   it("shows the active filter count on the mobile Filters button", () => {
-    render(<ResultsView cards={[makeCard()]} answers={mockAnswers} cardHolderName="Taylor" />);
+    renderResultsView({ cards: [makeCard()], answers: mockAnswers, cardHolderName: "Taylor" });
     fireEvent.click(screen.getByText(/^Filters/));
     const dialog = screen.getByRole("dialog", { name: "Filters" });
     const visaButtons = screen.getAllByText("Visa");
