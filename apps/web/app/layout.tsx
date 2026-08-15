@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { PageTransition } from "@/components/transitions/PageTransition";
 
 export const metadata: Metadata = {
   title: "PERQ — MIMIR",
@@ -40,7 +41,7 @@ export default function RootLayout({
         <Script id="theme-init" strategy="beforeInteractive">
           {`try{var t=localStorage.getItem('perq-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}`}
         </Script>
-        {children}
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
