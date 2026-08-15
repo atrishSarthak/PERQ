@@ -10,13 +10,12 @@ gsap.registerPlugin(DrawSVGPlugin);
 // Matches the source technique (github.com/agentPritam47/svg-page-transition):
 // the stroke draws AND balloons from a hairline to a screen-covering ribbon
 // at once, so the path itself is what visually paints over the outgoing
-// page, not just the overlay behind it. Cut to a third of the original
-// repo's timing (was 1.5s leave / 1.5s enter) so it still reads as the same
-// brush-stroke motion without lingering — the earlier "make it fast" pass
-// went too far and dropped the strokeWidth animation entirely, which lost
-// the actual visual identity; this restores it at a snappier speed instead.
-const LEAVE_DURATION = 0.45;
-const ENTER_DURATION = 0.45;
+// page, not just the overlay behind it. Roughly half the original repo's
+// timing (was 1.5s leave / 1.5s enter) — enough to actually see the
+// brush-stroke motion play out, without the multi-second lingering the
+// original had.
+const LEAVE_DURATION = 0.65;
+const ENTER_DURATION = 0.65;
 const MAX_STROKE_WIDTH = 300;
 const MIN_STROKE_WIDTH = 2;
 
