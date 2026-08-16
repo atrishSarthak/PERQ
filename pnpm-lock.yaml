@@ -32,6 +32,9 @@ importers:
       '@perq/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
+      '@perq/fetch':
+        specifier: workspace:*
+        version: link:../../packages/fetch
       '@perq/scoring-engine':
         specifier: workspace:*
         version: link:../../packages/scoring-engine
@@ -190,6 +193,18 @@ importers:
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
+
+  packages/fetch:
+    devDependencies:
+      '@perq/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@26.2.0)(jsdom@25.0.1)
 
   packages/scoring-engine:
     devDependencies:

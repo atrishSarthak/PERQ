@@ -1,11 +1,12 @@
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
 /**
- * Static placeholder for Feature 2 (Chrome extension) and Feature 3
- * (goal-based advisor) — neither has shipped, so no functional CTA, per
- * the task spec. `size` maps to the mockup's two distinct instances
- * (Goal-Based Advisor is the larger one) rather than exposing every
- * dimension as a prop for a component with exactly two call sites.
+ * Static placeholder for Feature 2 (Chrome extension) — not shipped yet, so
+ * no functional CTA. Feature 3 (goal-based advisor) used to render here too
+ * but now has a real widget (GoalAdvisorWidget) once it shipped; this
+ * component stays generic/reusable for whichever not-yet-built feature
+ * needs a placeholder next, rather than being renamed to a Feature-2-only
+ * component for one remaining call site.
  */
 export function ComingSoonWidget({
   gridArea,

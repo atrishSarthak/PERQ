@@ -3,3 +3,4 @@ export { estimateSpendFromBucket, estimateSpendFromFrequency } from "./estimateS
 export { buildProfileFromAnswers } from "./buildProfileFromAnswers";
 export { getBestCardForCategory } from "./getBestCardForCategory";
 export { scoreCards } from "./scoreCards";
+export { scorePaymentOptions } from "./scorePaymentOptions";

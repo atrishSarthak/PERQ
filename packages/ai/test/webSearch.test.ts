@@ -94,4 +94,39 @@ describe("extractStructuredJson", () => {
       nullable: undefined,
     });
   });
+
+  // T0 finding (2026-08-16, live test): extractStructuredJson had no retry
+  // at all, unlike client.ts's createGeminiModelCaller — a genuine
+  // transient 503 hard-failed on the first attempt. Both now share
+  // withTransientRetry (src/retry.ts).
+  it("retries once on a transient 503 and succeeds", async () => {
+    const transientErr = new Error(
+      'got status: 503 Service Unavailable. {"status":"UNAVAILABLE"}'
+    );
+    transientErr.name = "ServerError";
+    generateContentMock.mockRejectedValueOnce(transientErr).mockResolvedValueOnce({
+      text: '{"found":true}',
+    });
+
+    const result = await extractStructuredJson("test-key", "extract", { type: "object" });
+
+    expect(result).toEqual({ found: true });
+    expect(generateContentMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry a non-transient error", async () => {
+    generateContentMock.mockReset();
+    generateContentMock.mockRejectedValueOnce(new Error("invalid api key"));
+
+    let caught: unknown;
+    try {
+      await extractStructuredJson("test-key", "extract", { type: "object" });
+    } catch (err) {
+      caught = err;
+    }
+
+    expect(caught).toBeInstanceOf(Error);
+    expect((caught as Error).message).toBe("invalid api key");
+    expect(generateContentMock).toHaveBeenCalledTimes(1);
+  });
 });

@@ -24,6 +24,8 @@ function renderDashboard(props: Partial<React.ComponentProps<typeof HomeDashboar
         topPick={null}
         arsenalCards={[]}
         cardOptions={cardOptions}
+        atGoalSearchDailyLimit={false}
+        goalSearchDailyLimit={3}
         {...props}
       />
       <MimirChatPanel />
@@ -100,11 +102,26 @@ describe("HomeDashboard", () => {
     expect(screen.getByRole("dialog", { name: "Chat with MIMIR" })).toBeInTheDocument();
   });
 
-  it("renders the static coming-soon widgets for Feature 2 and Feature 3 with no functional CTA", () => {
+  it("still renders the static coming-soon widget for Feature 2 (Chrome extension)", () => {
     renderDashboard();
-    expect(screen.getByText("Goal-Based Advisor")).toBeInTheDocument();
-    expect(screen.getByText("COMING SOON")).toBeInTheDocument();
     expect(screen.getByText("MIMIR for Chrome")).toBeInTheDocument();
     expect(screen.getByText("SOON")).toBeInTheDocument();
+  });
+
+  it("renders the live Goal-Based Advisor widget as a link into /goal", () => {
+    renderDashboard();
+    const widget = screen.getByText("Ask MIMIR where to buy it").closest("a");
+    expect(widget).toHaveAttribute("href", "/goal");
+    expect(screen.queryByText("COMING SOON")).not.toBeInTheDocument();
+  });
+
+  it("shows a plain rate-limit message on the Goal Advisor widget when the daily cap is hit", () => {
+    renderDashboard({ atGoalSearchDailyLimit: true });
+    expect(screen.getByText(/today.s 3 searches/)).toBeInTheDocument();
+  });
+
+  it("does not show a rate-limit message when under the daily cap", () => {
+    renderDashboard({ atGoalSearchDailyLimit: false });
+    expect(screen.queryByText(/today.s 3 searches/)).not.toBeInTheDocument();
   });
 });

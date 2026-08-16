@@ -16,6 +16,7 @@
     "@perq/ai": "workspace:*",
     "@perq/db": "workspace:*",
     "@perq/design-tokens": "workspace:*",
+    "@perq/fetch": "workspace:*",
     "@perq/scoring-engine": "workspace:*",
     "@perq/ui": "workspace:*",
     "@radix-ui/react-scroll-area": "^1.2.2",

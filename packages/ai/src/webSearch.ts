@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type, type Schema } from "@google/genai";
 import type { ResponseSchema } from "./types";
+import { withTransientRetry } from "./retry";
 
 // D15 (Feature 1 Engineering Plan amendment): a scoped, deliberate exception
 // to D8's "tools execute in-process, no network hop" boundary — this is the
@@ -37,13 +38,15 @@ export async function searchGroundedText(
 ): Promise<GroundedSearchResult> {
   const client = new GoogleGenAI({ apiKey });
 
-  const response = await client.models.generateContent({
-    model: modelName,
-    contents: [{ role: "user", parts: [{ text: query }] }],
-    config: {
-      tools: [{ googleSearch: {} }],
-    },
-  });
+  const response = await withTransientRetry(() =>
+    client.models.generateContent({
+      model: modelName,
+      contents: [{ role: "user", parts: [{ text: query }] }],
+      config: {
+        tools: [{ googleSearch: {} }],
+      },
+    })
+  );
 
   const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
   const citations: Citation[] = [];
@@ -97,14 +100,16 @@ export async function extractStructuredJson(
 ): Promise<unknown> {
   const client = new GoogleGenAI({ apiKey });
 
-  const response = await client.models.generateContent({
-    model: modelName,
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: toGenAiResponseSchema(schema),
-    },
-  });
+  const response = await withTransientRetry(() =>
+    client.models.generateContent({
+      model: modelName,
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: toGenAiResponseSchema(schema),
+      },
+    })
+  );
 
   const text = response.text ?? "[]";
   return JSON.parse(text);

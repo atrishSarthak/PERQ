@@ -228,6 +228,124 @@ export const userCardArsenal = pgTable(
   })
 );
 
+// --- Feature 3 domain tables (Engineering Plan §1, D1-D9) ---
+
+// One row per goal search, append-only (unlike recommendations' delete-
+// and-replace, D14) — every search is its own attempt, not "current state"
+// (PRD §16: no persistent goal history/dashboard, so nothing reads this
+// table beyond the single most-recent row for the immediate result).
+export const goals = pgTable(
+  "goals",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    goalText: text("goal_text").notNull(),
+    // 'movie' | 'attraction' | 'electronics' | 'unsupported' | 'pending' —
+    // 'pending' is the transient state between the row being written (D8's
+    // rate-limit check must happen before ANY spend, including
+    // classification) and classifyGoal resolving; 'unsupported' is an
+    // honest, queryable outcome (D6), not null (PRD §8: a real, expected
+    // result, not an error state to hide).
+    category: text("category").notNull().default("pending"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({
+    // D8: rate-limit COUNT query — WHERE user_id = ? AND created_at >= ?
+    // (today, UTC calendar day).
+    userCreatedIdx: index("goals_user_created_idx").on(t.userId, t.createdAt),
+  })
+);
+
+// Shared across users, NOT per-user (PRD §5) — the raw facts a channel
+// returns don't depend on who's asking, only the final recommendation does
+// (computed fresh per user from this cache in goal_recommendations below).
+// Never receives financial-context input (D2) — that's what structurally
+// prevents the stale-cache-across-different-financial-contexts edge case.
+export const channelFetchCache = pgTable(
+  "channel_fetch_cache",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    // One of the 6 fixed channels (apps/web/lib/goals/channels.ts owns the
+    // enum) — stored as text since Drizzle/Postgres enums would require a
+    // migration to extend, and the fixed-6 guarantee is already enforced at
+    // the TypeScript/application layer (D2), not the DB layer.
+    channel: text("channel").notNull(),
+    // Normalized, date-scoped search terms (D3) — e.g.
+    // "movie:oppenheimer:bangalore:2026-08-16". Date-scoping prevents
+    // serving Tuesday's showtimes on Friday.
+    queryKey: text("query_key").notNull(),
+    // Structured listing(s) from that channel for that query — shape
+    // defined by apps/web/lib/goals/extractionSchema.ts (D5). Only ever
+    // written for a 'succeeded' or 'checked_empty' outcome (D5) — a
+    // 'failed' fetch/extraction never reaches this table at all.
+    extractedData: jsonb("extracted_data").notNull(),
+    // D5: 'succeeded' | 'checked_empty' — never 'failed' (failed fetches
+    // aren't cached, there's nothing useful to reuse).
+    outcome: text("outcome").notNull(),
+    fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
+    // Per-category TTL (D3) — computed by the caller (movies/attractions
+    // ~4-6h, electronics ~24h) and stored as an absolute time so a read
+    // is a single `expires_at > now()` comparison, not a recomputation.
+    expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  },
+  (t) => ({
+    // D7: unique index backing onConflictDoUpdate — a losing racer's insert
+    // becomes a harmless update instead of a duplicate row or a constraint
+    // error. Also the read-path lookup index.
+    channelQueryKeyIdx: uniqueIndex("channel_fetch_cache_channel_query_key_idx").on(
+      t.channel,
+      t.queryKey
+    ),
+  })
+);
+
+// One row per completed goal search that produced a real recommendation —
+// D9's total-failure path (both channels fail) writes NO row here (nothing
+// to recommend), even though the goals row above still exists and still
+// counted against D8's cap.
+export const goalRecommendations = pgTable(
+  "goal_recommendations",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    goalId: text("goal_id")
+      .notNull()
+      .references(() => goals.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    recommendedChannel: text("recommended_channel").notNull(),
+    recommendedCardId: text("recommended_card_id").references(() => cards.id),
+    // e.g. "wait 3 days — your statement closes then" — null when D1's
+    // deterministic billing-cycle rules don't produce a note (missing
+    // financial-context fields, or no float/utilization consideration
+    // applies for this purchase).
+    billingCycleNote: text("billing_cycle_note"),
+    explanation: text("explanation").notNull(),
+    // D5: which channels succeeded/failed/were empty — PRD §10's "show the
+    // work" transparency requirement. Shape:
+    // { channel: string, outcome: 'failed' | 'checked_empty' | 'succeeded' }[]
+    channelsChecked: jsonb("channels_checked").notNull(),
+    agent: text("agent").notNull().default("MIMIR"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({
+    // "most recent search result for this user" lookup (/goal/results) —
+    // no persistent history UI reads beyond the single latest row (PRD §16).
+    userCreatedIdx: index("goal_recommendations_user_created_idx").on(
+      t.userId,
+      t.createdAt
+    ),
+  })
+);
+
 // chat_messages is keyed to user_id, not a specific recommendation snapshot
 // (D11) — a chat thread always reasons from the user's LATEST recommendations,
 // so a profile edit mid-conversation isn't an orphan/reset case.

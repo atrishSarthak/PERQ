@@ -6,6 +6,7 @@ import type { TopPickData } from "./CardRecommenderWidget";
 import type { ArsenalCardData } from "./CardArsenalWidget";
 import type { CardOption } from "../quiz/QuizWizard";
 import { firstNameFrom } from "../results/cardHolderName";
+import { hasReachedDailyGoalSearchLimit, MAX_GOAL_SEARCHES_PER_DAY } from "@/lib/goals/rateLimit";
 
 function greetingFor(name: string): string {
   const hour = new Date().getHours();
@@ -84,6 +85,8 @@ export default async function HomePage() {
     day: "numeric",
   });
 
+  const atGoalSearchDailyLimit = await hasReachedDailyGoalSearchLimit(userId);
+
   return (
     <HomeDashboard
       greeting={greetingFor(name)}
@@ -92,6 +95,8 @@ export default async function HomePage() {
       topPick={topPick}
       arsenalCards={arsenalCards}
       cardOptions={cardOptions}
+      atGoalSearchDailyLimit={atGoalSearchDailyLimit}
+      goalSearchDailyLimit={MAX_GOAL_SEARCHES_PER_DAY}
     />
   );
 }

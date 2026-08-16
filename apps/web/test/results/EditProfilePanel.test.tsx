@@ -117,4 +117,56 @@ describe("EditProfilePanel (PRD §11)", () => {
     fireEvent.click(screen.getByText("Done"));
     expect(screen.queryByText(/spend on fuel each month/)).not.toBeInTheDocument();
   });
+
+  describe("Feature 3 §11 financial-context fields (2B)", () => {
+    it("shows the financial-context section, distinct from the 13 quiz questions", () => {
+      render(<EditProfilePanel answers={answers} cardOptions={[]} />);
+      fireEvent.click(screen.getByText("Edit my profile"));
+      expect(screen.getByText("Financial context")).toBeInTheDocument();
+      expect(screen.getByText(/credit score range/)).toBeInTheDocument();
+      expect(screen.getByText(/statement close/)).toBeInTheDocument();
+    });
+
+    it("does NOT render financial-context questions in the onboarding quiz wizard itself", async () => {
+      const { QuizWizard } = await import("@/app/(shell)/quiz/QuizWizard");
+      render(<QuizWizard cardOptions={[]} />);
+      expect(screen.queryByText(/credit score range/)).not.toBeInTheDocument();
+      expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
+    });
+
+    it("PATCHes a select field (creditScoreRange) on click", async () => {
+      render(<EditProfilePanel answers={answers} cardOptions={[]} />);
+      fireEvent.click(screen.getByText("Edit my profile"));
+      fireEvent.click(screen.getByText("750+"));
+
+      await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+      const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+      expect(JSON.parse(options.body)).toEqual({ field: "creditScoreRange", value: "750-plus" });
+    });
+
+    it("PATCHes a numeric field (statementDate) on blur, not on every keystroke", async () => {
+      render(<EditProfilePanel answers={answers} cardOptions={[]} />);
+      fireEvent.click(screen.getByText("Edit my profile"));
+      const input = screen.getByLabelText("statementDate");
+
+      fireEvent.change(input, { target: { value: "1" } });
+      fireEvent.change(input, { target: { value: "15" } });
+      expect(fetch).not.toHaveBeenCalled();
+
+      fireEvent.blur(input);
+      await waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+      const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+      expect(JSON.parse(options.body)).toEqual({ field: "statementDate", value: 15 });
+    });
+
+    it("does not PATCH a numeric field on blur if the value is unchanged", async () => {
+      render(
+        <EditProfilePanel answers={{ ...answers, creditLimit: 50000 }} cardOptions={[]} />
+      );
+      fireEvent.click(screen.getByText("Edit my profile"));
+      const input = screen.getByLabelText("creditLimit");
+      fireEvent.blur(input);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+  });
 });

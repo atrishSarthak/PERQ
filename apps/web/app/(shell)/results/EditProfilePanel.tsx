@@ -6,6 +6,8 @@ import { SingleSelectScale, PickUpToNChips } from "@perq/ui";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import { QUESTIONS } from "../quiz/questions";
 import { CardSearchField, type CardSearchOption } from "../quiz/CardSearchField";
+import { FINANCIAL_CONTEXT_QUESTIONS } from "./financialContextQuestions";
+import { NumberField } from "./NumberField";
 
 /**
  * PRD §11: "Edit my profile" panel — all 13 quiz answers individually
@@ -119,6 +121,53 @@ export function EditProfilePanel({
                   name={q.key}
                   noneOption={q.noneOption}
                 />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Feature 3 §11: a distinct sub-section for the 6 new financial-
+          context/billing-cycle fields, same panel (not a separate surface)
+          per PRD §11's requirement — the exact sub-section split was left
+          to Claude Code's design judgment. */}
+      <div className="space-y-6 border-t border-border pt-6">
+        <h3 className="font-display text-body-lg font-semibold text-text-primary">
+          Financial context
+        </h3>
+        <p className="font-body text-body-sm text-text-secondary">
+          Powers MIMIR&rsquo;s billing-cycle timing advice on goal searches — e.g. suggesting you
+          wait a few days for your statement to close. Fully optional and self-reported, same as
+          everything else in your profile.
+        </p>
+        {FINANCIAL_CONTEXT_QUESTIONS.map((q) => {
+          const currentValue = (answers as unknown as Record<string, unknown>)[q.key];
+          const saving = savingKey === q.key;
+
+          return (
+            <div key={q.key} className={saving ? "opacity-60" : ""}>
+              <p className="mb-2 font-body text-body-sm text-text-secondary">{q.prompt}</p>
+              {q.type === "select" && (
+                <SingleSelectScale
+                  options={q.options}
+                  value={(currentValue as string) ?? null}
+                  onChange={(v) => saveField(q.key, v)}
+                  name={q.key}
+                />
+              )}
+              {(q.type === "day-of-month" || q.type === "rupee-amount") && (
+                <NumberField
+                  value={(currentValue as number) ?? null}
+                  onSave={(v) => saveField(q.key, v)}
+                  min={q.type === "day-of-month" ? 1 : 0}
+                  max={q.type === "day-of-month" ? 31 : undefined}
+                  prefix={q.type === "rupee-amount" ? "₹" : undefined}
+                  placeholder={q.type === "day-of-month" ? "e.g. 15" : "e.g. 25000"}
+                  name={q.key}
+                />
+              )}
+              {q.type === "day-of-month" && "subtext" in q && q.subtext && (
+                <p className="mt-1 font-body text-caption text-text-secondary">{q.subtext}</p>
               )}
             </div>
           );

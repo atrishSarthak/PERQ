@@ -4,6 +4,7 @@ import { AskMimirWidget } from "./AskMimirWidget";
 import { CardRecommenderWidget, type TopPickData } from "./CardRecommenderWidget";
 import { CardArsenalWidget, type ArsenalCardData } from "./CardArsenalWidget";
 import { ComingSoonWidget } from "./ComingSoonWidget";
+import { GoalAdvisorWidget } from "./GoalAdvisorWidget";
 import type { CardOption } from "../quiz/QuizWizard";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
@@ -28,6 +29,8 @@ export function HomeDashboard({
   topPick,
   arsenalCards,
   cardOptions,
+  atGoalSearchDailyLimit,
+  goalSearchDailyLimit,
 }: {
   greeting: string;
   dateString: string;
@@ -35,6 +38,8 @@ export function HomeDashboard({
   topPick: TopPickData | null;
   arsenalCards: ArsenalCardData[];
   cardOptions: CardOption[];
+  atGoalSearchDailyLimit: boolean;
+  goalSearchDailyLimit: number;
 }) {
   return (
     <div style={{ backgroundColor: C.pageBg, minHeight: "100vh" }} className="px-16 py-14 pb-24">
@@ -58,14 +63,9 @@ export function HomeDashboard({
           <CardRecommenderWidget quizTaken={quizTaken} topPick={topPick} cardOptions={cardOptions} />
           <CardArsenalWidget cards={arsenalCards} />
           <AskMimirWidget />
-          <ComingSoonWidget
-            gridArea="3 / 1 / auto / 9"
-            size="lg"
-            badge="COMING SOON"
-            title="Goal-Based Advisor"
-            body={
-              'State a goal — "best card for a ₹50,000 purchase" — and get one clear, confident answer instead of ten open tabs.'
-            }
+          <GoalAdvisorWidget
+            atDailyLimit={atGoalSearchDailyLimit}
+            dailyLimit={goalSearchDailyLimit}
           />
           <ComingSoonWidget
             gridArea="3 / 9 / auto / 13"
