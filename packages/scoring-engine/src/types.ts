@@ -127,25 +127,26 @@ export interface QuizAnswers {
   creditLimit?: number | null;
 }
 
-// --- Feature 3 (Goal-Based Purchase Advisor) domain types, D1 ---
+// --- Feature 3 (Goal-Based Purchase Advisor) domain types ---
 // Defined here (not in apps/web) since scorePaymentOptions is pure/I/O-free
 // like scoreCards, and packages/db/apps/web map their own rows to these
 // shapes at the boundary — same worktree-design-note discipline as the
-// Card/QuizAnswers split above. apps/web/lib/goals/channels.ts (2A) imports
-// GoalCategory from here rather than redefining it, so there's one source
-// of truth for the 3 fixed categories.
+// Card/QuizAnswers split above.
+//
+// v2 (open-ended web-search redesign): there is no fixed category/channel
+// enum anymore — a goal is classified directly into the existing
+// SpendCategory taxonomy above (the same one cards.rewardRates already
+// uses everywhere else), rather than a bespoke 3-value GoalCategory with a
+// lossy mapping onto SpendCategory. One well-defined 8-bucket system, not
+// two.
 
-export type GoalCategory = "movie" | "attraction" | "electronics";
-
-// One channel's extracted listing for a goal search (Engineering Plan D5 —
-// only a 'succeeded' outcome's data ever reaches scorePaymentOptions;
-// 'failed'/'checked_empty' channels are excluded by the caller before this
-// function runs). seller/warrantyMonths are captured for electronics'
-// category-asymmetry (D1's outside-voice note) but not yet weighted in the
-// score — real weighting logic is deferred to a later pass, same as
-// billing-cycle heuristics were until this function encoded them.
-export interface ChannelResult {
-  channel: string;
+// One discovered listing for a goal search (open web search, not a fixed
+// channel) — only a validated, citation-backed result ever reaches
+// scorePaymentOptions; unconfirmed/failed candidates are excluded by the
+// caller before this function runs.
+export interface PurchaseOffer {
+  source: string; // human-readable site/seller label, e.g. "Ticketmaster"
+  sourceUrl?: string | null;
   price: number; // ₹
   seller?: string | null;
   warrantyMonths?: number | null;
@@ -173,16 +174,27 @@ export interface FinancialContext {
 }
 
 export interface PaymentOptionScore {
-  channel: string;
+  source: string;
+  sourceUrl: string | null;
   price: number;
   // null = "pay some other way" baseline (no card recommended) — the
-  // option that always exists even with an empty arsenal (D1 edge case).
+  // option that always exists even with an empty arsenal.
   cardId: string | null;
   cardName: string | null;
+  // Which of the three payment shapes this option represents — cardId is
+  // null for both "no_card" and "bnpl", so this is the explicit discriminant
+  // between them (a bnpl option is never confused with the plain no-card
+  // baseline downstream).
+  paymentMethod: "card" | "no_card" | "bnpl";
   rewardValue: number; // ₹ estimated reward earned on this purchase with this card
   effectiveCost: number; // price - rewardValue, before any utilization penalty
   utilizationWarning: boolean;
   billingCycleNote: string | null;
+  // Set only when paymentMethod === "bnpl" — either a real, citation-backed
+  // BNPL-provider fact found during discovery, or a generic honest advisory
+  // sentence when discovery found nothing specific. Distinct from
+  // billingCycleNote, which is card-float-specific.
+  bnplNote: string | null;
   // Lower is better — effectiveCost plus a utilization penalty when
   // applicable (see scorePaymentOptions doc comment). This is what options
   // are ranked by, not effectiveCost alone.

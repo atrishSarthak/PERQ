@@ -18,8 +18,8 @@ const { hasReachedDailyGoalSearchLimit, MAX_GOAL_SEARCHES_PER_DAY } = await impo
 );
 
 describe("hasReachedDailyGoalSearchLimit", () => {
-  it("is 3 per day (revised down from the PRD's illustrative 8, per the outside-voice pass)", () => {
-    expect(MAX_GOAL_SEARCHES_PER_DAY).toBe(3);
+  it("is 5 per day (bounded against Gemini's shared free-tier quota, not Firecrawl credits)", () => {
+    expect(MAX_GOAL_SEARCHES_PER_DAY).toBe(5);
   });
 
   it("allows a search when under the cap", async () => {

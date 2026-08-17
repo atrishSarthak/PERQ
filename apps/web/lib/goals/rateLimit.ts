@@ -2,14 +2,20 @@ import { and, eq, gte, sql } from "drizzle-orm";
 import { db, goals } from "@perq/db";
 
 /**
- * Engineering Plan D8: revised from PRD §12's illustrative 8/day down to
- * 3/day — the outside-voice pass's Firecrawl credit math showed 8/day/user
- * could exhaust the entire shared 1,000-credit/month budget in 1-2 days.
- * Exact per-channel credit cost should be reconfirmed against Firecrawl's
- * real dashboard (T0 spike — currently BLOCKED in this environment, no
- * FIRECRAWL_API_KEY available) before treating 3 as final.
+ * v2 (open-ended web-search redesign): Firecrawl credits no longer apply —
+ * the binding cost constraint is now Gemini's own free-tier quota, shared
+ * across every PERQ feature on the same API key (~1,000 requests/day total,
+ * with grounded-search calls drawing from their own ~1,500/day sub-quota).
+ * A single goal search costs roughly 5-7 Gemini calls with no clarification
+ * needed (understand + 1-2 grounded discovery calls + up to 3 precision-
+ * fetch extractions + narration), up to ~13 calls in the worst case (3
+ * clarifying rounds, each re-running understandGoal). At 5 searches/user/day
+ * that's up to ~65 calls/user/day worst case — a real throttle against the
+ * shared quota, not effectively unlimited, while giving genuine headroom for
+ * a multi-turn clarification conversation to feel natural rather than
+ * stingy. A starting point, easy to adjust once real usage is observed.
  */
-export const MAX_GOAL_SEARCHES_PER_DAY = 3;
+export const MAX_GOAL_SEARCHES_PER_DAY = 5;
 
 function startOfUtcDay(now: Date): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));

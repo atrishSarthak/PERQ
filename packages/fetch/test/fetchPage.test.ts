@@ -14,7 +14,7 @@ describe("fetchPage", () => {
 
   it("returns markdown on success", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ success: true, data: { markdown: "# Hello" } }), {
+      new Response(JSON.stringify({ code: 200, data: { content: "# Hello" } }), {
         status: 200,
       })
     );
@@ -23,11 +23,22 @@ describe("fetchPage", () => {
     expect(result).toEqual({ success: true, markdown: "# Hello" });
   });
 
+  it("works without an API key", async () => {
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      new Response(JSON.stringify({ code: 200, data: { content: "ok" } }), { status: 200 })
+    );
+
+    const result = await fetchPage("https://example.com", { timeoutMs: 50, maxRetries: 1 });
+    expect(result).toEqual({ success: true, markdown: "ok" });
+    const [, init] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    expect((init.headers as Record<string, string>).Authorization).toBeUndefined();
+  });
+
   it("retries once on a transient 429 then succeeds", async () => {
     (fetch as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce(new Response("rate limited", { status: 429 }))
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ success: true, data: { markdown: "ok" } }), { status: 200 })
+        new Response(JSON.stringify({ code: 200, data: { content: "ok" } }), { status: 200 })
       );
 
     const result = await fetchPage("https://example.com", OPTIONS);
@@ -55,9 +66,9 @@ describe("fetchPage", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it("treats a 200 with success:false as non-retryable", async () => {
+  it("treats a 200 with no content as non-retryable", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ success: false, error: "blocked" }), { status: 200 })
+      new Response(JSON.stringify({ code: 451, message: "blocked" }), { status: 200 })
     );
 
     const result = await fetchPage("https://example.com", OPTIONS);
@@ -78,7 +89,7 @@ describe("fetchPage", () => {
           })
       )
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ success: true, data: { markdown: "ok" } }), { status: 200 })
+        new Response(JSON.stringify({ code: 200, data: { content: "ok" } }), { status: 200 })
       );
 
     const result = await fetchPage("https://example.com", OPTIONS);

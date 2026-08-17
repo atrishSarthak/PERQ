@@ -42,8 +42,8 @@ export function GoalAdvisorWidget({
         className="font-body leading-relaxed"
         style={{ color: C.textSecondary, fontSize: 14, maxWidth: 520 }}
       >
-        State a goal — &ldquo;cheapest way to watch Oppenheimer this weekend&rdquo; — and MIMIR
-        checks real channels, then tells you where to buy and which card to use.
+        State a goal — anything from concert tickets to a new phone — and MIMIR searches the web,
+        then tells you where to buy and which card (or Buy Now Pay Later) to use.
       </p>
       {atDailyLimit && (
         <p className="font-body font-semibold" style={{ color: "var(--warning)", fontSize: 12 }}>

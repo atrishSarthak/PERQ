@@ -244,12 +244,16 @@ export const goals = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     goalText: text("goal_text").notNull(),
-    // 'movie' | 'attraction' | 'electronics' | 'unsupported' | 'pending' —
-    // 'pending' is the transient state between the row being written (D8's
-    // rate-limit check must happen before ANY spend, including
-    // classification) and classifyGoal resolving; 'unsupported' is an
-    // honest, queryable outcome (D6), not null (PRD §8: a real, expected
-    // result, not an error state to hide).
+    // One of the 8 SpendCategory values (dining/travel/hotels/fuel/
+    // groceries/ecommerce/utilities/general — @perq/scoring-engine's
+    // SpendCategory, the same taxonomy cards.rewardRates uses everywhere
+    // else) | 'unsupported' | 'pending'. 'pending' is the transient state
+    // between the row being written (the rate-limit check must happen
+    // before ANY spend, including understanding the goal) and
+    // understandGoal resolving; 'unsupported' is an honest, queryable
+    // outcome, not null (a real, expected result, not an error state to
+    // hide). Stored as text, not a Postgres enum, at the app layer only —
+    // no DB constraint to migrate when the value set changes.
     category: text("category").notNull().default("pending"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
@@ -260,55 +264,19 @@ export const goals = pgTable(
   })
 );
 
-// Shared across users, NOT per-user (PRD §5) — the raw facts a channel
-// returns don't depend on who's asking, only the final recommendation does
-// (computed fresh per user from this cache in goal_recommendations below).
-// Never receives financial-context input (D2) — that's what structurally
-// prevents the stale-cache-across-different-financial-contexts edge case.
-export const channelFetchCache = pgTable(
-  "channel_fetch_cache",
-  {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    // One of the 6 fixed channels (apps/web/lib/goals/channels.ts owns the
-    // enum) — stored as text since Drizzle/Postgres enums would require a
-    // migration to extend, and the fixed-6 guarantee is already enforced at
-    // the TypeScript/application layer (D2), not the DB layer.
-    channel: text("channel").notNull(),
-    // Normalized, date-scoped search terms (D3) — e.g.
-    // "movie:oppenheimer:bangalore:2026-08-16". Date-scoping prevents
-    // serving Tuesday's showtimes on Friday.
-    queryKey: text("query_key").notNull(),
-    // Structured listing(s) from that channel for that query — shape
-    // defined by apps/web/lib/goals/extractionSchema.ts (D5). Only ever
-    // written for a 'succeeded' or 'checked_empty' outcome (D5) — a
-    // 'failed' fetch/extraction never reaches this table at all.
-    extractedData: jsonb("extracted_data").notNull(),
-    // D5: 'succeeded' | 'checked_empty' — never 'failed' (failed fetches
-    // aren't cached, there's nothing useful to reuse).
-    outcome: text("outcome").notNull(),
-    fetchedAt: timestamp("fetched_at", { mode: "date" }).notNull().defaultNow(),
-    // Per-category TTL (D3) — computed by the caller (movies/attractions
-    // ~4-6h, electronics ~24h) and stored as an absolute time so a read
-    // is a single `expires_at > now()` comparison, not a recomputation.
-    expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
-  },
-  (t) => ({
-    // D7: unique index backing onConflictDoUpdate — a losing racer's insert
-    // becomes a harmless update instead of a duplicate row or a constraint
-    // error. Also the read-path lookup index.
-    channelQueryKeyIdx: uniqueIndex("channel_fetch_cache_channel_query_key_idx").on(
-      t.channel,
-      t.queryKey
-    ),
-  })
-);
+// v2 (open-ended web-search redesign): the shared cross-user
+// channel_fetch_cache table (keyed on a fixed 6-channel enum) was dropped
+// outright, not redesigned around a new key shape. It existed for a design
+// with exactly 6 URLs and real cross-user reuse; open-ended per-goal
+// discovery produces near-unique queries/URLs per user, so a shared cache's
+// hit rate collapses toward zero while the new cost driver (Gemini quota)
+// isn't touched by a page-fetch cache at all. Revisit only if real usage
+// later shows repeat-goal patterns worth caching.
 
 // One row per completed goal search that produced a real recommendation —
-// D9's total-failure path (both channels fail) writes NO row here (nothing
-// to recommend), even though the goals row above still exists and still
-// counted against D8's cap.
+// the total-failure path (discovery/search itself hard-fails) writes NO row
+// here (nothing to recommend), even though the goals row above still exists
+// and still counted against the rate-limit cap.
 export const goalRecommendations = pgTable(
   "goal_recommendations",
   {
@@ -321,17 +289,36 @@ export const goalRecommendations = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    // Legacy column name from the v1 fixed-channel design, kept as-is
+    // (no rename migration) — now holds a free-text, human-readable
+    // source/site label (e.g. "Ticketmaster", "Amazon.in") rather than a
+    // fixed enum value.
     recommendedChannel: text("recommended_channel").notNull(),
+    // The actual listing URL discovered for the winning option — lets the
+    // results page link out to the real page, not just name it.
+    recommendedSourceUrl: text("recommended_source_url"),
     recommendedCardId: text("recommended_card_id").references(() => cards.id),
-    // e.g. "wait 3 days — your statement closes then" — null when D1's
+    // 'card' | 'no_card' | 'bnpl' — explicit discriminant since
+    // recommendedCardId is null for both 'no_card' and 'bnpl'.
+    paymentMethod: text("payment_method").notNull().default("no_card"),
+    // Set only when paymentMethod = 'bnpl' — either a real, citation-backed
+    // BNPL-provider fact found during discovery, or a generic honest
+    // advisory sentence. Distinct from billingCycleNote (card-float-
+    // specific).
+    bnplNote: text("bnpl_note"),
+    // A real, citation-backed card/bank/payment-platform offer found during
+    // discovery, if any — never a fabricated or guessed offer.
+    cardOfferNote: text("card_offer_note"),
+    cardOfferCitationUrl: text("card_offer_citation_url"),
+    // e.g. "wait 3 days — your statement closes then" — null when the
     // deterministic billing-cycle rules don't produce a note (missing
     // financial-context fields, or no float/utilization consideration
     // applies for this purchase).
     billingCycleNote: text("billing_cycle_note"),
     explanation: text("explanation").notNull(),
-    // D5: which channels succeeded/failed/were empty — PRD §10's "show the
-    // work" transparency requirement. Shape:
-    // { channel: string, outcome: 'failed' | 'checked_empty' | 'succeeded' }[]
+    // Which discovered offers had a confirmed price vs. an unconfirmed one —
+    // the "show the work" transparency requirement. Shape:
+    // { source: string, sourceUrl: string, outcome: 'succeeded' | 'unconfirmed_price', price?: number }[]
     channelsChecked: jsonb("channels_checked").notNull(),
     agent: text("agent").notNull().default("MIMIR"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
