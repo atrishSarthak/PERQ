@@ -59,3 +59,12 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     fails, the template fallback is used (`status = banned_phrase_fallback`).
 20. **`agent_runs` logging is injected** (`logRun`), so `packages/ai` stays free of DB code and testable.
     `user_id` is nullable for the public finder.
+21. **Finance assumptions** (also in comments in `packages/finance-engine/src/finance.ts`): fees include
+    18% GST; caps limit the ₹ reward per month (category first, then a `total` cap scales every category
+    down); year 1 = joining fee + welcome benefit with no renewal fee; ongoing = renewal fee after waiver;
+    the waiver uses projected spend minus excluded categories; a held card worth less than ₹0 counts as
+    ₹0 for leakage (you'd close it). Reward rates are stored as % value back, already converted from
+    points (per the §1.2 schema), so the engine never multiplies by `redemption_value` again; that
+    column is kept for the breakdown notes.
+22. **`formatInr`** lives in finance-engine and is hand-rolled (₹1,23,456), because Hermes' `Intl`
+    en-IN grouping isn't reliable in every Expo Go build.
