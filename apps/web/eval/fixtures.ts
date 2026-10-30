@@ -1,177 +1,118 @@
-import type { Card, UserProfile } from "@perq/scoring-engine";
+import type { QuizAnswersV2 } from "@perq/shared";
+
+// Ember eval fixtures (handoff §1.8): 10 cases run against the real
+// 40-card catalogue. `expectedTopCardId` pins the deterministic ranking
+// (checked offline in test/eval/fixtures.test.ts); the live eval then checks
+// Ember's prose against the tool outputs.
+
+const spend = (s: Partial<QuizAnswersV2["monthlySpend"]>): QuizAnswersV2["monthlySpend"] => ({
+  food_delivery: "0",
+  online_shopping: "0",
+  groceries: "0",
+  dining: "0",
+  fuel: "0",
+  bills: "0",
+  upi: "0",
+  ...s,
+});
+
+const base: QuizAnswersV2 = {
+  schemaVersion: 2,
+  cardsHeld: [],
+  occupation: "salaried",
+  monthlyIncome: "50k_1l",
+  monthlySpend: spend({ food_delivery: "1k_3k", online_shopping: "1k_3k", groceries: "1k_3k", dining: "1k_3k", bills: "1k_3k" }),
+  travelPerYear: "1_2",
+  feeTolerance: "upto_1000",
+  priorities: [],
+  openToSecured: null,
+};
 
 export interface EvalFixture {
   name: string;
-  profile: UserProfile;
-  cards: (Card & { name: string })[];
-  // The card id the deterministic scorer should rank #1 for this fixture
-  // (asserted separately from the LLM call — grounds what "correct" means
-  // for this fixture without relying on the model's own judgment).
+  answers: QuizAnswersV2;
   expectedTopCardId: string;
-  // A real number (as it would appear in the explanation) the grounding
-  // check looks for — a spot check, not exhaustive fact-checking.
-  expectedGroundedNumber: string;
-  // If set, the explanation should mention this category — used for
-  // fixtures designed to require a surfaced trade-off (PRD §9.1).
-  expectedTradeoffMention?: string;
+  /** Set for "why not X?" chat fixtures: the card the user asks about. */
+  whyNotCardId?: string;
 }
-
-const zeroRates = {
-  dining: 0,
-  travel: 0,
-  hotels: 0,
-  fuel: 0,
-  groceries: 0,
-  ecommerce: 0,
-  utilities: 0,
-  general: 0,
-};
 
 export const FIXTURES: EvalFixture[] = [
   {
-    name: "heavy-dining-spend",
-    profile: {
-      categorySpend: { ...zeroRates, dining: 9000 },
-      annualIncome: 900000,
-      feeTolerant: true,
-      priorityCategories: ["dining"],
-    },
-    cards: [
-      {
-        id: "eval-dining-card",
-        name: "Eval Dining Card",
-        annualFee: 500,
-        rewardRates: { ...zeroRates, dining: 0.05 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-      {
-        id: "eval-generic-card",
-        name: "Eval Generic Card",
-        annualFee: 0,
-        rewardRates: { ...zeroRates, general: 0.01 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-    ],
-    expectedTopCardId: "eval-dining-card",
-    expectedGroundedNumber: "5400", // 0.05 * 9000 * 12
+    name: "food-delivery heavy, modest fee",
+    answers: { ...base, monthlySpend: spend({ food_delivery: "6k_plus", online_shopping: "1k_3k", groceries: "1k_3k" }) },
+    // Live+ pays the same 10% on delivery, plus 10% on groceries.
+    expectedTopCardId: "hsbc-live-plus",
   },
   {
-    name: "heavy-travel-spend-high-income",
-    profile: {
-      categorySpend: { ...zeroRates, travel: 15000 },
-      annualIncome: 1500000,
-      feeTolerant: true,
-      priorityCategories: ["travel"],
+    name: "everyday spender, any fee",
+    answers: {
+      ...base,
+      feeTolerance: "any",
+      monthlySpend: spend({ food_delivery: "3k_6k", online_shopping: "3k_6k", groceries: "3k_6k", dining: "1k_3k", bills: "1k_3k", upi: "1k_3k" }),
     },
-    cards: [
-      {
-        id: "eval-travel-card",
-        name: "Eval Travel Card",
-        annualFee: 5000,
-        rewardRates: { ...zeroRates, travel: 0.06 },
-        milestoneBenefits: [{ spendThreshold: 100000, bonusValue: 3000 }],
-        minIncomeEligibility: 1000000,
-      },
-      {
-        id: "eval-zero-fee-card",
-        name: "Eval Zero Fee Card",
-        annualFee: 0,
-        rewardRates: { ...zeroRates, travel: 0.01 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-    ],
-    expectedTopCardId: "eval-travel-card",
-    expectedGroundedNumber: "10800", // 0.06 * 15000 * 12
+    expectedTopCardId: "hsbc-live-plus",
   },
   {
-    name: "tradeoff-priority-not-served",
-    profile: {
-      categorySpend: { ...zeroRates, dining: 9000, travel: 1000 },
-      annualIncome: 900000,
-      feeTolerant: true,
-      priorityCategories: ["travel"], // priority stated, but dining card will win numerically
+    name: "student, ₹0 fee, open to FD",
+    answers: {
+      ...base,
+      occupation: "student",
+      monthlyIncome: "below_25k",
+      feeTolerance: "zero",
+      openToSecured: true,
+      monthlySpend: spend({ food_delivery: "1k_3k", online_shopping: "lt_1k", upi: "1k_3k" }),
+      travelPerYear: "never",
     },
-    cards: [
-      {
-        id: "eval-dining-card-2",
-        name: "Eval Dining Card Two",
-        annualFee: 500,
-        rewardRates: { ...zeroRates, dining: 0.05, travel: 0 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-      {
-        id: "eval-weak-travel-card",
-        name: "Eval Weak Travel Card",
-        annualFee: 2000,
-        rewardRates: { ...zeroRates, dining: 0, travel: 0.02 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-    ],
-    expectedTopCardId: "eval-dining-card-2",
-    expectedGroundedNumber: "5400",
-    expectedTradeoffMention: "travel",
+    expectedTopCardId: "icici-amazon-pay",
   },
   {
-    name: "fee-sensitive-profile",
-    profile: {
-      categorySpend: { ...zeroRates, groceries: 3000 },
-      annualIncome: 400000,
-      feeTolerant: false,
-      priorityCategories: ["general"],
-    },
-    cards: [
-      {
-        id: "eval-highfee-card",
-        name: "Eval High Fee Card",
-        annualFee: 3000,
-        rewardRates: { ...zeroRates, groceries: 0.03 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-      {
-        id: "eval-zerofee-grocery-card",
-        name: "Eval Zero Fee Grocery Card",
-        annualFee: 0,
-        rewardRates: { ...zeroRates, groceries: 0.015 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-    ],
-    expectedTopCardId: "eval-zerofee-grocery-card",
-    expectedGroundedNumber: "540", // 0.015 * 3000 * 12
+    name: "heavy UPI user, ₹0 fee",
+    answers: { ...base, feeTolerance: "zero", monthlySpend: spend({ upi: "6k_plus", online_shopping: "lt_1k" }), travelPerYear: "never" },
+    expectedTopCardId: "kiwi-yes-rupay",
   },
   {
-    name: "milestone-benefit-tips-the-balance",
-    profile: {
-      categorySpend: { ...zeroRates, ecommerce: 8000 },
-      annualIncome: 700000,
-      feeTolerant: true,
-      priorityCategories: ["ecommerce"],
+    name: "fuel heavy commuter",
+    answers: {
+      ...base,
+      feeTolerance: "upto_5000",
+      monthlySpend: spend({ fuel: "6k_plus", dining: "lt_1k" }),
     },
-    cards: [
-      {
-        id: "eval-milestone-card",
-        name: "Eval Milestone Card",
-        annualFee: 1000,
-        rewardRates: { ...zeroRates, ecommerce: 0.02 },
-        milestoneBenefits: [{ spendThreshold: 90000, bonusValue: 4000 }],
-        minIncomeEligibility: null,
-      },
-      {
-        id: "eval-plain-card",
-        name: "Eval Plain Card",
-        annualFee: 0,
-        rewardRates: { ...zeroRates, ecommerce: 0.025 },
-        milestoneBenefits: [],
-        minIncomeEligibility: null,
-      },
-    ],
-    expectedTopCardId: "eval-milestone-card",
-    expectedGroundedNumber: "4000",
+    expectedTopCardId: "sbi-bpcl-octane",
+  },
+  {
+    name: "online shopper on a ₹0 budget",
+    answers: { ...base, feeTolerance: "zero", monthlySpend: spend({ online_shopping: "6k_plus", food_delivery: "1k_3k" }) },
+    expectedTopCardId: "icici-amazon-pay",
+  },
+  {
+    name: "already holds the best card",
+    answers: {
+      ...base,
+      cardsHeld: ["hsbc-live-plus"],
+      monthlySpend: spend({ food_delivery: "6k_plus", online_shopping: "1k_3k", groceries: "1k_3k" }),
+    },
+    expectedTopCardId: "hsbc-live-plus",
+  },
+  {
+    name: "why not Amazon Pay (everyday spender)",
+    answers: {
+      ...base,
+      feeTolerance: "any",
+      monthlySpend: spend({ food_delivery: "3k_6k", online_shopping: "3k_6k", groceries: "3k_6k", dining: "1k_3k", bills: "1k_3k", upi: "1k_3k" }),
+    },
+    expectedTopCardId: "hsbc-live-plus",
+    whyNotCardId: "icici-amazon-pay",
+  },
+  {
+    name: "why not Swiggy HDFC when fees aren't OK",
+    answers: { ...base, feeTolerance: "zero", monthlySpend: spend({ food_delivery: "6k_plus", online_shopping: "1k_3k" }) },
+    expectedTopCardId: "icici-amazon-pay",
+    whyNotCardId: "hdfc-swiggy",
+  },
+  {
+    name: "why not SBI Cashback for a food-heavy user",
+    answers: { ...base, monthlySpend: spend({ food_delivery: "6k_plus", online_shopping: "1k_3k", groceries: "1k_3k" }) },
+    expectedTopCardId: "hsbc-live-plus",
+    whyNotCardId: "sbi-cashback",
   },
 ];

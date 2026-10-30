@@ -141,3 +141,23 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     results toggle and the Profile toggle all write through it, and `answers.cardsHeld` mirrors it.
 45. **Public finder rate limit:** 30 requests per IP per 10 minutes, in memory. On Vercel that's per
     warm instance; fine for a demo. It needs a shared store (e.g. Upstash) before real launch.
+46. **Grounding is enforced in code.** After Gemini writes an explanation or chat reply, every ₹ figure
+    must appear in that run's tool outputs (`ungroundedRupees`). If one doesn't, the template answer is
+    used. Template answers only print numbers that come straight from the engine (no subtraction in
+    prose).
+47. **Narration labels** follow handoff §1.6: "Checked your answers" → "Filtered 40 cards to the N you
+    can get" → "Worked out your yearly value for each" → "Writing your recommendation". When Gemini is
+    off (no key, quota, or `GEMINI_DISABLED=1`), the same steps are emitted ~350 ms apart before the
+    template, so the phone still shows them ticking in.
+48. **Gemini quota → model order flipped.** The eval showed this key's free tier allows
+    `gemini-3.5-flash` only 5 req/min and 20 req/day. An explanation is 3–4 requests, so that's about
+    five a day. `gemini-3.5-flash-lite` passed the same eval and now leads; `flash` is the fallback.
+    The explanation cache (reused while the Top Pick is unchanged) also keeps calls down. For a demo
+    with several people, consider a paid key.
+49. **Eval fixtures pin the engine's real ranking.** My first guesses for four fixtures were wrong (HSBC
+    Live+ beats Swiggy HDFC for heavy food delivery once groceries count), so they assert what
+    finance-engine computes. The offline half runs in `pnpm test`; the live half is `pnpm eval`
+    (10/10 on 2026-10-31).
+50. **Chat thread** is `recommender`, keeps the last 12 messages as history, and is capped at 40 user
+    turns. The old `/api/chat` and `/api/quiz/submit` (old engine + D15 web search) stay until the web
+    moves over at checkpoint 14.

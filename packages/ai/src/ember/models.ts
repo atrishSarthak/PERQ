@@ -7,7 +7,10 @@
 // is exhausted (429): each model has its own quota bucket.
 // Free-tier RPM/RPD limits change often; check them in Google AI Studio
 // (Settings → Rate limits) rather than trusting a number in code.
-// GEMINI_MODEL in the environment overrides the whole chain with one model.
-export const EMBER_MODEL = "gemini-3.5-flash";
-export const EMBER_FALLBACK_MODEL = "gemini-3.5-flash-lite";
+// Free-tier quota observed during the eval (2026-10-31): gemini-3.5-flash
+// allows only 5 requests/minute and 20/day on this key, about five
+// explanations a day. Flash-Lite passed the same 10/10 eval, so it leads and
+// Flash is the second hop. GEMINI_MODEL overrides the chain with one model.
+export const EMBER_MODEL = "gemini-3.5-flash-lite";
+export const EMBER_FALLBACK_MODEL = "gemini-3.5-flash";
 export const EMBER_MODEL_CHAIN = [EMBER_MODEL, EMBER_FALLBACK_MODEL];
