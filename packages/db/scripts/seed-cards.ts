@@ -18,7 +18,7 @@ import { fieldsEqual } from "./cardDiff";
  * UI — updating a card's terms means editing the source JSON and
  * re-running this script.
  *
- *   pnpm db:seed-cards path/to/cards.json
+ *   pnpm db:seed-cards [path/to/cards.json]   (defaults to data/cards.json)
  *
  * 2C: a card missing from the source file is marked 'discontinued', never
  * hard-deleted — preserves arsenal/recommendation history instead of
@@ -31,11 +31,9 @@ import { fieldsEqual } from "./cardDiff";
  */
 
 async function main() {
-  const filePath = process.argv[2];
-  if (!filePath) {
-    console.error("Usage: pnpm db:seed-cards path/to/cards.json");
-    process.exit(1);
-  }
+  // Defaults to the curated catalogue so `pnpm db:seed-cards` from the repo
+  // root needs no argument; an explicit path still overrides it.
+  const filePath = process.argv[2] ?? resolve(__dirname, "../data/cards.json");
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is not set");
   }
