@@ -72,6 +72,20 @@ describe("monthlyRewardsByCategory", () => {
     expect(dining.capApplied && groceries.capApplied).toBe(true);
   });
 
+  it("applies a cap shared by a group of categories, leaving others alone", () => {
+    const c = card({
+      id: "a",
+      rewardRates: { ...zeroRates, online_shopping: 5, food_delivery: 5, dining: 1 },
+      capGroups: [{ categories: ["online_shopping", "food_delivery"], monthlyCap: 100 }],
+    });
+    const lines = monthlyRewardsByCategory(spend({ online_shopping: 3000, food_delivery: 1000, dining: 5000 }), c);
+    const by = (c: Category) => lines.find((l) => l.category === c)!;
+    expect(by("online_shopping").monthlyReward + by("food_delivery").monthlyReward).toBeCloseTo(100);
+    expect(by("online_shopping").monthlyReward).toBeCloseTo(75);
+    expect(by("dining").monthlyReward).toBe(50);
+    expect(by("dining").capApplied).toBe(false);
+  });
+
   it("returns zero everywhere for zero spend", () => {
     const c = card({ id: "a", rewardRates: { ...zeroRates, other: 2 } });
     expect(monthlyRewardsByCategory(zeroSpend, c).every((l) => l.monthlyReward === 0)).toBe(true);

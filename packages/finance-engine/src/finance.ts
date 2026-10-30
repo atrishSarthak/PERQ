@@ -8,8 +8,9 @@ import { CATEGORIES, type Category, type FinanceCard, type MonthlySpend } from "
 // 3. Reward rates are % value back already converted from points with the
 //    card's redemption value (cards.reward_rates); this module never
 //    re-applies a point value.
-// 4. Caps limit the ₹ reward earned per month. A category cap applies first;
-//    a `total` cap then scales every category down proportionally.
+// 4. Caps limit the ₹ reward earned per month, in three layers: a category's
+//    own cap, then any cap group it shares with other categories, then the
+//    card-wide `total`. A shared cap scales its categories down in proportion.
 // 5. Year 1 = joining fee + welcome benefit (no renewal fee yet). Ongoing =
 //    renewal fee after waiver, no joining fee, no welcome benefit.
 // 6. The renewal waiver is judged on projected annual spend (monthly × 12),
@@ -71,17 +72,25 @@ export function monthlyRewardsByCategory(spend: MonthlySpend, card: FinanceCard)
     };
   });
 
-  const totalCap = card.rewardCaps.total;
-  const sum = lines.reduce((s, l) => s + l.monthlyReward, 0);
-  if (totalCap !== null && totalCap !== undefined && sum > totalCap) {
-    const scale = sum === 0 ? 0 : totalCap / sum;
-    for (const l of lines) {
+  const applySharedCap = (group: CategoryReward[], cap: number | null | undefined) => {
+    if (cap === null || cap === undefined) return;
+    const sum = group.reduce((s, l) => s + l.monthlyReward, 0);
+    if (sum <= cap) return;
+    const scale = cap / sum;
+    for (const l of group) {
       if (l.monthlyReward > 0) {
         l.monthlyReward *= scale;
         l.capApplied = true;
       }
     }
+  };
+  for (const g of card.capGroups ?? []) {
+    applySharedCap(
+      lines.filter((l) => g.categories.includes(l.category)),
+      g.monthlyCap
+    );
   }
+  applySharedCap(lines, card.rewardCaps.total);
 
   for (const l of lines) l.annualReward = Math.round(l.monthlyReward * 12);
   return lines;

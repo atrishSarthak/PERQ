@@ -22,6 +22,14 @@ export interface Milestone {
   value: number; // ₹ value of the benefit (conservative)
 }
 
+// A monthly reward cap shared by several categories, e.g. SBI Cashback's
+// "₹2,000 a month across all online spends".
+export interface CapGroup {
+  categories: Category[];
+  monthlyCap: number; // ₹ of reward per month
+  label?: string;
+}
+
 export interface FinanceCard {
   id: string;
   joiningFee: number; // ₹, before GST
@@ -32,6 +40,8 @@ export interface FinanceCard {
   // Monthly cap on the ₹ REWARD earned (not on spend), per category.
   // null/undefined = no cap. `total` caps the sum across all categories.
   rewardCaps: Partial<Record<Category | "total", number | null>>;
+  // Caps shared across categories (applied after per-category caps, before `total`).
+  capGroups?: CapGroup[];
   feeWaiverSpend: number | null; // ₹ annual spend that waives the renewal fee
   // Spend that doesn't count toward the waiver (commonly fuel, UPI, bills).
   waiverExcludes?: Category[];

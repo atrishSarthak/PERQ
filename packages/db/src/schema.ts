@@ -1,5 +1,6 @@
 import {
   pgTable,
+  boolean,
   text,
   timestamp,
   integer,
@@ -138,6 +139,28 @@ export const cards = pgTable(
     origin: text("origin").notNull().default("seeded"),
     searchBucketKey: text("search_bucket_key"),
     sourceUrls: jsonb("source_urls"),
+
+    // --- Card Recommender v2 (handoff §1.2). reward_rates above now holds
+    // the 9-category v2 shape: % value back per category, already converted
+    // from points with redemption_value. Every rupee computed from these
+    // goes through packages/finance-engine.
+    cardType: text("card_type").notNull().default("unsecured"), // 'secured' | 'unsecured'
+    fdMinAmount: integer("fd_min_amount"), // ₹, secured cards only
+    lifetimeFree: boolean("lifetime_free").notNull().default(false),
+    networks: text("networks").array().notNull().default([]), // e.g. ['RuPay','Visa']
+    upiEnabled: boolean("upi_enabled").notNull().default(false), // RuPay credit on UPI
+    rewardCaps: jsonb("reward_caps").notNull().default({}), // per category (+ 'total'), ₹/month of reward
+    capGroups: jsonb("cap_groups").notNull().default([]), // [{ categories, monthlyCap, label }]
+    bucket: text("bucket"), // catalogue segment: secured | lifetime_free | entry_cashback | rupay_upi | mid_tier
+    rewardNotes: text("reward_notes"),
+    minAge: integer("min_age"),
+    eligibleOccupations: text("eligible_occupations").array(), // null = any
+    minMonthlyIncome: integer("min_monthly_income"), // ₹ take-home/month, null = not published
+    feeWaiverSpend: integer("fee_waiver_spend"), // ₹/yr that waives the renewal fee
+    waiverExcludes: text("waiver_excludes").array().notNull().default([]),
+    welcomeBenefitValue: integer("welcome_benefit_value").notNull().default(0),
+    sourceUrl: text("source_url"), // the bank's own product / MITC page
+    verified: boolean("verified").notNull().default(false), // false = excluded from ranking
   },
   (t) => ({
     // D15 bucket-cache lookup: WHERE origin = ? AND search_bucket_key = ? AND status = ?
