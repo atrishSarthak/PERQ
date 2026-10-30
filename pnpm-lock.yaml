@@ -331,6 +331,13 @@ importers:
         version: 2.1.9(@types/node@26.2.0)(jsdom@25.0.1)(lightningcss@1.33.0)(terser@5.51.2)
 
   packages/scoring-engine:
+    dependencies:
+      '@perq/finance-engine':
+        specifier: workspace:*
+        version: link:../finance-engine
+      '@perq/shared':
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@perq/config':
         specifier: workspace:*

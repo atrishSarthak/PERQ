@@ -121,3 +121,15 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     travel (the higher of flights/hotels), fee tolerance and priorities. Occupation, UPI spend and the
     FD question weren't in v1: occupation defaults to salaried and UPI to ₹0, and the user is asked to
     confirm them. Anything unreadable starts the quiz again; nothing crashes.
+40. **Recommender v2** lives in `packages/scoring-engine/src/recommend.ts` beside the legacy
+    `scoreCards` (kept until the web switches at checkpoint 14). Eligibility rules beyond published
+    bank criteria: students and under-₹25k incomes see only secured or lifetime-free cards; secured
+    cards need `openToSecured` except for students; fee tolerance compares the higher of joining and
+    renewal fee before GST. Age isn't asked, so the quiz assumes an adult.
+41. **Priority boost** = ongoing value × 10% × (share of the card's rewards from the user's priority
+    categories). "Cashback" priority matches cards that pay plain cashback. The boost only changes
+    order. A test checks that ₹ values are identical with and without priorities, and that any card
+    moved up was within 10%.
+42. **Leakage** compares the best eligible verified card with the best held verified card. Held cards
+    that are unverified or not in the catalogue can't be valued and are ignored. With no card the
+    message says what the best card would add instead of "leaking".
