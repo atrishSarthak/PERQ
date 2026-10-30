@@ -170,3 +170,11 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     chartreuse fill), no imagery or call to apply, so it doesn't read as an ad.
 54. **Web preview only:** the session token falls back to `localStorage` on web, because SecureStore
     doesn't exist there. On iPhone it's always the Keychain.
+55. **Web on v2:** the landing page has the public "Find your card" finder (top 3, no login). `/quiz`
+    and `/results` now use quiz v2 and the v2 API; the home "Take the quiz" goes to `/quiz`, and the web
+    Ember chat panel talks to `/api/ember/chat`. The quiz reducer moved to `packages/shared` so web and
+    mobile ask exactly the same questions. Web "See the math" is an inline expandable section.
+56. **v1 web code is unlinked, not deleted** (listed in AUDIT.md §8), the same treatment the handoff
+    asks for with Feature 3.
+57. **Logo:** the existing PERQ logo image is the old gold wordmark. I didn't redraw the brand logo;
+    swap `apps/web/public/perq-logo.png` when the new-palette version exists.

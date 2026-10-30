@@ -9,7 +9,7 @@ import {
   toAnswers,
   type QuizAction,
   type QuizState,
-} from "../src/features/quiz/reducer";
+} from "../src/quizReducer";
 
 const run = (actions: QuizAction[], s: QuizState = initialQuizState()) => actions.reduce(quizReducer, s);
 

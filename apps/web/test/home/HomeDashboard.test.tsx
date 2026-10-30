@@ -2,8 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
+const push = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ push, refresh: vi.fn() }),
 }));
 
 const { HomeDashboard } = await import("@/app/(shell)/home/HomeDashboard");
@@ -44,10 +45,10 @@ describe("HomeDashboard", () => {
     expect(screen.queryByText("Top pick from Ember")).not.toBeInTheDocument();
   });
 
-  it("opens the real QuizWizard modal on Take the quiz, starting at question 1", () => {
+  it("sends Take the quiz to the quiz v2 page", () => {
     renderDashboard({ quizTaken: false, topPick: null });
     fireEvent.click(screen.getByText("Take the quiz"));
-    expect(screen.getByText("Question 1 of 13")).toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith("/quiz");
   });
 
   it("shows a real top-pick preview when the quiz was taken and a #1 card exists", () => {

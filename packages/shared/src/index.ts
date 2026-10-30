@@ -6,3 +6,4 @@ export * from "./quiz";
 export * from "./quizMigration";
 export * from "./recommendation";
 export * from "./api";
+export * from "./quizReducer";

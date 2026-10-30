@@ -118,3 +118,19 @@ Modified: Feature 3 files (`lib/goals/*` + tests), `packages/ai` (model-fallback
 Untracked: `packages/ai/src/{firecrawlSearch,groq,multiProvider}.ts`, `home/loading.tsx`, root planning
 docs and PNGs. These were committed as-is in a snapshot commit before Step 0, so later checkpoint
 commits stay clean.
+
+## 8. Retired by Step 1 (to delete later)
+
+Superseded by Card Recommender v2 and unlinked from navigation, but left in place (with their
+tests passing) so this handoff doesn't turn into a deletion sweep:
+
+- v1 quiz/results UI: `app/(shell)/quiz/QuizWizard.tsx`, `questions.ts`, `CardSearchField.tsx`,
+  `EmberLoadingSequence.tsx`, `MiniCardVisual.tsx`, `app/(shell)/results/{ResultsView,ResultCard,
+  EditProfilePanel,RetakeQuizButton,filterAndSort,financialContextQuestions,...}.tsx`
+- v1 routes: `/api/quiz/submit`, `/api/quiz/card-search`, `/api/profile`, `/api/profile/reset`,
+  `/api/chat`, `/api/arsenal/toggle`
+- v1 Ember pipeline: `apps/web/lib/ember/{computeRecommendations,cardSearch,cardSearchSchema,
+  resolveCardSet,tools,prompt,narrationLabels,explanationTemplate,cache,cardMapper,...}.ts` and
+  `runGeminiAgent` in `packages/ai`
+- Legacy scoring: `packages/scoring-engine/src/{scoreCards,buildProfileFromAnswers,
+  estimateSpendFromBucket,getBestCardForCategory}.ts`

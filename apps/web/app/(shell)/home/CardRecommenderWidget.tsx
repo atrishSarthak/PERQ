@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { QuizWizard, type CardOption } from "../quiz/QuizWizard";
+import type { CardOption } from "../quiz/QuizWizard";
 import { DashboardCardChip } from "./DashboardCardChip";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
@@ -22,33 +21,20 @@ export interface TopPickData {
  * is a genuine edge case computeAndPersistRecommendations already handles
  * server-side, so the dashboard shouldn't misreport it as "take the quiz"
  * when the user already did):
- *   1. No quiz on file: CTA + opens the real QuizWizard modal.
+ *   1. No quiz on file: CTA to the quiz v2 page (/quiz).
  *   2. Quiz taken, has a top pick: compact real preview + link to /results.
  *   3. Quiz taken, no eligible cards: brief explanation, link to /results.
  */
 export function CardRecommenderWidget({
   quizTaken,
   topPick,
-  cardOptions,
+  cardOptions: _cardOptions,
 }: {
   quizTaken: boolean;
   topPick: TopPickData | null;
   cardOptions: CardOption[];
 }) {
   const router = useRouter();
-  const [quizOpen, setQuizOpen] = useState(false);
-
-  if (quizOpen) {
-    return (
-      <QuizWizard
-        cardOptions={cardOptions}
-        onComplete={() => {
-          setQuizOpen(false);
-          router.refresh();
-        }}
-      />
-    );
-  }
 
   return (
     <div
@@ -131,7 +117,7 @@ export function CardRecommenderWidget({
             </p>
             <button
               type="button"
-              onClick={() => setQuizOpen(true)}
+              onClick={() => router.push("/quiz")}
               className="mt-2 w-fit rounded-2xl px-6 py-3.5 font-body text-[15px] font-semibold"
               style={{ backgroundColor: "var(--ember)", color: "var(--on-ember)" }}
             >

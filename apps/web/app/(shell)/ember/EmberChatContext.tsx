@@ -55,7 +55,7 @@ export function EmberChatProvider({ children }: { children: React.ReactNode }) {
       setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
 
       try {
-        const res = await fetch("/api/chat", {
+        const res = await fetch("/api/ember/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: trimmed }),
