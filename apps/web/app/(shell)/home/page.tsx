@@ -28,15 +28,35 @@ export default async function HomePage() {
   const session = await auth();
   const userId = session!.user.id;
 
-  const [profile] = await db
-    .select({ id: userProfile.id })
-    .from(userProfile)
-    .where(eq(userProfile.userId, userId))
-    .limit(1);
+  // These three don't depend on each other, only on userId — running them
+  // sequentially (as this page used to) means the page-transition overlay
+  // (which can't shrink away until this Server Component actually finishes
+  // rendering) sits fully opaque for the SUM of every round trip. In
+  // parallel, it's bounded by the slowest one instead — this is why
+  // navigating back to /home specifically felt "stuck" longer than other
+  // pages: results/page.tsx already parallelizes its two queries, this one
+  // didn't.
+  const [[profile], arsenalCards, atGoalSearchDailyLimit] = await Promise.all([
+    db.select({ id: userProfile.id }).from(userProfile).where(eq(userProfile.userId, userId)).limit(1),
+    db
+      .select({
+        cardId: userCardArsenal.cardId,
+        name: cards.name,
+        issuer: cards.issuer,
+        network: cards.network,
+      })
+      .from(userCardArsenal)
+      .innerJoin(cards, eq(cards.id, userCardArsenal.cardId))
+      .where(and(eq(userCardArsenal.userId, userId), eq(userCardArsenal.status, "held"))),
+    hasReachedDailyGoalSearchLimit(userId),
+  ]);
 
   let topPick: TopPickData | null = null;
   let cardOptions: CardOption[] = [];
 
+  // This one genuinely depends on `profile` (which branch to take), so it
+  // can't join the batch above — but it's the only remaining sequential
+  // step now, not one of four.
   if (profile) {
     const [topRec] = await db
       .select({
@@ -67,25 +87,12 @@ export default async function HomePage() {
     }));
   }
 
-  const arsenalCards: ArsenalCardData[] = await db
-    .select({
-      cardId: userCardArsenal.cardId,
-      name: cards.name,
-      issuer: cards.issuer,
-      network: cards.network,
-    })
-    .from(userCardArsenal)
-    .innerJoin(cards, eq(cards.id, userCardArsenal.cardId))
-    .where(and(eq(userCardArsenal.userId, userId), eq(userCardArsenal.status, "held")));
-
   const name = firstNameFrom(session!.user.name, session!.user.email);
   const dateString = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
   });
-
-  const atGoalSearchDailyLimit = await hasReachedDailyGoalSearchLimit(userId);
 
   return (
     <HomeDashboard

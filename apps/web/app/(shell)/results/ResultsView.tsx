@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import type { ResultsCard } from "./types";
 import {
@@ -15,6 +16,7 @@ import { EditProfilePanel } from "./EditProfilePanel";
 import { RetakeQuizButton } from "./RetakeQuizButton";
 import { ResultCard } from "./ResultCard";
 import { DarkModeToggle } from "./DarkModeToggle";
+import ResultsLoading from "./loading";
 
 const ANNUAL_FEE_BUCKETS: { key: AnnualFeeBucket; label: string }[] = [
   { key: "free", label: "Free (₹0)" },
@@ -50,6 +52,8 @@ export function ResultsView({
   answers: QuizAnswers;
   cardHolderName: string;
 }) {
+  const router = useRouter();
+  const [isRetaking, startRetakeTransition] = useTransition();
   const [filters, setFilters] = useState(emptyFilters());
   const [sortMode, setSortMode] = useState<SortMode>("best-match");
   const [arsenal, setArsenal] = useState<Record<string, "held" | "not_held" | undefined>>(
@@ -173,6 +177,14 @@ export function ResultsView({
     [cards]
   );
 
+  // The full skeleton (same layout as the route-level Suspense fallback),
+  // shown for the entire router.refresh() round-trip after "Retake the
+  // Quiz" completes, so the new profile's cards replace the skeleton
+  // directly — never the stale pre-retake cards flashing before the swap.
+  if (isRetaking) {
+    return <ResultsLoading />;
+  }
+
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       {/* Desktop: always-visible sidebar (DR8 — unaffected below md, where
@@ -255,7 +267,10 @@ export function ResultsView({
 
         <div className="flex flex-wrap items-center gap-2">
           <EditProfilePanel answers={answers} cardOptions={cardOptions} />
-          <RetakeQuizButton cardOptions={cardOptions} />
+          <RetakeQuizButton
+            cardOptions={cardOptions}
+            onRetakeComplete={() => startRetakeTransition(() => router.refresh())}
+          />
         </div>
 
         {sorted.length === 0 ? (

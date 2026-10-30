@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Modal } from "@perq/ui";
 import { QuizWizard, type CardOption } from "../quiz/QuizWizard";
 
@@ -12,9 +11,20 @@ import { QuizWizard, type CardOption } from "../quiz/QuizWizard";
  * /api/profile/reset (which deliberately leaves user_card_arsenal alone —
  * see that route's comment) and drops the user straight into the same
  * QuizWizard used for new-user onboarding, starting fresh at question 1.
+ *
+ * onRetakeComplete (not a direct router.refresh() here) — the caller
+ * (ResultsView) owns the useTransition that drives it, so it can show a
+ * skeleton for the full duration of the server refetch instead of this
+ * button unmounting the wizard and leaving the OLD cards/recommendations on
+ * screen for a beat before the new ones suddenly replace them.
  */
-export function RetakeQuizButton({ cardOptions }: { cardOptions: CardOption[] }) {
-  const router = useRouter();
+export function RetakeQuizButton({
+  cardOptions,
+  onRetakeComplete,
+}: {
+  cardOptions: CardOption[];
+  onRetakeComplete: () => void;
+}) {
   const [confirming, setConfirming] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [retaking, setRetaking] = useState(false);
@@ -41,7 +51,7 @@ export function RetakeQuizButton({ cardOptions }: { cardOptions: CardOption[] })
         cardOptions={cardOptions}
         onComplete={() => {
           setRetaking(false);
-          router.refresh();
+          onRetakeComplete();
         }}
       />
     );

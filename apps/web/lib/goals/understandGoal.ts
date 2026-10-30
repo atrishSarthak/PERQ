@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { extractStructuredJson, type ResponseSchema } from "@perq/ai";
+import { extractJsonWithFallback, type ResponseSchema } from "@perq/ai";
 import { SPEND_CATEGORIES, type SpendCategory } from "@perq/scoring-engine";
 import { MAX_CLARIFYING_ROUNDS, type ClarificationTurn } from "./clarification";
 
@@ -103,16 +103,17 @@ Do not guess or invent a subject, location, variant, or budget that isn't actual
 export async function understandGoal(
   goalText: string,
   clarification: ClarificationTurn[],
-  apiKey: string
+  apiKey: string,
+  groqApiKey?: string
 ): Promise<UnderstandGoalResult> {
   const mustProceed = clarification.length >= MAX_CLARIFYING_ROUNDS;
 
   let raw: unknown;
   try {
-    raw = await extractStructuredJson(
-      apiKey,
+    raw = await extractJsonWithFallback(
       buildPrompt(goalText, clarification, mustProceed),
-      UNDERSTAND_RESPONSE_SCHEMA
+      UNDERSTAND_RESPONSE_SCHEMA,
+      { geminiApiKey: apiKey, groqApiKey }
     );
   } catch {
     return { ok: false, reason: "unsupported" };

@@ -5,18 +5,26 @@ import type {
   ModelCallOutput,
   ModelCaller,
 } from "./types";
-import { withTransientRetry } from "./retry";
+import { withModelFallback } from "./retry";
 
 // PRD §3/§15: pin the exact model identifier and confirm current free-tier
 // quota (RPM/RPD/TPM) in Google AI Studio at implementation time — don't
 // hardcode a number that will go stale. Verified against the live API
 // (2026-08-12): "gemini-2.0-flash" is already deprecated/removed
-// (404 "no longer available"). "gemini-flash-latest" is Google's own
-// maintained alias to the current recommended Flash-tier model — it
-// resolves the staleness problem structurally rather than requiring a
-// code change every time Google rotates model names. Still overridable
-// via GEMINI_MODEL for a deliberate pin later.
-const DEFAULT_MODEL = "gemini-flash-latest";
+// (404 "no longer available"). "gemini-flash-latest" and
+// "gemini-flash-lite-latest" are Google's own maintained aliases to the
+// current recommended Flash-tier and Flash-Lite-tier models — each is a
+// distinct model with its own separate RPM/TPM/RPD quota bucket, so
+// chaining them here (via withModelFallback) spreads load instead of
+// pinning every call to one model's shared free-tier quota. Still
+// overridable to a single pinned model via GEMINI_MODEL.
+const DEFAULT_MODEL_CHAIN = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+
+function resolveModelChain(modelName?: string): string[] {
+  if (modelName) return [modelName];
+  if (process.env.GEMINI_MODEL) return [process.env.GEMINI_MODEL];
+  return DEFAULT_MODEL_CHAIN;
+}
 
 // Our own JsonSchema stays SDK-agnostic (types.ts has zero external
 // dependencies) — this is the one place that adapts it to the genai SDK's
@@ -37,11 +45,9 @@ function toGenAiSchema(schema: JsonSchema): Schema {
  * where GEMINI_API_KEY is actually available — packages/ai itself never
  * requires the key to be built or unit-tested.
  */
-export function createGeminiModelCaller(
-  apiKey: string,
-  modelName: string = process.env.GEMINI_MODEL ?? DEFAULT_MODEL
-): ModelCaller {
+export function createGeminiModelCaller(apiKey: string, modelName?: string): ModelCaller {
   const client = new GoogleGenAI({ apiKey });
+  const models = resolveModelChain(modelName);
 
   return async (input: ModelCallInput): Promise<ModelCallOutput> => {
     const contents = [
@@ -74,9 +80,9 @@ export function createGeminiModelCaller(
       });
     }
 
-    const response = await withTransientRetry(() =>
+    const response = await withModelFallback(models, (model) =>
       client.models.generateContent({
-        model: modelName,
+        model,
         contents,
         config: {
           systemInstruction: input.systemPrompt,

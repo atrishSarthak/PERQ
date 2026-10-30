@@ -1,5 +1,5 @@
 import { fetchPage } from "@perq/fetch";
-import { extractStructuredJson } from "@perq/ai";
+import { extractJsonWithFallback } from "@perq/ai";
 import type { DiscoveredOffer } from "./discoverySchema";
 import { precisionPriceSchema, PRECISION_PRICE_RESPONSE_SCHEMA } from "./discoverySchema";
 
@@ -10,7 +10,14 @@ export const MAX_PRECISION_FETCHES = 3;
 function buildPricePrompt(markdown: string, offerTitle: string): string {
   return `Below is the Markdown content of a page. Does it contain a real, current price for "${offerTitle}"?
 
-If a real price is present, set found:true and extract it as a plain number (no currency symbol). Do not invent a price that isn't actually visible in the content below — if you can't find a real number, set found:false instead of guessing one.
+If a real price IN INDIAN RUPEES (₹, INR, or Rs) is clearly stated for this specific item, set found:true and extract it as a plain number (no currency symbol, no commas).
+
+Otherwise set found:false. In particular, set found:false — do NOT guess a number — if:
+- No price for this specific item appears in the content at all.
+- The only price shown is in a different currency (e.g. $/USD) — do not convert it.
+- The only numbers near the item are something other than its price (a rating like "9/10", a review score, a model/SKU number, a year, a percentage, a page/article ID).
+
+A false negative (found:false when a price genuinely was there) is a minor, recoverable miss. A false positive (a wrong number reported as this item's real price) is a real user-facing error — when in doubt, set found:false.
 
 PAGE CONTENT:
 ${markdown.slice(0, 30000)}`;
@@ -36,7 +43,8 @@ ${markdown.slice(0, 30000)}`;
 export async function refinePricesWithPrecisionFetch(
   offers: DiscoveredOffer[],
   apiKey: string,
-  jinaApiKey?: string
+  jinaApiKey?: string,
+  groqApiKey?: string
 ): Promise<DiscoveredOffer[]> {
   const needsFetch = offers.filter((o) => o.price === null).slice(0, MAX_PRECISION_FETCHES);
   if (needsFetch.length === 0) return offers;
@@ -52,10 +60,10 @@ export async function refinePricesWithPrecisionFetch(
 
       let raw: unknown;
       try {
-        raw = await extractStructuredJson(
-          apiKey,
+        raw = await extractJsonWithFallback(
           buildPricePrompt(fetched.markdown, offer.title),
-          PRECISION_PRICE_RESPONSE_SCHEMA
+          PRECISION_PRICE_RESPONSE_SCHEMA,
+          { geminiApiKey: apiKey, groqApiKey }
         );
       } catch {
         return null;

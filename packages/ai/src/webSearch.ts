@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type, type Schema } from "@google/genai";
 import type { ResponseSchema } from "./types";
-import { withTransientRetry } from "./retry";
+import { withModelFallback } from "./retry";
 
 // D15 (Feature 1 Engineering Plan amendment): a scoped, deliberate exception
 // to D8's "tools execute in-process, no network hop" boundary — this is the
@@ -12,7 +12,17 @@ import { withTransientRetry } from "./retry";
 // 1's card-search orchestration (query building, schema validation, citation
 // checking) lives in apps/web/lib/mimir/cardSearch.ts.
 
-const DEFAULT_MODEL = "gemini-flash-latest";
+// Kept in sync with client.ts's DEFAULT_MODEL_CHAIN — see that file's
+// comment for why two distinct model aliases (separate quota buckets) beat
+// one, and why the whole chain is skipped when a caller (or GEMINI_MODEL)
+// explicitly pins a single model.
+const DEFAULT_MODEL_CHAIN = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+
+function resolveModelChain(modelName?: string): string[] {
+  if (modelName) return [modelName];
+  if (process.env.GEMINI_MODEL) return [process.env.GEMINI_MODEL];
+  return DEFAULT_MODEL_CHAIN;
+}
 
 export interface Citation {
   uri: string;
@@ -34,13 +44,14 @@ export interface GroundedSearchResult {
 export async function searchGroundedText(
   apiKey: string,
   query: string,
-  modelName: string = process.env.GEMINI_MODEL ?? DEFAULT_MODEL
+  modelName?: string
 ): Promise<GroundedSearchResult> {
   const client = new GoogleGenAI({ apiKey });
+  const models = resolveModelChain(modelName);
 
-  const response = await withTransientRetry(() =>
+  const response = await withModelFallback(models, (model) =>
     client.models.generateContent({
-      model: modelName,
+      model,
       contents: [{ role: "user", parts: [{ text: query }] }],
       config: {
         tools: [{ googleSearch: {} }],
@@ -96,13 +107,14 @@ export async function extractStructuredJson(
   apiKey: string,
   prompt: string,
   schema: ResponseSchema,
-  modelName: string = process.env.GEMINI_MODEL ?? DEFAULT_MODEL
+  modelName?: string
 ): Promise<unknown> {
   const client = new GoogleGenAI({ apiKey });
+  const models = resolveModelChain(modelName);
 
-  const response = await withTransientRetry(() =>
+  const response = await withModelFallback(models, (model) =>
     client.models.generateContent({
-      model: modelName,
+      model,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: {
         responseMimeType: "application/json",

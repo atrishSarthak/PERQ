@@ -1,4 +1,4 @@
-import { searchGroundedText, extractStructuredJson } from "@perq/ai";
+import { searchWebWithFallback, extractJsonWithFallback } from "@perq/ai";
 import type { GoalFacts } from "./understandGoal";
 import {
   discoveredOfferSchema,
@@ -12,6 +12,18 @@ import {
 // apps/web/lib/mimir/cardSearch.ts.
 export const MAX_DISCOVERED_OFFERS = 8;
 
+// PERQ is an India-only product (₹ pricing, Indian card issuers/BNPL
+// throughout) — unlike packages/ai, which stays geography-agnostic, this
+// file is exactly where that domain assumption belongs. Verified live:
+// Firecrawl's search has no inherent geographic bias — the identical query
+// text (even one that already asks for "prices in INR") surfaced all-US
+// retailers without a location hint, and real India-facing ones
+// (apple.com/in, Flipkart, Amazon.in) with one. Used both as the query's
+// stated location AND Firecrawl's `location` param (searchWebWithFallback's
+// firecrawlLocation) — belt and suspenders, since the param alone wasn't
+// tested in isolation and both are cheap to include.
+const DEFAULT_LOCATION = "India";
+
 export interface DiscoveryResult {
   offers: DiscoveredOffer[];
   cardOfferNote: string | null;
@@ -21,7 +33,7 @@ export interface DiscoveryResult {
 function describeGoal(facts: GoalFacts): string {
   const parts = [facts.subject];
   if (facts.variant) parts.push(facts.variant);
-  if (facts.location) parts.push(`in ${facts.location}`);
+  parts.push(`in ${facts.location ?? DEFAULT_LOCATION}`);
   return parts.join(" ");
 }
 
@@ -36,7 +48,12 @@ function buildDiscoveryQuery(facts: GoalFacts): string {
 function buildExtractionPrompt(researchNotes: string, citationUris: string[]): string {
   return `From the research notes below, extract up to ${MAX_DISCOVERED_OFFERS} distinct real purchase listings/options as structured data.
 
-For each listing, you MUST use a sourceUrl from the exact list below — never invent one. If you cannot attribute a listing to one of these sources, omit it entirely rather than guessing. If a listing is clearly real but no specific price is stated in the notes, set price to null rather than guessing a number.
+For each listing, you MUST use a sourceUrl from the exact list below — never invent one. If you cannot attribute a listing to one of these sources, omit it entirely rather than guessing.
+
+PRICE DISCIPLINE — this matters more than filling every field:
+- Only set a price if you can point to the specific number in the research notes below that IS that listing's price (not a rating, a review score, a model number, a year, a percentage, or any other unrelated number that happens to appear near the listing).
+- The price must be stated in Indian Rupees (₹ or "INR" or "Rs"). If the notes only give a price in another currency (e.g. $, USD) or the currency is unclear, treat it as not found — do NOT convert or guess an equivalent.
+- If a listing is clearly real but you cannot find its actual INR price stated in the notes, set price to null. A null price is the CORRECT, expected answer when the notes don't contain one — it is not a failure, and a wrong guessed number is much worse than null.
 
 SOURCE URLS AVAILABLE:
 ${citationUris.map((uri) => `- ${uri}`).join("\n")}
@@ -104,16 +121,22 @@ function validateOffers(raw: unknown, citationUris: string[]): DiscoveredOffer[]
  */
 async function discoverCardOffer(
   facts: GoalFacts,
-  apiKey: string
+  apiKey: string,
+  firecrawlApiKey?: string,
+  groqApiKey?: string
 ): Promise<{ cardOfferNote: string | null; cardOfferCitationUrl: string | null }> {
-  const { text, citations } = await searchGroundedText(apiKey, buildCardOfferQuery(facts));
+  const { text, citations } = await searchWebWithFallback(buildCardOfferQuery(facts), {
+    geminiApiKey: apiKey,
+    firecrawlApiKey,
+    firecrawlLocation: DEFAULT_LOCATION,
+  });
   if (citations.length === 0 || !text) return { cardOfferNote: null, cardOfferCitationUrl: null };
 
   const citationUris = citations.map((c) => c.uri);
-  const raw = await extractStructuredJson(
-    apiKey,
+  const raw = await extractJsonWithFallback(
     buildCardOfferExtractionPrompt(text, citationUris),
-    CARD_OFFER_RESPONSE_SCHEMA
+    CARD_OFFER_RESPONSE_SCHEMA,
+    { geminiApiKey: apiKey, groqApiKey }
   );
 
   // CARD_OFFER_RESPONSE_SCHEMA only requires "found" — note/citationUrl are
@@ -141,19 +164,25 @@ async function discoverCardOffer(
  */
 export async function discoverPurchaseOptions(
   facts: GoalFacts,
-  apiKey: string
+  apiKey: string,
+  firecrawlApiKey?: string,
+  groqApiKey?: string
 ): Promise<DiscoveryResult> {
   const query = buildDiscoveryQuery(facts);
-  const { text, citations } = await searchGroundedText(apiKey, query);
+  const { text, citations } = await searchWebWithFallback(query, {
+    geminiApiKey: apiKey,
+    firecrawlApiKey,
+    firecrawlLocation: DEFAULT_LOCATION,
+  });
   if (citations.length === 0 || !text) {
     return { offers: [], cardOfferNote: null, cardOfferCitationUrl: null };
   }
 
   const citationUris = citations.map((c) => c.uri);
-  const raw = await extractStructuredJson(
-    apiKey,
+  const raw = await extractJsonWithFallback(
     buildExtractionPrompt(text, citationUris),
-    DISCOVERY_RESPONSE_SCHEMA
+    DISCOVERY_RESPONSE_SCHEMA,
+    { geminiApiKey: apiKey, groqApiKey }
   );
   const offers = validateOffers(raw, citationUris);
 
@@ -161,6 +190,6 @@ export async function discoverPurchaseOptions(
     return { offers: [], cardOfferNote: null, cardOfferCitationUrl: null };
   }
 
-  const cardOffer = await discoverCardOffer(facts, apiKey);
+  const cardOffer = await discoverCardOffer(facts, apiKey, firecrawlApiKey, groqApiKey);
   return { offers, ...cardOffer };
 }

@@ -71,9 +71,17 @@ export async function computeAndPersistGoalRecommendation(
   onNarrationStep?: (label: string) => void
 ): Promise<ComputeGoalRecommendationResult> {
   const apiKey = requireGeminiKey();
+  // Optional cross-provider fallbacks (packages/ai/src/multiProvider.ts) —
+  // engaged only once Gemini's own model chain is exhausted (confirmed
+  // live: Google Search grounding's quota is shared across every Gemini
+  // model on this key, so model-hopping alone can't route around it).
+  // Both undefined when unset, which is a no-op — behaves exactly like
+  // Gemini-only before this existed.
+  const firecrawlApiKey = process.env.FIRECRAWL_API_KEY;
+  const groqApiKey = process.env.GROQ_API_KEY;
 
   onNarrationStep?.("MIMIR is figuring out what you mean");
-  const understanding = await understandGoal(goalText, clarification, apiKey);
+  const understanding = await understandGoal(goalText, clarification, apiKey, groqApiKey);
 
   if (!understanding.ok) {
     if (understanding.reason === "needs_clarification") {
@@ -91,12 +99,15 @@ export async function computeAndPersistGoalRecommendation(
   onNarrationStep?.("MIMIR is searching the web");
   let discovery;
   try {
-    discovery = await discoverPurchaseOptions(facts, apiKey);
-  } catch {
+    discovery = await discoverPurchaseOptions(facts, apiKey, firecrawlApiKey, groqApiKey);
+  } catch (err) {
     // A hard Gemini/search failure here (distinct from "searched but found
     // nothing," which discoverPurchaseOptions itself resolves to an empty
     // offers list) gets the same explicit "couldn't complete this search"
     // UX as a total pipeline failure, not a generic bare error message.
+    // Logged server-side (never surfaced to the user) so a spike in this
+    // outcome is diagnosable instead of a silent black box.
+    console.error("[goals] discoverPurchaseOptions failed:", err);
     return { outcome: "total_failure" };
   }
 
@@ -108,7 +119,8 @@ export async function computeAndPersistGoalRecommendation(
   const refinedOffers = await refinePricesWithPrecisionFetch(
     discovery.offers,
     apiKey,
-    process.env.JINA_API_KEY
+    process.env.JINA_API_KEY,
+    groqApiKey
   );
 
   const offersChecked: OfferCheckResult[] = refinedOffers.map((o) => ({

@@ -3,7 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 const extractStructuredJsonMock = vi.fn();
 
 vi.mock("@perq/ai", () => ({
-  extractStructuredJson: (...args: unknown[]) => extractStructuredJsonMock(...args),
+  extractJsonWithFallback: (...args: unknown[]) => extractStructuredJsonMock(...args),
 }));
 
 const { understandGoal } = await import("@/lib/goals/understandGoal");

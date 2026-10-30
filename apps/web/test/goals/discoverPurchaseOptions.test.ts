@@ -5,8 +5,8 @@ const searchGroundedTextMock = vi.fn();
 const extractStructuredJsonMock = vi.fn();
 
 vi.mock("@perq/ai", () => ({
-  searchGroundedText: (...args: unknown[]) => searchGroundedTextMock(...args),
-  extractStructuredJson: (...args: unknown[]) => extractStructuredJsonMock(...args),
+  searchWebWithFallback: (...args: unknown[]) => searchGroundedTextMock(...args),
+  extractJsonWithFallback: (...args: unknown[]) => extractStructuredJsonMock(...args),
 }));
 
 const { discoverPurchaseOptions, MAX_DISCOVERED_OFFERS } = await import(

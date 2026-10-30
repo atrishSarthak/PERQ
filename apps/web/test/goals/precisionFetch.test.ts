@@ -6,7 +6,7 @@ vi.mock("@perq/fetch", () => ({ fetchPage: (...args: unknown[]) => fetchPageMock
 
 const extractStructuredJsonMock = vi.fn();
 vi.mock("@perq/ai", () => ({
-  extractStructuredJson: (...args: unknown[]) => extractStructuredJsonMock(...args),
+  extractJsonWithFallback: (...args: unknown[]) => extractStructuredJsonMock(...args),
 }));
 
 const { refinePricesWithPrecisionFetch, MAX_PRECISION_FETCHES } = await import(

@@ -226,6 +226,11 @@ describe("computeAndPersistGoalRecommendation", () => {
 
     await computeAndPersistGoalRecommendation("u1", "g1", "buy tickets", transcript);
 
-    expect(understandGoalMock).toHaveBeenCalledWith("buy tickets", transcript, expect.any(String));
+    expect(understandGoalMock).toHaveBeenCalledWith(
+      "buy tickets",
+      transcript,
+      expect.any(String),
+      undefined
+    );
   });
 });
