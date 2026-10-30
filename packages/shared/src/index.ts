@@ -2,3 +2,5 @@
 // (typed client). Plain TS only: must bundle under Metro as well as Next.
 export * from "./auth";
 export * from "./cards";
+export * from "./quiz";
+export * from "./quizMigration";

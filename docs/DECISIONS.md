@@ -113,3 +113,11 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
 37. **Catalogue swap:** the seed marks every active card not in `cards.json` as discontinued (97 rows:
     the old 123-card unverified seed plus D15 web-search rows). Old ids are reused where it's the
     same card, so existing arsenal rows survive.
+38. **Quiz v2 assumptions** (in `packages/shared/src/quiz.ts`, shown in the breakdown): spend buckets
+    ₹0 / ₹500 / ₹2,000 / ₹4,500 / ₹8,000 a month; travel 0 / 1.5 / 4 / 8 trips a year × ₹12,000 a trip
+    (a return domestic flight + one hotel night); income eligibility uses the bottom of the user's range.
+    The quiz doesn't ask about "everything else" spend, so it's ₹0. Value is never inflated by a guess.
+39. **v1 → v2 migration** maps cards held, income (annual → monthly), the five spend answers, bills,
+    travel (the higher of flights/hotels), fee tolerance and priorities. Occupation, UPI spend and the
+    FD question weren't in v1: occupation defaults to salaried and UPI to ₹0, and the user is asked to
+    confirm them. Anything unreadable starts the quiz again; nothing crashes.
