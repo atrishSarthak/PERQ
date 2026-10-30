@@ -41,9 +41,14 @@ export interface ModelFunctionCall {
   args: Record<string, unknown>;
 }
 
+export interface ModelUsage {
+  inputTokens?: number;
+  outputTokens?: number;
+}
+
 export type ModelCallOutput =
-  | { type: "function_calls"; calls: ModelFunctionCall[] }
-  | { type: "text"; text: string };
+  | { type: "function_calls"; calls: ModelFunctionCall[]; usage?: ModelUsage }
+  | { type: "text"; text: string; usage?: ModelUsage };
 
 export interface ModelCallInput {
   systemPrompt: string;

@@ -8,3 +8,4 @@ export { searchWithFirecrawl } from "./firecrawlSearch";
 export { extractStructuredJsonGroq } from "./groq";
 export { searchWebWithFallback, extractJsonWithFallback } from "./multiProvider";
 export type { SearchFallbackKeys, ExtractionFallbackKeys } from "./multiProvider";
+export * from "./ember";

@@ -43,6 +43,13 @@
       "when": 1793387129666,
       "tag": "0005_ember_agent_default",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793388122592,
+      "tag": "0006_agent_runs",
+      "breakpoints": true
     }
   ]
 }

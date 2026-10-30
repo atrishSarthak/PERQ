@@ -1,5 +1,6 @@
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type {
+  agentRuns,
   cards,
   chatMessages,
   goalRecommendations,
@@ -18,6 +19,7 @@ export type RecommendationRow = InferSelectModel<typeof recommendations>;
 export type NewRecommendationRow = InferInsertModel<typeof recommendations>;
 export type UserCardArsenalRow = InferSelectModel<typeof userCardArsenal>;
 export type ChatMessageRow = InferSelectModel<typeof chatMessages>;
+export type AgentRunRow = InferSelectModel<typeof agentRuns>;
 
 export type GoalRow = InferSelectModel<typeof goals>;
 export type NewGoalRow = InferInsertModel<typeof goals>;

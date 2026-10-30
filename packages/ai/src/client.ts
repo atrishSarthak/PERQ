@@ -6,6 +6,7 @@ import type {
   ModelCaller,
 } from "./types";
 import { withModelFallback } from "./retry";
+import { EMBER_MODEL_CHAIN } from "./ember/models";
 
 // PRD §3/§15: pin the exact model identifier and confirm current free-tier
 // quota (RPM/RPD/TPM) in Google AI Studio at implementation time — don't
@@ -18,7 +19,8 @@ import { withModelFallback } from "./retry";
 // chaining them here (via withModelFallback) spreads load instead of
 // pinning every call to one model's shared free-tier quota. Still
 // overridable to a single pinned model via GEMINI_MODEL.
-const DEFAULT_MODEL_CHAIN = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+// Pinned in ember/models.ts (see the note there on why not the -latest aliases).
+const DEFAULT_MODEL_CHAIN = EMBER_MODEL_CHAIN;
 
 function resolveModelChain(modelName?: string): string[] {
   if (modelName) return [modelName];
@@ -102,10 +104,18 @@ export function createGeminiModelCaller(apiKey: string, modelName?: string): Mod
       })
     );
 
+    const usage = response.usageMetadata
+      ? {
+          inputTokens: response.usageMetadata.promptTokenCount ?? 0,
+          outputTokens: response.usageMetadata.candidatesTokenCount ?? 0,
+        }
+      : undefined;
+
     const functionCalls = response.functionCalls;
     if (functionCalls && functionCalls.length > 0) {
       return {
         type: "function_calls",
+        usage,
         calls: functionCalls.map((call) => ({
           name: call.name ?? "",
           args: (call.args ?? {}) as Record<string, unknown>,
@@ -113,6 +123,6 @@ export function createGeminiModelCaller(apiKey: string, modelName?: string): Mod
       };
     }
 
-    return { type: "text", text: response.text ?? "" };
+    return { type: "text", text: response.text ?? "", usage };
   };
 }

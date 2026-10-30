@@ -353,3 +353,26 @@ export const chatMessages = pgTable(
     userIdx: index("chat_messages_user_idx").on(t.userId, t.createdAt),
   })
 );
+
+// --- Ember agent runs (handoff §0.4) ---
+// One row per runEmber call, written by apps/web/lib/ember/agentRunLog.ts.
+// user_id is nullable: the public card finder runs Ember without a login.
+// steps: [{ tool, input, outputSummary, ms, status, narration }].
+export const agentRuns = pgTable(
+  "agent_runs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+    task: text("task").notNull(),
+    steps: jsonb("steps").notNull(),
+    model: text("model"),
+    inputTokens: integer("input_tokens"),
+    outputTokens: integer("output_tokens"),
+    status: text("status").notNull(), // 'ok' | 'fallback' | 'capped' | 'banned_phrase_fallback'
+    error: text("error"),
+    createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({
+    userCreatedIdx: index("agent_runs_user_created_idx").on(t.userId, t.createdAt),
+  })
+);

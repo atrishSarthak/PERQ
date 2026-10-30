@@ -43,3 +43,19 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
 14. **Web theme default is dark** regardless of OS setting; light applies only when picked with the toggle.
 15. **New Ember avatar** is an SVG (`public/ember-avatar.svg`, a chartreuse ember mark on navy) and
     replaces the old MIMIR PNG.
+16. **Pinned model: `gemini-3.5-flash`**, with `gemini-3.5-flash-lite` on 429. On 2026-10-31,
+    `gemini-flash-latest` (the old default) resolved to `gemini-3.8-flash` and took 40–134 s for a
+    one-word reply on our key; `gemini-3.5-flash` took ~2 s. The pin is in `packages/ai/src/ember/models.ts`,
+    and `GEMINI_MODEL` overrides it. I couldn't read free-tier RPM/RPD limits from the API, so check AI
+    Studio's rate-limit page before the demo.
+17. **`runEmber` sits beside `runGeminiAgent`.** It's a new runner in `packages/ai/src/ember/` (zod tool
+    inputs, permission levels, narration templates, banned-phrase regeneration, fallback, run logging).
+    `runGeminiAgent` stays only for the retired Feature 3 code; Feature 1 moves to `runEmber` at
+    checkpoint 12.
+18. **Permission refusal still shows the tool to the model.** Registered tools above `maxPermission`
+    are declared to the model, but the runner refuses their calls in code and returns a
+    "Permission denied" result. The model learns the limit, and the refusal is testable.
+19. **Banned phrases:** on a hit, Ember gets one regeneration with explicit instructions. If that still
+    fails, the template fallback is used (`status = banned_phrase_fallback`).
+20. **`agent_runs` logging is injected** (`logRun`), so `packages/ai` stays free of DB code and testable.
+    `user_id` is nullable for the public finder.

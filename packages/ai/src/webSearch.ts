@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type, type Schema } from "@google/genai";
 import type { ResponseSchema } from "./types";
 import { withModelFallback } from "./retry";
+import { EMBER_MODEL_CHAIN } from "./ember/models";
 
 // D15 (Feature 1 Engineering Plan amendment): a scoped, deliberate exception
 // to D8's "tools execute in-process, no network hop" boundary — this is the
@@ -16,7 +17,7 @@ import { withModelFallback } from "./retry";
 // comment for why two distinct model aliases (separate quota buckets) beat
 // one, and why the whole chain is skipped when a caller (or GEMINI_MODEL)
 // explicitly pins a single model.
-const DEFAULT_MODEL_CHAIN = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+const DEFAULT_MODEL_CHAIN = EMBER_MODEL_CHAIN;
 
 function resolveModelChain(modelName?: string): string[] {
   if (modelName) return [modelName];
