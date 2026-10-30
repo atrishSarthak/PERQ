@@ -12,8 +12,8 @@ import { requireAuth, isAuthed } from "@/lib/auth";
  * quiz-derived spend profile, and the spec is explicit this action must
  * never silently wipe it.
  */
-export async function POST() {
-  const authResult = await requireAuth();
+export async function POST(req: Request) {
+  const authResult = await requireAuth(req);
   if (!isAuthed(authResult)) return authResult;
   const user = authResult;
 

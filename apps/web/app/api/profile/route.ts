@@ -18,7 +18,7 @@ import {
  * failure, returns an explicit error and leaves prior state untouched (2D).
  */
 export async function PATCH(req: Request) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (!isAuthed(authResult)) return authResult;
   const user = authResult;
 

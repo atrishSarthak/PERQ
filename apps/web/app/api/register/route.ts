@@ -1,42 +1,24 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { db, users } from "@perq/db";
-import { eq } from "drizzle-orm";
+import { signupRequestSchema } from "@perq/shared";
+import { createUser, EmailTakenError } from "@/lib/users";
 
-// Minimal registration endpoint — necessary plumbing for email/password
-// auth (PRD §6 default) to be real, not a Feature 1 deliverable in its own
-// right. No admin panel, no extra fields — just enough to create an
-// authenticatable account.
+// Web registration (the web signs in through Auth.js right after). Shares
+// createUser with the mobile signup route so hashing never drifts.
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
-  const email = typeof body?.email === "string" ? body.email : null;
-  const password = typeof body?.password === "string" ? body.password : null;
-
-  if (!email || !password || password.length < 8) {
+  const parsed = signupRequestSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
     return NextResponse.json(
       { error: "Email and an 8+ character password are required." },
       { status: 400 }
     );
   }
-
-  const [existing] = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
-
-  if (existing) {
-    return NextResponse.json(
-      { error: "An account with this email already exists." },
-      { status: 409 }
-    );
+  try {
+    const user = await createUser(parsed.data.email, parsed.data.password);
+    return NextResponse.json({ user: { id: user.id, email: user.email } }, { status: 201 });
+  } catch (err) {
+    if (err instanceof EmailTakenError) {
+      return NextResponse.json({ error: err.message }, { status: 409 });
+    }
+    throw err;
   }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const [created] = await db
-    .insert(users)
-    .values({ email, passwordHash })
-    .returning({ id: users.id, email: users.email });
-
-  return NextResponse.json({ user: created }, { status: 201 });
 }

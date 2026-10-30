@@ -68,3 +68,21 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     column is kept for the breakdown notes.
 22. **`formatInr`** lives in finance-engine and is hand-rolled (₹1,23,456), because Hermes' `Intl`
     en-IN grouping isn't reliable in every Expo Go build.
+23. **Web upgraded to React 19.3** (handoff risk noted in the checkpoint 2 plan). Expo SDK 58 needs
+    React 19.3, and with a hoisted `node_modules` two Reacts broke 47 web tests. Web, `@perq/ui` and
+    mobile now share one `react@19.3.0`. All web tests pass and pages render; `expo-doctor` reports 20/20.
+24. **Mobile routes live in `apps/mobile/src/app`** (Expo SDK 58 convention). Auth gating uses
+    `Stack.Protected`; tabs are Home / Ember / Cards / Profile. Diagnostics opens from a long-press on
+    the Profile title, and also on the PERQ wordmark on the Welcome screen, so it works before sign-in.
+25. **SSE on the phone uses `expo/fetch`.** Its streaming `ReadableStream` body works in Expo Go on
+    SDK 58 (per the SDK docs), so no `react-native-sse` and no polling fallback.
+26. **CORS** is only on the mobile-facing API routes (`apps/web/middleware.ts`) and only matters for the
+    Expo web preview; native requests ignore CORS. These routes authenticate by Bearer token.
+27. **Email lookups are case-insensitive** and new emails are stored lowercased. Web register, Auth.js
+    Credentials and the mobile routes share `lib/users.ts`.
+28. **Icon/splash** are generated placeholders: a chartreuse flame on navy, with a `navy-900` splash.
+    Cabinet Grotesk Bold/Extrabold TTFs are bundled from Fontshare (ITF Free Font License, copy in
+    `apps/mobile/assets/fonts/`).
+29. **iPhone check deferred to the end.** I can't scan the QR, so checkpoint 7 was verified by an iOS
+    Metro export (bundles cleanly), `expo-doctor`, and the full sign-up → tabs → Diagnostics flow in
+    the Expo web preview against the real API. The on-device check is in RUNNING.md.

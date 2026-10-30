@@ -35,7 +35,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 export async function POST(req: Request) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (!isAuthed(authResult)) return authResult;
   const user = authResult;
 

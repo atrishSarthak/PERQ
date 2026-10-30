@@ -11,7 +11,7 @@ import { arsenalToggleSchema } from "@/lib/ember/arsenalSchema";
  * the schema — no select-then-branch race window.
  */
 export async function POST(req: Request) {
-  const authResult = await requireAuth();
+  const authResult = await requireAuth(req);
   if (!isAuthed(authResult)) return authResult;
   const user = authResult;
 

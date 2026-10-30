@@ -1,10 +1,9 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import bcrypt from "bcryptjs";
 import NextAuth, { type NextAuthResult } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { db, users, accounts, sessions, verificationTokens } from "@perq/db";
-import { eq } from "drizzle-orm";
+import { verifyCredentials } from "@/lib/users";
 
 // PRD §6: Auth.js (NextAuth), Drizzle adapter, Postgres-backed sessions.
 // Email/password plus Google OAuth (PRD §15).
@@ -51,19 +50,7 @@ const nextAuth: NextAuthResult = NextAuth({
         if (typeof email !== "string" || typeof password !== "string") {
           return null;
         }
-
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, email))
-          .limit(1);
-
-        if (!user || !user.passwordHash) return null;
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
-
-        return { id: user.id, email: user.email, name: user.name };
+        return verifyCredentials(email, password);
       },
     }),
   ],
