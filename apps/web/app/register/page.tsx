@@ -69,12 +69,12 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-accent px-3 py-2 font-body text-body text-white disabled:opacity-50"
+          className="rounded-md bg-primary px-3 py-2 font-body text-body text-white disabled:opacity-50"
         >
           {submitting ? "Creating account…" : "Create account"}
         </button>
       </form>
-      <a href="/login" className="font-body text-body-sm text-accent">
+      <a href="/login" className="font-body text-body-sm text-link">
         Already have an account? Sign in
       </a>
     </main>

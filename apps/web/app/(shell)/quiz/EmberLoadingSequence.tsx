@@ -13,16 +13,17 @@ export function EmberLoadingSequence({ steps }: { steps: NarrationStep[] }) {
     <div className="flex flex-col items-center gap-6 py-8 text-center">
       <div className="relative">
         <Image
-          src="/ember-avatar.png"
+          src="/ember-avatar.svg"
+          unoptimized
           alt=""
           width={96}
           height={96}
           className="h-16 w-16 rounded-full"
-          style={{ boxShadow: "0 0 0 3px var(--gold)" }}
+          style={{ boxShadow: "0 0 0 3px var(--ember)" }}
         />
       </div>
       <p className="font-display text-h2 text-text-primary">
-        <span className="text-gold">Ember</span> is on it
+        <span className="text-ember">Ember</span> is on it
       </p>
       <div className="w-full max-w-xs">
         <Narration steps={steps} />

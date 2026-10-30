@@ -78,7 +78,7 @@ export function CardRecommenderWidget({
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5">
             <p
               className="font-body text-[11px] font-semibold uppercase tracking-wide"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "var(--link)" }}
             >
               Top pick from Ember
             </p>
@@ -100,7 +100,7 @@ export function CardRecommenderWidget({
             <Link
               href="/results"
               className="mt-1 w-fit shrink-0 font-body text-sm font-semibold"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "var(--link)" }}
             >
               See all recommendations →
             </Link>
@@ -114,7 +114,7 @@ export function CardRecommenderWidget({
           <Link
             href="/results"
             className="w-fit font-body text-sm font-semibold"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "var(--link)" }}
           >
             See your results →
           </Link>
@@ -133,7 +133,7 @@ export function CardRecommenderWidget({
               type="button"
               onClick={() => setQuizOpen(true)}
               className="mt-2 w-fit rounded-2xl px-6 py-3.5 font-body text-[15px] font-semibold"
-              style={{ backgroundColor: "var(--gold)", color: "#161611" }}
+              style={{ backgroundColor: "var(--ember)", color: "var(--on-ember)" }}
             >
               Take the quiz
             </button>

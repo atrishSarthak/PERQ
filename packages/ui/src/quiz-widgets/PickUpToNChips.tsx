@@ -57,7 +57,7 @@ export function PickUpToNChips({
             className="rounded-md border px-3 py-1.5 font-body text-body-sm disabled:opacity-40"
             style={{
               borderColor: "var(--border)",
-              backgroundColor: selected ? "var(--accent)" : "var(--bg-base)",
+              backgroundColor: selected ? "var(--primary)" : "var(--bg-base)",
               color: selected ? "#fff" : "var(--text-primary)",
             }}
           >
@@ -73,7 +73,7 @@ export function PickUpToNChips({
           className="rounded-md border px-3 py-1.5 font-body text-body-sm"
           style={{
             borderColor: "var(--border)",
-            backgroundColor: noneSelected ? "var(--accent)" : "var(--bg-base)",
+            backgroundColor: noneSelected ? "var(--primary)" : "var(--bg-base)",
             color: noneSelected ? "#fff" : "var(--text-primary)",
           }}
         >

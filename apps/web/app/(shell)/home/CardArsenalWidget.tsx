@@ -55,7 +55,7 @@ export function CardArsenalWidget({ cards }: { cards: ArsenalCardData[] }) {
           <Link
             href="/results"
             className="rounded-xl px-[18px] py-2 font-body text-[13px] font-semibold"
-            style={{ color: "var(--gold)", border: "1px solid rgba(229,181,103,0.4)" }}
+            style={{ color: "var(--ember)", border: "1px solid color-mix(in srgb, var(--ember) 40%, transparent)" }}
           >
             Add your first card
           </Link>

@@ -56,8 +56,8 @@ export function ResultCard({
         backgroundColor: "var(--bg-surface)",
         borderStyle: "solid",
         borderWidth: isTopPick ? 3 : 1,
-        borderColor: isTopPick ? "var(--gold)" : "var(--border)",
-        boxShadow: isTopPick ? "0 0 0 4px rgba(184, 134, 11, 0.12)" : undefined,
+        borderColor: isTopPick ? "var(--ember)" : "var(--border)",
+        boxShadow: isTopPick ? "0 0 0 4px color-mix(in srgb, var(--ember) 14%, transparent)" : undefined,
       }}
     >
       <div className="flex flex-col gap-4 md:flex-row md:gap-6">
@@ -114,14 +114,14 @@ export function ResultCard({
         style={{ backgroundColor: "var(--bg-surface-2)" }}
       >
         <p>
-          <span className="font-bold text-accent">✦ Ember:</span>{" "}
+          <span className="font-bold text-link">✦ Ember:</span>{" "}
           {card.recommendation?.explanation ?? "Not yet scored for your profile."}
         </p>
         {card.recommendation && (
           <button
             type="button"
             onClick={askEmberToElaborate}
-            className="mt-2 font-body text-caption text-accent opacity-70 underline decoration-dotted underline-offset-2 hover:opacity-100"
+            className="mt-2 font-body text-caption text-link opacity-70 underline decoration-dotted underline-offset-2 hover:opacity-100"
           >
             Learn more
           </button>

@@ -70,7 +70,7 @@ export function Narration({
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "var(--text-body-size)",
-                color: isCurrent ? "var(--accent)" : "var(--text-secondary)",
+                color: isCurrent ? "var(--link)" : "var(--text-secondary)",
               }}
             >
               {!isCurrent && (

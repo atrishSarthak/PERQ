@@ -30,3 +30,16 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
    N cards", "Ember is writing your recommendation".
 10. **Goal advisor unlinked.** The home dashboard's Goal widget became a "Card Manager arrives next"
     placeholder. The `/goal` routes still exist but nothing links to them.
+11. **Token pipeline.** `packages/design-tokens/src/tokens.ts` is the only place colour values live.
+    `tokens.css` is generated from it (`pnpm --filter @perq/design-tokens build:css`), and a test fails
+    if the two drift. The test also checks WCAG AA for every text/background pair in both themes.
+12. **Extra derived tokens** (not in the handoff table, all AA-checked): `navy750 #222452` (nested surface
+    on dark, since navy-700 is reserved for borders), `ice100 #E9EEF2` and `lightBorder #D3DCE2` (light
+    theme surfaces/borders), `warning #E59A3B` (kept from the old semantic set), and a darker success,
+    warning and danger for the light theme so ₹ figures stay readable.
+13. **Old `--accent`/`--gold` vars replaced** with `--primary` (button fills), `--link` (link text, focus
+    rings) and `--ember` / `--on-ember` (Ember accent: chartreuse on dark, electric on light). User chat
+    bubbles moved from gold to electric, because chartreuse is never a large background.
+14. **Web theme default is dark** regardless of OS setting; light applies only when picked with the toggle.
+15. **New Ember avatar** is an SVG (`public/ember-avatar.svg`, a chartreuse ember mark on navy) and
+    replaces the old MIMIR PNG.

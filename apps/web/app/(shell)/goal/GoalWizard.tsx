@@ -152,7 +152,7 @@ export function GoalWizard() {
         <button
           onClick={() => void submitClarificationAnswer()}
           disabled={!answerText.trim()}
-          className="w-fit rounded-md bg-accent px-4 py-2 font-body text-body-sm text-white disabled:opacity-40"
+          className="w-fit rounded-md bg-primary px-4 py-2 font-body text-body-sm text-white disabled:opacity-40"
         >
           Continue
         </button>
@@ -215,7 +215,7 @@ export function GoalWizard() {
       <button
         onClick={() => void submit()}
         disabled={!goalText.trim()}
-        className="w-fit rounded-md bg-accent px-4 py-2 font-body text-body-sm text-white disabled:opacity-40"
+        className="w-fit rounded-md bg-primary px-4 py-2 font-body text-body-sm text-white disabled:opacity-40"
       >
         Ask Ember
       </button>
@@ -238,7 +238,7 @@ function ResultMessage({
       <p className="max-w-md font-body text-body text-text-secondary">{body}</p>
       <button
         onClick={onTryAgain}
-        className="rounded-md bg-accent px-3 py-1.5 font-body text-body-sm text-white"
+        className="rounded-md bg-primary px-3 py-1.5 font-body text-body-sm text-white"
       >
         Try again
       </button>

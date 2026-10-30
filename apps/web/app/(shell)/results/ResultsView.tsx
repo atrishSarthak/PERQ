@@ -281,7 +281,7 @@ export function ResultsView({
             </p>
             <button
               onClick={() => setFilters(emptyFilters())}
-              className="rounded-md bg-accent px-3 py-1.5 font-body text-body-sm text-white"
+              className="rounded-md bg-primary px-3 py-1.5 font-body text-body-sm text-white"
             >
               Clear filters
             </button>
@@ -291,8 +291,8 @@ export function ResultsView({
             {topPick && (
               <div>
                 <p
-                  className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-gold"
-                  style={{ backgroundColor: "rgba(184, 134, 11, 0.12)" }}
+                  className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-ember"
+                  style={{ backgroundColor: "color-mix(in srgb, var(--ember) 14%, transparent)" }}
                 >
                   <span aria-hidden="true">✦</span> Ember&apos;s Top Pick
                 </p>
@@ -408,8 +408,8 @@ function CheckboxRow({
           disabled ? "opacity-50" : ""
         }`}
         style={{
-          backgroundColor: checked ? "var(--accent)" : "var(--bg-base)",
-          borderColor: checked ? "var(--accent)" : "var(--border)",
+          backgroundColor: checked ? "var(--primary)" : "var(--bg-base)",
+          borderColor: checked ? "var(--primary)" : "var(--border)",
         }}
       >
         <input

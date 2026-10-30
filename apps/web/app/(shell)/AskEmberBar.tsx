@@ -26,7 +26,8 @@ export function AskEmberBar() {
         style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border)" }}
       >
         <Image
-          src="/ember-avatar.png"
+          src="/ember-avatar.svg"
+          unoptimized
           alt=""
           width={64}
           height={64}
@@ -50,7 +51,7 @@ export function AskEmberBar() {
           onClick={() => void handleSend()}
           disabled={sending || !input.trim()}
           className="shrink-0 rounded-full px-3 py-1 font-body text-body-sm font-semibold text-white disabled:opacity-40"
-          style={{ backgroundColor: "var(--accent)" }}
+          style={{ backgroundColor: "var(--primary)" }}
         >
           {sending ? "…" : "Send"}
         </button>

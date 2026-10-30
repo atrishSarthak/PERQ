@@ -18,7 +18,7 @@ export default async function LandingPage() {
       <div className="flex gap-3">
         <a
           href="/register"
-          className="rounded-md bg-accent px-4 py-2 font-body text-body text-white"
+          className="rounded-md bg-primary px-4 py-2 font-body text-body text-white"
         >
           Get started
         </a>

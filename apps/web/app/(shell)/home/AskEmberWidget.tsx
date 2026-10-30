@@ -27,18 +27,18 @@ export function AskEmberWidget() {
     >
       <span className="h-11 w-11 shrink-0" aria-hidden="true">
         <svg viewBox="0 0 52 52" width="100%" height="100%" fill="none">
-          <circle cx="26" cy="26" r="24.5" stroke="var(--gold)" strokeWidth="1.2" opacity="0.35" />
+          <circle cx="26" cy="26" r="24.5" stroke="var(--ember)" strokeWidth="1.2" opacity="0.35" />
           <path
             d="M10 26C14 18 20 15 26 15C32 15 38 18 42 26C38 34 32 37 26 37C20 37 14 34 10 26Z"
-            stroke="var(--gold)"
+            stroke="var(--ember)"
             strokeWidth="1.4"
           />
-          <circle cx="26" cy="26" r="6" stroke="var(--accent)" strokeWidth="1.4" />
-          <circle cx="26" cy="26" r="1.8" fill="var(--accent)" />
-          <path d="M6 20C3 16 3 10 6 6" stroke="var(--gold)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
-          <path d="M6 32C2 36 2 42 6 46" stroke="var(--gold)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
-          <path d="M46 20C49 16 49 10 46 6" stroke="var(--gold)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
-          <path d="M46 32C50 36 50 42 46 46" stroke="var(--gold)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
+          <circle cx="26" cy="26" r="6" stroke="var(--link)" strokeWidth="1.4" />
+          <circle cx="26" cy="26" r="1.8" fill="var(--link)" />
+          <path d="M6 20C3 16 3 10 6 6" stroke="var(--ember)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
+          <path d="M6 32C2 36 2 42 6 46" stroke="var(--ember)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
+          <path d="M46 20C49 16 49 10 46 6" stroke="var(--ember)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
+          <path d="M46 32C50 36 50 42 46 46" stroke="var(--ember)" strokeWidth="1.1" strokeLinecap="round" opacity="0.7" />
         </svg>
       </span>
 
@@ -63,7 +63,7 @@ export function AskEmberWidget() {
         </span>
         <span
           className="ml-3 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg"
-          style={{ backgroundColor: "var(--accent)" }}
+          style={{ backgroundColor: "var(--primary)" }}
           aria-hidden="true"
         >
           <span
@@ -72,7 +72,7 @@ export function AskEmberWidget() {
               height: 0,
               borderTop: "5px solid transparent",
               borderBottom: "5px solid transparent",
-              borderLeft: "7px solid #06131A",
+              borderLeft: "7px solid var(--on-primary)",
               marginLeft: "2px",
             }}
           />

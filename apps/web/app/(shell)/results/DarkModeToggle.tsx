@@ -15,12 +15,9 @@ export function DarkModeToggle() {
   const [theme, setTheme] = useState<"light" | "dark" | null>(null);
 
   useEffect(() => {
+    // Dark is PERQ's default theme (handoff §3) — light only when chosen.
     const stored = localStorage.getItem(STORAGE_KEY);
-    const prefersDark =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial: "light" | "dark" =
-      stored === "dark" || stored === "light" ? stored : prefersDark ? "dark" : "light";
+    const initial: "light" | "dark" = stored === "light" ? "light" : "dark";
     setTheme(initial);
   }, []);
 

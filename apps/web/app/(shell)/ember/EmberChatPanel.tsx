@@ -44,7 +44,8 @@ export function EmberChatPanel() {
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
             <Image
-              src="/ember-avatar.png"
+              src="/ember-avatar.svg"
+          unoptimized
               alt=""
               width={64}
               height={64}
@@ -105,13 +106,13 @@ export function EmberChatPanel() {
             placeholder="Why not the travel card?"
             disabled={sending}
             className="flex-1 rounded-md border-2 px-3 py-2 font-body text-body text-text-primary outline-none"
-            style={{ borderColor: "var(--gold)", backgroundColor: "var(--bg-base)" }}
+            style={{ borderColor: "var(--ember)", backgroundColor: "var(--bg-base)" }}
           />
           <button
             onClick={() => void handleSend()}
             disabled={sending || !input.trim()}
             className="rounded-md px-3 py-2 font-body text-body-sm font-semibold text-white disabled:opacity-40"
-            style={{ backgroundColor: "var(--gold)" }}
+            style={{ backgroundColor: "var(--ember)" }}
           >
             {sending ? "…" : "Send"}
           </button>

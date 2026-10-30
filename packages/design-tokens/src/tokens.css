@@ -1,101 +1,70 @@
 /*
- * PERQ Design Tokens — locked values from PERQ_Design_System.md.
- * Imported once, globally, by apps/web. Never invent a new color, font,
- * or spacing value outside this file (Design System doc, header note).
+ * GENERATED from packages/design-tokens/src/tokens.ts by
+ * `pnpm --filter @perq/design-tokens build:css`. Do not edit by hand.
+ *
+ * Dark is the default theme (handoff §3); light applies only when the user
+ * picks it (data-theme="light" on <html>).
  */
 
 :root {
-  /* Primitives (§2, locked) */
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-accent: #00a1ff;
-  /* Deliberate, explicit exception to "never invent a color outside this
-     system" — added at the product owner's request specifically for Ember
-     "brand moment" highlights (originally the results page's "Ember's Top
-     Pick" badge, now also the dashboard). Constant across light/dark, same
-     pattern as --color-accent. Updated to #E5B567 (from #B8860B) to match
-     the pixel-accurate PERQ Dashboard mockup (design-reference/) — the
-     same conceptual token, refined value, applied globally rather than
-     left inconsistent between pages. */
-  --color-gold: #e5b567;
-
-  /* Semantic tokens — light mode default (§2) */
-  --bg-base: #ffffff;
-  --bg-surface: #f7f7f8;
-  /* A further step beyond --bg-surface, for content nested one level
-     deeper than a card/panel (e.g. the Ember explanation box sitting
-     inside a result card) — never a third independent color, always one
-     more step in the same base->surface->surface-2 hierarchy. */
-  --bg-surface-2: #eef0f2;
-  --text-primary: #000000;
-  --text-secondary: #5c5c63;
-  --accent: #00a1ff;
-  --gold: var(--color-gold);
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --border: #e5e5e8;
-
-  /* Typography scale (§3 marks this "proposed," not locked — widened here
-     for more heading/body contrast; body sizes untouched since shrinking
-     them would cost readability, not gain hierarchy). */
-  --font-display: "Cabinet Grotesk", sans-serif;
+  --bg-base: #12132F;
+  --bg-surface: #1B1C45;
+  --bg-surface-2: #222452;
+  --border: #2A2C5E;
+  --text-primary: #E2EAEE;
+  --text-secondary: #B9C7CF;
+  --primary: #2B4A8E;
+  --primary-pressed: #223B72;
+  --on-primary: #FFFFFF;
+  --link: #5B7FD1;
+  --ember: #E0D847;
+  --ember-pressed: #B8B01F;
+  --on-ember: #1B1C45;
+  --success: #3FB68B;
+  --warning: #E59A3B;
+  --danger: #E5484D;
+  --font-display: "Cabinet Grotesk", "Lexend Deca", sans-serif;
   --font-body: "Lexend Deca", sans-serif;
-
-  --text-display-size: 56px; /* top of the doc's stated 40-56px range */
+  --text-display-size: 56px;
   --text-h1-size: 36px;
   --text-h2-size: 26px;
   --text-body-lg-size: 18px;
   --text-body-size: 16px;
   --text-body-sm-size: 14px;
   --text-caption-size: 12px;
-
-  /* Spacing scale — 4px base unit (§4) */
+  --space-0: 0px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+  --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-
-  /* Radius (§4) — rounded but not pill-shaped */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
+  color-scheme: dark;
 }
 
-/* Dark mode via prefers-color-scheme, honoring an explicit override (§2) */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg-base: #000000;
-    /* Was #0d0d0f — barely a step above pure black, so cards read as
-       outlined shapes blending into the page rather than separate
-       objects. #18181b is a real, perceptible step up; borders can stay
-       thin/low-contrast because this background difference now does most
-       of the separation work. */
-    --bg-surface: #18181b;
-    --bg-surface-2: #232326;
-    --text-primary: #ffffff;
-    --text-secondary: #a6a6ad;
-    --accent: #00a1ff;
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --border: #2c2c30;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg-base: #000000;
-  --bg-surface: #18181b;
-  --bg-surface-2: #232326;
-  --text-primary: #ffffff;
-  --text-secondary: #a6a6ad;
-  --accent: #00a1ff;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --border: #2c2c30;
+:root[data-theme="light"] {
+  --bg-base: #F4F7F9;
+  --bg-surface: #FFFFFF;
+  --bg-surface-2: #E9EEF2;
+  --border: #D3DCE2;
+  --text-primary: #1B1C45;
+  --text-secondary: #5A6378;
+  --primary: #2B4A8E;
+  --primary-pressed: #223B72;
+  --on-primary: #FFFFFF;
+  --link: #2B4A8E;
+  --ember: #2B4A8E;
+  --ember-pressed: #223B72;
+  --on-ember: #FFFFFF;
+  --success: #2A8F6A;
+  --warning: #B8741F;
+  --danger: #C9373C;
+  color-scheme: light;
 }

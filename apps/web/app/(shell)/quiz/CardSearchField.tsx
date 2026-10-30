@@ -126,7 +126,7 @@ export function CardSearchField({
         className="rounded-md border px-3 py-1.5 font-body text-body-sm"
         style={{
           borderColor: "var(--border)",
-          backgroundColor: value.length === 0 ? "var(--accent)" : "var(--bg-base)",
+          backgroundColor: value.length === 0 ? "var(--primary)" : "var(--bg-base)",
           color: value.length === 0 ? "#fff" : "var(--text-primary)",
         }}
       >
@@ -214,7 +214,7 @@ function CardTile({
       onClick={onClick}
       className="relative rounded-md text-left outline-none"
       style={{
-        boxShadow: selected ? "0 0 0 2px var(--accent)" : "0 0 0 1px var(--border)",
+        boxShadow: selected ? "0 0 0 2px var(--link)" : "0 0 0 1px var(--border)",
         borderRadius: "var(--radius-md)",
       }}
     >
@@ -223,7 +223,7 @@ function CardTile({
         <span
           aria-hidden="true"
           className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white"
-          style={{ backgroundColor: "var(--accent)" }}
+          style={{ backgroundColor: "var(--primary)" }}
         >
           ✓
         </span>
@@ -237,7 +237,7 @@ function CardTile({
         </span>
       )}
       {actionLabel && (
-        <p className="mt-1 font-body text-caption font-semibold text-accent">{actionLabel}</p>
+        <p className="mt-1 font-body text-caption font-semibold text-link">{actionLabel}</p>
       )}
     </button>
   );

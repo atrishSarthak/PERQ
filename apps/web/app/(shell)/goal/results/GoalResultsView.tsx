@@ -80,8 +80,8 @@ export function GoalResultsView({
         className="rounded-lg p-4 md:p-6"
         style={{
           backgroundColor: "var(--bg-surface)",
-          border: "3px solid var(--gold)",
-          boxShadow: "0 0 0 4px rgba(184, 134, 11, 0.12)",
+          border: "3px solid var(--ember)",
+          boxShadow: "0 0 0 4px color-mix(in srgb, var(--ember) 14%, transparent)",
         }}
       >
         <p className="font-display text-display font-bold text-text-primary">
@@ -95,7 +95,7 @@ export function GoalResultsView({
           style={{ backgroundColor: "var(--bg-surface-2)" }}
         >
           <p>
-            <span className="font-bold text-accent">✦ Ember:</span> {explanation}
+            <span className="font-bold text-link">✦ Ember:</span> {explanation}
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function GoalResultsView({
             style={{ backgroundColor: "var(--bg-surface-2)" }}
           >
             <p>
-              <span className="font-bold text-accent">🏷 Ember found a live offer:</span>{" "}
+              <span className="font-bold text-link">🏷 Ember found a live offer:</span>{" "}
               {cardOfferCitationUrl ? (
                 <a
                   href={cardOfferCitationUrl}
@@ -160,7 +160,7 @@ export function GoalResultsView({
 
       <Link
         href="/goal"
-        className="w-fit font-body text-body-sm font-semibold text-accent"
+        className="w-fit font-body text-body-sm font-semibold text-link"
       >
         Ask Ember about something else →
       </Link>

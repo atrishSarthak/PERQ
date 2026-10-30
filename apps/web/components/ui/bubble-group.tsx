@@ -20,13 +20,14 @@ export const BubbleGroup = React.forwardRef<HTMLDivElement, BubbleGroupProps>(
       {role === "assistant" && (
         <div className="flex items-center gap-1.5">
           <Image
-            src="/ember-avatar.png"
+            src="/ember-avatar.svg"
+          unoptimized
             alt=""
             width={40}
             height={40}
             className="h-4 w-4 rounded-full"
           />
-          <span className="font-display text-body-sm text-accent">Ember</span>
+          <span className="font-display text-body-sm text-link">Ember</span>
         </div>
       )}
       <div className={cn("flex w-full flex-col gap-1", role === "user" ? "items-end" : "items-start")}>

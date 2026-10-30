@@ -49,7 +49,7 @@ export default function LoginPage() {
         {error && <p className="text-body-sm text-danger">{error}</p>}
         <button
           type="submit"
-          className="rounded-md bg-accent px-3 py-2 font-body text-white"
+          className="rounded-md bg-primary px-3 py-2 font-body text-white"
         >
           Sign in
         </button>
@@ -84,7 +84,7 @@ export default function LoginPage() {
         </svg>
         Continue with Google
       </button>
-      <a href="/register" className="font-body text-body-sm text-accent">
+      <a href="/register" className="font-body text-body-sm text-link">
         New here? Create an account
       </a>
     </main>

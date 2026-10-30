@@ -7,14 +7,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 // Both roles render as boxed bubbles, color-coded by voice: Ember's
-// replies in accent blue (the "Ember-attributed" color used everywhere
-// else — the "✦ Ember:" label, narration), the user's own messages in
-// gold, so the two voices are visually distinct at a glance.
-const messageVariants = cva("max-w-[85%] rounded-lg px-3 py-2 font-body text-body text-white", {
+// replies on a raised surface, the user's own messages in the primary
+// electric blue, so the two voices are visually distinct at a glance.
+// (Chartreuse is an accent only — never a large background, handoff §3.)
+const messageVariants = cva("max-w-[85%] rounded-lg px-3 py-2 font-body text-body", {
   variants: {
     role: {
-      user: "self-end",
-      assistant: "self-start",
+      user: "self-end text-on-primary",
+      assistant: "self-start text-text-primary",
     },
   },
   defaultVariants: { role: "assistant" },
@@ -23,8 +23,8 @@ const messageVariants = cva("max-w-[85%] rounded-lg px-3 py-2 font-body text-bod
 // Ember's replies are real Markdown (headings, bold, lists — Gemini writes
 // them that way on its own) — rendering `content` as plain text left the
 // raw `###`/`**`/`*` syntax visible. These overrides keep every element
-// legible against the bubble's solid color background (white text
-// throughout, tight spacing so it still reads like a chat bubble rather
+// legible against the bubble's solid color background (inheriting the
+// bubble's text colour, tight spacing so it still reads like a chat bubble rather
 // than a rendered document).
 const markdownComponents = {
   p: ({ children }: { children?: React.ReactNode }) => (
@@ -77,7 +77,7 @@ export const Message = React.forwardRef<HTMLDivElement, MessageProps>(
       ref={ref}
       className={cn(messageVariants({ role }), className)}
       style={{
-        backgroundColor: role === "user" ? "var(--gold)" : "var(--accent)",
+        backgroundColor: role === "user" ? "var(--primary)" : "var(--bg-surface-2)",
         ...style,
       }}
       {...props}

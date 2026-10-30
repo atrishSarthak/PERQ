@@ -155,7 +155,7 @@ export function QuizWizard({
             <p className="font-body text-body text-danger">{errorMessage}</p>
             <button
               onClick={() => setPhase("answering")}
-              className="rounded-md bg-accent px-3 py-1.5 font-body text-body-sm text-white"
+              className="rounded-md bg-primary px-3 py-1.5 font-body text-body-sm text-white"
             >
               Back to quiz
             </button>
@@ -179,7 +179,7 @@ export function QuizWizard({
                 className="h-full rounded-full transition-all"
                 style={{
                   width: `${((index + 1) / QUESTIONS.length) * 100}%`,
-                  backgroundColor: "var(--accent)",
+                  backgroundColor: "var(--primary)",
                 }}
               />
             </div>
@@ -231,7 +231,7 @@ export function QuizWizard({
             <button
               onClick={goNext}
               disabled={!answered}
-              className="rounded-md bg-accent px-3 py-1.5 font-body text-body-sm text-white disabled:opacity-40"
+              className="rounded-md bg-primary px-3 py-1.5 font-body text-body-sm text-white disabled:opacity-40"
             >
               {isLast ? "Submit" : "Next"}
             </button>

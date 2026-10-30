@@ -30,7 +30,7 @@ export function SingleSelectScale({ options, value, onChange, name }: SingleSele
           className="rounded-md border px-4 py-2 font-body text-body"
           style={{
             borderColor: "var(--border)",
-            backgroundColor: value === opt.value ? "var(--accent)" : "var(--bg-base)",
+            backgroundColor: value === opt.value ? "var(--primary)" : "var(--bg-base)",
             color: value === opt.value ? "#fff" : "var(--text-primary)",
           }}
         >
