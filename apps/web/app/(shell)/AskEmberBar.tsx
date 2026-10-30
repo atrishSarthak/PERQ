@@ -2,16 +2,16 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { useMimirChat } from "./mimir/MimirChatContext";
+import { useEmberChat } from "./ember/EmberChatContext";
 
 /**
  * Global quick-ask entry point, centered in the top bar. Sending a message
- * here opens the shared MimirChatPanel (right side of the shell) and the
+ * here opens the shared EmberChatPanel (right side of the shell) and the
  * conversation continues there — this bar doesn't hold its own reply UI.
  */
-export function AskMimirBar() {
+export function AskEmberBar() {
   const [input, setInput] = useState("");
-  const { send, sending } = useMimirChat();
+  const { send, sending } = useEmberChat();
 
   async function handleSend() {
     const text = input;
@@ -26,7 +26,7 @@ export function AskMimirBar() {
         style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border)" }}
       >
         <Image
-          src="/mimir-avatar.png"
+          src="/ember-avatar.png"
           alt=""
           width={64}
           height={64}
@@ -42,7 +42,7 @@ export function AskMimirBar() {
               void handleSend();
             }
           }}
-          placeholder="Ask MIMIR anything…"
+          placeholder="Ask Ember anything…"
           disabled={sending}
           className="min-w-0 flex-1 bg-transparent font-body text-body-sm text-text-primary outline-none placeholder:text-text-secondary"
         />

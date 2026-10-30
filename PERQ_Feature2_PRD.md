@@ -10,9 +10,9 @@ Last updated: 2026-08-12
 
 ## 1. Feature Context
 
-PERQ's Feature 1 (Card Recommender) established a user's card arsenal and profile. Feature 2 takes MIMIR out of the web app and into the browser: a Chrome extension that watches the pages a user is actually shopping on — not a hardcoded list of supported sites — detects offers and payment options in real time, and recommends which card or payment method to use, cross-referenced against the arsenal and profile Feature 1 already built.
+PERQ's Feature 1 (Card Recommender) established a user's card arsenal and profile. Feature 2 takes Ember out of the web app and into the browser: a Chrome extension that watches the pages a user is actually shopping on — not a hardcoded list of supported sites — detects offers and payment options in real time, and recommends which card or payment method to use, cross-referenced against the arsenal and profile Feature 1 already built.
 
-This is the first of the two "hero moment" features the product handbook calls out — MIMIR *doing* something (reading a real page, acting on it) rather than answering a question a user typed. Feature 1 was the conversational exception (a quiz); this one is where "agentic, not conversational" actually has to show up in the product.
+This is the first of the two "hero moment" features the product handbook calls out — Ember *doing* something (reading a real page, acting on it) rather than answering a question a user typed. Feature 1 was the conversational exception (a quiz); this one is where "agentic, not conversational" actually has to show up in the product.
 
 **Relationship to Feature 1:** this feature is additive. It reads the same `user_profile` and `user_card_arsenal` tables, extends the profile with new fields, and reuses the AI client and design tokens from `packages/ai` and `packages/design-tokens`. It does not change anything already shipped in Feature 1.
 
@@ -25,7 +25,7 @@ This is the first of the two "hero moment" features the product handbook calls o
 - Detect offers, discounts, cashback, and BNPL/EMI options on any shopping page the user visits, without requiring per-site engineering.
 - Keep the cost of "watching every page" near zero by scanning locally first, and only escalating to an AI call when there's a real signal.
 - Recommend one specific action — which card to use, or to avoid stacking another EMI — grounded in the user's actual arsenal and financial context, not a generic "here are some offers."
-- Feel like MIMIR is genuinely watching out for the user in the background, consistent with the "agentic, not conversational" positioning — not a tool the user has to remember to open.
+- Feel like Ember is genuinely watching out for the user in the background, consistent with the "agentic, not conversational" positioning — not a tool the user has to remember to open.
 
 **Non-Goals**
 
@@ -85,7 +85,7 @@ offer_recommendations
   page_url, recommended_action          -- e.g. "use_card", "avoid_bnpl"
   recommended_card_id  nullable (fk -> cards)
   explanation           text
-  agent                 text default 'MIMIR'
+  agent                 text default 'Ember'
   created_at
 ```
 
@@ -132,12 +132,12 @@ Given an extracted offer or BNPL badge, the system must reason over the user's c
 
 ---
 
-## 10. MIMIR in the Extension — UI & Interaction Model
+## 10. Ember in the Extension — UI & Interaction Model
 
 - **Scan trigger:** automatic. The content script scans every page as the user browses (§7); this is a deliberate choice to match "PERQ lives wherever you're shopping" rather than requiring the user to remember to click something.
 - **Surface:** an injected in-page widget (Shadow DOM, React), appearing near the offer it found — not a toolbar-popup-only experience. It must be dismissible and must not break the host page's layout.
-- **Show the work:** consistent with the brand principle from the Design System doc, the widget should narrate what MIMIR is doing when there's a visible delay (e.g. "MIMIR is checking this offer") rather than a silent spinner.
-- **Depth (proposed default, adjustable):** the widget shows a grounded one-to-two-line reasoning and a single recommended action — not a full chat. An "Ask MIMIR more" link opens the existing Feature 1 follow-up chat in the web app, passed this page's offer as extra context, rather than building a second, cramped chat surface inside the extension. This keeps scope tight and reuses Feature 1 infrastructure instead of duplicating it.
+- **Show the work:** consistent with the brand principle from the Design System doc, the widget should narrate what Ember is doing when there's a visible delay (e.g. "Ember is checking this offer") rather than a silent spinner.
+- **Depth (proposed default, adjustable):** the widget shows a grounded one-to-two-line reasoning and a single recommended action — not a full chat. An "Ask Ember more" link opens the existing Feature 1 follow-up chat in the web app, passed this page's offer as extra context, rather than building a second, cramped chat surface inside the extension. This keeps scope tight and reuses Feature 1 infrastructure instead of duplicating it.
 
 ---
 
@@ -177,7 +177,7 @@ Feature 2 needs self-reported financial context beyond Feature 1's quiz — spec
 - [ ] Content script runs on page load, matches the signal list in §7, and escalates to an AI extraction call only on a positive match.
 - [ ] Extraction results are cached per page and reused on repeat visits without a redundant Gemini call.
 - [ ] A logged-in web app session is recognized by the extension automatically, with no separate login step.
-- [ ] The injected widget appears near a detected offer, narrates what MIMIR is doing, and recommends one specific grounded action (a card to use, or a caution against stacking BNPL).
+- [ ] The injected widget appears near a detected offer, narrates what Ember is doing, and recommends one specific grounded action (a card to use, or a caution against stacking BNPL).
 - [ ] The recommendation correctly reflects the user's actual card arsenal and financial context — verified by testing with two different profiles on the same page and confirming different recommendations where warranted.
 - [ ] BNPL detection is badge-level only; no attempt to read cross-origin iframe content.
 - [ ] The Gemini API key is never present in the extension bundle — verified by inspecting the unpacked extension's source.

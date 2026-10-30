@@ -15,17 +15,17 @@ describe("runGeminiAgent", () => {
   it("returns final text immediately when the model calls no tools", async () => {
     const callModel: ModelCaller = vi.fn().mockResolvedValue({
       type: "text",
-      text: "MIMIR recommends the Axis Airtel card.",
+      text: "Ember recommends the Axis Airtel card.",
     });
 
     const result = await runGeminiAgent({
-      systemPrompt: "You are MIMIR.",
+      systemPrompt: "You are Ember.",
       history: [],
       tools: [],
       callModel,
     });
 
-    expect(result.finalText).toBe("MIMIR recommends the Axis Airtel card.");
+    expect(result.finalText).toBe("Ember recommends the Axis Airtel card.");
     expect(result.roundsUsed).toBe(1);
     expect(result.cappedOut).toBe(false);
     expect(callModel).toHaveBeenCalledTimes(1);
@@ -44,7 +44,7 @@ describe("runGeminiAgent", () => {
       .mockResolvedValueOnce({ type: "text", text: "done" });
 
     const result = await runGeminiAgent({
-      systemPrompt: "You are MIMIR.",
+      systemPrompt: "You are Ember.",
       history: [],
       tools,
       callModel,

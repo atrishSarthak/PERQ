@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, cards, userCardArsenal } from "@perq/db";
 import { requireAuth, isAuthed } from "@/lib/auth";
-import { arsenalToggleSchema } from "@/lib/mimir/arsenalSchema";
+import { arsenalToggleSchema } from "@/lib/ember/arsenalSchema";
 
 /**
  * POST /api/arsenal/toggle — PRD §12: one mutation, two entry points (quiz

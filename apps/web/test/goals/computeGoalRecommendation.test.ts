@@ -171,7 +171,7 @@ describe("computeAndPersistGoalRecommendation", () => {
     understandGoalMock.mockResolvedValue(OK_UNDERSTANDING);
     discoverPurchaseOptionsMock.mockResolvedValue(ONE_OFFER);
     runGeminiAgentMock.mockResolvedValue({
-      finalText: "MIMIR recommends Flipkart for this one.",
+      finalText: "Ember recommends Flipkart for this one.",
       roundsUsed: 1,
       cappedOut: false,
     });
@@ -183,7 +183,7 @@ describe("computeAndPersistGoalRecommendation", () => {
       goalId: "g1",
       userId: "u1",
       recommendedChannel: "Flipkart",
-      explanation: "MIMIR recommends Flipkart for this one.",
+      explanation: "Ember recommends Flipkart for this one.",
     });
   });
 
@@ -196,7 +196,7 @@ describe("computeAndPersistGoalRecommendation", () => {
 
     expect(result.outcome).toBe("success");
     const inserted = dbState.insertedGoalRec as { explanation: string };
-    expect(inserted.explanation).toContain("MIMIR recommends buying from");
+    expect(inserted.explanation).toContain("Ember recommends buying from");
   });
 
   it("carries a citation-backed card offer note through to the persisted row", async () => {

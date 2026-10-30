@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { NarrationStep } from "@perq/ui";
 import { parseSSEStream } from "../quiz/parseSSEStream";
-import { MimirLoadingSequence } from "../quiz/MimirLoadingSequence";
+import { EmberLoadingSequence } from "../quiz/EmberLoadingSequence";
 
 interface ClarificationTurn {
   question: string;
@@ -31,13 +31,13 @@ type GoalSSEEvent =
 
 /**
  * A dedicated goal entry point (not buried in the follow-up chat),
- * placeholder copy in MIMIR's voice, transitioning into the same branded
- * narrated-loading pattern as the quiz (reusing MimirLoadingSequence/
+ * placeholder copy in Ember's voice, transitioning into the same branded
+ * narrated-loading pattern as the quiz (reusing EmberLoadingSequence/
  * parseSSEStream as-is). On a real recommendation, redirects to
  * /goal/results since goal_recommendations rows are DB-persisted, not just
  * client state.
  *
- * v2 (open-ended web-search redesign): when the goal is ambiguous, MIMIR
+ * v2 (open-ended web-search redesign): when the goal is ambiguous, Ember
  * asks a single clarifying follow-up question inline instead of declining
  * and asking the user to retype — the "clarifying" phase captures the
  * answer and resubmits, continuing the same session via goalId, up to
@@ -127,13 +127,13 @@ export function GoalWizard() {
   }
 
   if (phase === "submitting") {
-    return <MimirLoadingSequence steps={narrationSteps} />;
+    return <EmberLoadingSequence steps={narrationSteps} />;
   }
 
   if (phase === "clarifying") {
     return (
       <div className="flex flex-col gap-4">
-        <p className="font-body text-body-sm text-text-secondary">MIMIR needs one more thing:</p>
+        <p className="font-body text-body-sm text-text-secondary">Ember needs one more thing:</p>
         <h1 className="font-display text-h2 text-text-primary">{currentQuestion}</h1>
         <textarea
           value={answerText}
@@ -163,8 +163,8 @@ export function GoalWizard() {
   if (phase === "unsupported") {
     return (
       <ResultMessage
-        heading="Not quite in MIMIR's lane yet"
-        body="MIMIR helps you decide where and how to buy something — this doesn't look like that kind of question yet. Try rephrasing it as a purchase you're trying to make."
+        heading="Not quite in Ember's lane yet"
+        body="Ember helps you decide where and how to buy something — this doesn't look like that kind of question yet. Try rephrasing it as a purchase you're trying to make."
         onTryAgain={reset}
       />
     );
@@ -174,7 +174,7 @@ export function GoalWizard() {
     return (
       <ResultMessage
         heading="Nothing found"
-        body="MIMIR searched the web for this, but couldn't find a matching listing with a real price right now. Try again with more specific details, or check back later."
+        body="Ember searched the web for this, but couldn't find a matching listing with a real price right now. Try again with more specific details, or check back later."
         onTryAgain={reset}
       />
     );
@@ -183,7 +183,7 @@ export function GoalWizard() {
   if (phase === "total_failure" || phase === "error") {
     return (
       <ResultMessage
-        heading="MIMIR couldn't complete this search right now"
+        heading="Ember couldn't complete this search right now"
         body={errorMessage ?? "Something went wrong searching for this. Try again in a moment."}
         onTryAgain={reset}
       />
@@ -196,7 +196,7 @@ export function GoalWizard() {
         What are you trying to buy?
       </h1>
       <p className="font-body text-body-sm text-text-secondary">
-        MIMIR searches the web and tells you where to buy and how to pay — one clear answer, not
+        Ember searches the web and tells you where to buy and how to pay — one clear answer, not
         ten open tabs.
       </p>
       <textarea
@@ -217,7 +217,7 @@ export function GoalWizard() {
         disabled={!goalText.trim()}
         className="w-fit rounded-md bg-accent px-4 py-2 font-body text-body-sm text-white disabled:opacity-40"
       >
-        Ask MIMIR
+        Ask Ember
       </button>
     </div>
   );

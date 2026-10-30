@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { TopBar } from "./TopBar";
-import { MimirChatProvider } from "./mimir/MimirChatContext";
-import { MimirChatPanel } from "./mimir/MimirChatPanel";
+import { EmberChatProvider } from "./ember/EmberChatContext";
+import { EmberChatPanel } from "./ember/EmberChatPanel";
 
 /**
  * Wraps every authenticated page (home, quiz, results) with a persistent
- * top bar (PERQ logo + sign out) and the MIMIR chat panel. The auth check
+ * top bar (PERQ logo + sign out) and the Ember chat panel. The auth check
  * lives here once, instead of duplicated per page.
  */
 export default async function ShellLayout({ children }: { children: React.ReactNode }) {
@@ -16,12 +16,12 @@ export default async function ShellLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <MimirChatProvider>
+    <EmberChatProvider>
       <div className="flex min-h-screen flex-col">
         <TopBar />
         <div className="flex-1">{children}</div>
       </div>
-      <MimirChatPanel />
-    </MimirChatProvider>
+      <EmberChatPanel />
+    </EmberChatProvider>
   );
 }

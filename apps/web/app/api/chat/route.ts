@@ -3,10 +3,10 @@ import { and, asc, count, eq } from "drizzle-orm";
 import { db, cards, chatMessages, type Card as DbCard } from "@perq/db";
 import { runGeminiAgent, createGeminiModelCaller } from "@perq/ai";
 import { requireAuth, isAuthed } from "@/lib/auth";
-import { chatMessageSchema } from "@/lib/mimir/chatMessageSchema";
-import { buildGroundingContext } from "@/lib/mimir/chatContext";
-import { buildChatSystemPrompt } from "@/lib/mimir/prompt";
-import { createGetCardDetailsTool } from "@/lib/mimir/tools";
+import { chatMessageSchema } from "@/lib/ember/chatMessageSchema";
+import { buildGroundingContext } from "@/lib/ember/chatContext";
+import { buildChatSystemPrompt } from "@/lib/ember/prompt";
+import { createGetCardDetailsTool } from "@/lib/ember/tools";
 
 export const dynamic = "force-dynamic";
 
@@ -108,12 +108,12 @@ export async function POST(req: Request) {
           // Post-outside-voice decision: explicit error, the failed turn is
           // NOT persisted (it would pollute D2's context reconstruction on
           // retry), user can just retry with the same message.
-          emit({ type: "error", message: "MIMIR couldn't respond — try again." });
+          emit({ type: "error", message: "Ember couldn't respond — try again." });
           return;
         }
 
         if (!agentResult.finalText || agentResult.cappedOut) {
-          emit({ type: "error", message: "MIMIR couldn't respond — try again." });
+          emit({ type: "error", message: "Ember couldn't respond — try again." });
           return;
         }
 

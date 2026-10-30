@@ -80,7 +80,7 @@ export async function computeAndPersistGoalRecommendation(
   const firecrawlApiKey = process.env.FIRECRAWL_API_KEY;
   const groqApiKey = process.env.GROQ_API_KEY;
 
-  onNarrationStep?.("MIMIR is figuring out what you mean");
+  onNarrationStep?.("Ember is figuring out what you mean");
   const understanding = await understandGoal(goalText, clarification, apiKey, groqApiKey);
 
   if (!understanding.ok) {
@@ -96,7 +96,7 @@ export async function computeAndPersistGoalRecommendation(
   const { category, facts } = understanding;
   await db.update(goals).set({ category }).where(eq(goals.id, goalId));
 
-  onNarrationStep?.("MIMIR is searching the web");
+  onNarrationStep?.("Ember is searching the web");
   let discovery;
   try {
     discovery = await discoverPurchaseOptions(facts, apiKey, firecrawlApiKey, groqApiKey);
@@ -115,7 +115,7 @@ export async function computeAndPersistGoalRecommendation(
     return { outcome: "no_listings_found", offersChecked: [] };
   }
 
-  onNarrationStep?.("MIMIR is checking real listings");
+  onNarrationStep?.("Ember is checking real listings");
   const refinedOffers = await refinePricesWithPrecisionFetch(
     discovery.offers,
     apiKey,
@@ -138,7 +138,7 @@ export async function computeAndPersistGoalRecommendation(
     return { outcome: "no_listings_found", offersChecked };
   }
 
-  onNarrationStep?.("MIMIR is factoring in your cards");
+  onNarrationStep?.("Ember is factoring in your cards");
 
   const [profileRow] = await db
     .select({ answers: userProfile.answers })
@@ -181,7 +181,7 @@ export async function computeAndPersistGoalRecommendation(
   try {
     const agentResult = await runGeminiAgent({
       systemPrompt: GOAL_NARRATION_SYSTEM_PROMPT,
-      history: [{ role: "user", content: "Write MIMIR's recommendation for this goal now." }],
+      history: [{ role: "user", content: "Write Ember's recommendation for this goal now." }],
       tools,
       callModel: createGeminiModelCaller(apiKey),
       onStep: (event) => {
@@ -215,7 +215,7 @@ export async function computeAndPersistGoalRecommendation(
       billingCycleNote: winner.billingCycleNote,
       explanation,
       channelsChecked: offersChecked,
-      agent: "MIMIR",
+      agent: "Ember",
     })
     .returning({ id: goalRecommendations.id });
 

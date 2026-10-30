@@ -14,59 +14,59 @@ describe("Narration", () => {
   });
 
   it("renders an aria-live=polite region (DR9)", () => {
-    const steps: NarrationStep[] = [{ id: "1", label: "MIMIR checked your profile" }];
+    const steps: NarrationStep[] = [{ id: "1", label: "Ember checked your profile" }];
     render(<Narration steps={steps} />);
     const list = document.querySelector(".perq-narration-list");
     expect(list).toHaveAttribute("aria-live", "polite");
   });
 
   it("reveals nothing before the first pacing-floor tick", () => {
-    const steps: NarrationStep[] = [{ id: "1", label: "MIMIR checked your profile" }];
+    const steps: NarrationStep[] = [{ id: "1", label: "Ember checked your profile" }];
     render(<Narration steps={steps} minStepDurationMs={400} />);
-    expect(screen.queryByText("MIMIR checked your profile")).not.toBeInTheDocument();
+    expect(screen.queryByText("Ember checked your profile")).not.toBeInTheDocument();
   });
 
   it("reveals the first step after the pacing floor elapses", () => {
-    const steps: NarrationStep[] = [{ id: "1", label: "MIMIR checked your profile" }];
+    const steps: NarrationStep[] = [{ id: "1", label: "Ember checked your profile" }];
     render(<Narration steps={steps} minStepDurationMs={400} />);
     act(() => { vi.advanceTimersByTime(400); });
-    expect(screen.getByText("MIMIR checked your profile")).toBeInTheDocument();
+    expect(screen.getByText("Ember checked your profile")).toBeInTheDocument();
   });
 
   it("holds each step for the minimum duration even when all steps arrive instantly (cache-hit / DR5)", () => {
     const steps: NarrationStep[] = [
-      { id: "1", label: "MIMIR checked your profile" },
-      { id: "2", label: "MIMIR scored 118 cards" },
-      { id: "3", label: "MIMIR is writing your recommendation" },
+      { id: "1", label: "Ember checked your profile" },
+      { id: "2", label: "Ember scored 118 cards" },
+      { id: "3", label: "Ember is writing your recommendation" },
     ];
     render(<Narration steps={steps} minStepDurationMs={400} />);
 
     // All three steps are already available in props (simulating a fast
     // cache-hit response), but only one should reveal per floor tick.
     act(() => { vi.advanceTimersByTime(400); });
-    expect(screen.getByText("MIMIR checked your profile")).toBeInTheDocument();
-    expect(screen.queryByText("MIMIR scored 118 cards")).not.toBeInTheDocument();
+    expect(screen.getByText("Ember checked your profile")).toBeInTheDocument();
+    expect(screen.queryByText("Ember scored 118 cards")).not.toBeInTheDocument();
 
     act(() => { vi.advanceTimersByTime(400); });
-    expect(screen.getByText("MIMIR scored 118 cards")).toBeInTheDocument();
+    expect(screen.getByText("Ember scored 118 cards")).toBeInTheDocument();
     expect(
-      screen.queryByText("MIMIR is writing your recommendation")
+      screen.queryByText("Ember is writing your recommendation")
     ).not.toBeInTheDocument();
 
     act(() => { vi.advanceTimersByTime(400); });
     expect(
-      screen.getByText("MIMIR is writing your recommendation")
+      screen.getByText("Ember is writing your recommendation")
     ).toBeInTheDocument();
   });
 
   it("handles an arbitrary event sequence, not a fixed script (D3 revised) — e.g. multiple card lookups", () => {
     const steps: NarrationStep[] = [
-      { id: "1", label: "MIMIR checked your profile" },
-      { id: "2", label: "MIMIR scored 118 cards" },
-      { id: "3", label: "MIMIR is looking up Axis Airtel" },
-      { id: "4", label: "MIMIR is looking up HDFC Regalia" },
-      { id: "5", label: "MIMIR is looking up SBI Cashback" },
-      { id: "6", label: "MIMIR is writing your recommendation" },
+      { id: "1", label: "Ember checked your profile" },
+      { id: "2", label: "Ember scored 118 cards" },
+      { id: "3", label: "Ember is looking up Axis Airtel" },
+      { id: "4", label: "Ember is looking up HDFC Regalia" },
+      { id: "5", label: "Ember is looking up SBI Cashback" },
+      { id: "6", label: "Ember is writing your recommendation" },
     ];
     render(<Narration steps={steps} minStepDurationMs={100} />);
 

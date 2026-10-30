@@ -36,13 +36,13 @@ export function GoalAdvisorWidget({
       }}
     >
       <h3 className="font-display font-semibold" style={{ color: C.textPrimary, fontSize: 20 }}>
-        Ask MIMIR where to buy it
+        Ask Ember where to buy it
       </h3>
       <p
         className="font-body leading-relaxed"
         style={{ color: C.textSecondary, fontSize: 14, maxWidth: 520 }}
       >
-        State a goal — anything from concert tickets to a new phone — and MIMIR searches the web,
+        State a goal — anything from concert tickets to a new phone — and Ember searches the web,
         then tells you where to buy and which card (or Buy Now Pay Later) to use.
       </p>
       {atDailyLimit && (

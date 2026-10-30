@@ -1,21 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { narrationLabelForStep } from "@/lib/mimir/narrationLabels";
+import { narrationLabelForStep } from "@/lib/ember/narrationLabels";
 import type { AgentStepEvent } from "@perq/ai";
 
 describe("narrationLabelForStep (D3, revised — event-driven, not scripted)", () => {
   it("maps getUserProfile tool_call to the profile-reading label", () => {
     const event: AgentStepEvent = { type: "tool_call", toolName: "getUserProfile", round: 0, args: {} };
-    expect(narrationLabelForStep(event)).toBe("MIMIR is reading your profile");
+    expect(narrationLabelForStep(event)).toBe("Ember is checking your profile");
   });
 
   it("maps scoreCards tool_call to a generic scoring label without a count", () => {
     const event: AgentStepEvent = { type: "tool_call", toolName: "scoreCards", round: 1, args: {} };
-    expect(narrationLabelForStep(event)).toBe("MIMIR is scoring your cards");
+    expect(narrationLabelForStep(event)).toBe("Ember is comparing your cards");
   });
 
   it("includes the scored card count when provided", () => {
     const event: AgentStepEvent = { type: "tool_call", toolName: "scoreCards", round: 1, args: {} };
-    expect(narrationLabelForStep(event, undefined, 118)).toBe("MIMIR is scoring 118 cards");
+    expect(narrationLabelForStep(event, undefined, 118)).toBe("Ember compared 118 cards");
   });
 
   it("resolves the real card name for getCardDetails via the provided lookup", () => {
@@ -28,7 +28,7 @@ describe("narrationLabelForStep (D3, revised — event-driven, not scripted)", (
     const label = narrationLabelForStep(event, (id) =>
       id === "axis-airtel" ? "Axis Airtel" : undefined
     );
-    expect(label).toBe("MIMIR is looking up Axis Airtel");
+    expect(label).toBe("Ember is looking up Axis Airtel");
   });
 
   it("falls back to a generic label when the card name can't be resolved", () => {
@@ -38,12 +38,12 @@ describe("narrationLabelForStep (D3, revised — event-driven, not scripted)", (
       round: 2,
       args: { cardId: "unknown-card" },
     };
-    expect(narrationLabelForStep(event, () => undefined)).toBe("MIMIR is looking up a card");
+    expect(narrationLabelForStep(event, () => undefined)).toBe("Ember is looking up a card");
   });
 
   it("maps the final event to the writing-recommendation label", () => {
     const event: AgentStepEvent = { type: "final", round: 3 };
-    expect(narrationLabelForStep(event)).toBe("MIMIR is writing your recommendation");
+    expect(narrationLabelForStep(event)).toBe("Ember is writing your recommendation");
   });
 
   it("returns null for tool_result events and unknown tool names (no narration noise)", () => {
@@ -64,9 +64,9 @@ describe("narrationLabelForStep (D3, revised — event-driven, not scripted)", (
       )
     );
     expect(labels).toEqual([
-      "MIMIR is looking up Card A",
-      "MIMIR is looking up Card B",
-      "MIMIR is looking up Card C",
+      "Ember is looking up Card A",
+      "Ember is looking up Card B",
+      "Ember is looking up Card C",
     ]);
   });
 });

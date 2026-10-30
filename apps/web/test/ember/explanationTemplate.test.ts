@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildTemplateExplanation,
   buildTopPickTemplateExplanation,
-} from "@/lib/mimir/explanationTemplate";
+} from "@/lib/ember/explanationTemplate";
 import type { ScoredCard } from "@perq/scoring-engine";
 
 function makeScoredCard(overrides: Partial<ScoredCard> = {}): ScoredCard {

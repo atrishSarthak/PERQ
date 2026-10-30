@@ -62,12 +62,12 @@ vi.mock("@perq/ai", () => ({
 }));
 
 const resolveCardSetMock = vi.fn();
-vi.mock("@/lib/mimir/resolveCardSet", () => ({
+vi.mock("@/lib/ember/resolveCardSet", () => ({
   resolveCardSet: (...args: unknown[]) => resolveCardSetMock(...args),
 }));
 
 const { computeAndPersistRecommendations } = await import(
-  "@/lib/mimir/computeRecommendations"
+  "@/lib/ember/computeRecommendations"
 );
 
 function makeDbCard(id: string, dining: number) {

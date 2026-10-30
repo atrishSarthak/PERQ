@@ -1,8 +1,8 @@
 # PERQ
 
-An AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for — credit cards, BNPL, cash/UPI — personalized to the user's actual financial picture. Powered by one named AI agent, **MIMIR**.
+An AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for — credit cards, BNPL, cash/UPI — personalized to the user's actual financial picture. Powered by one named AI agent, **Ember**.
 
-This repo currently builds **Feature 1: Card Recommender** — a one-time onboarding quiz that captures a user's spend pattern and existing cards, then returns a ranked, MIMIR-explained set of credit card recommendations. It's the foundation Feature 2 (Chrome extension) and Feature 3 (goal-based advisor) will be built on top of later.
+This repo currently builds **Feature 1: Card Recommender** — a one-time onboarding quiz that captures a user's spend pattern and existing cards, then returns a ranked, Ember-explained set of credit card recommendations. It's the foundation Feature 2 (Chrome extension) and Feature 3 (goal-based advisor) will be built on top of later.
 
 ## Docs
 
@@ -28,7 +28,7 @@ packages/
   design-tokens/  Colors, type scale, spacing
   db/             Drizzle schema, migrations, Neon client, card seed script
   scoring-engine/ Card-ranking logic — pure, testable, reused by Feature 2/3
-  ai/             Gemini client, MIMIR's tool-calling agent logic
+  ai/             Gemini client, Ember's tool-calling agent logic
   config/         Shared tsconfig/eslint/prettier
 ```
 

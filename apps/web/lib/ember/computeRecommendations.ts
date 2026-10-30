@@ -9,13 +9,13 @@ import { runGeminiAgent, createGeminiModelCaller, type AgentStepEvent } from "@p
 import { computeCardsVersion, computeProfileHash } from "./hash";
 import { findCachedTopExplanation } from "./cache";
 import { buildTemplateExplanation, buildTopPickTemplateExplanation } from "./explanationTemplate";
-import { createMimirTools } from "./tools";
+import { createEmberTools } from "./tools";
 import { EXPLANATION_SYSTEM_PROMPT } from "./prompt";
 import { narrationLabelForStep } from "./narrationLabels";
 import { mapDbCardToScoringCard } from "./cardMapper";
 import { resolveCardSet, type CardSourceMode } from "./resolveCardSet";
 
-// MIMIR only ever recommends its actual top picks, not every eligible card
+// Ember only ever recommends its actual top picks, not every eligible card
 // in whatever set it scored against (which can now run into the hundreds —
 // see D15/packages/db/data). Ranks beyond this never get a recommendations
 // row at all, so the results page (which now only shows cards with a
@@ -39,7 +39,7 @@ export interface PreviousTopCard {
 /**
  * The shared pipeline behind both quiz-submit (T6) and profile-edit
  * re-scoring (T8): resolve which card set to score against (D15 —
- * resolveCardSet: MIMIR's live web search, or the curated DB fallback),
+ * resolveCardSet: Ember's live web search, or the curated DB fallback),
  * score deterministically (D1) against whichever set won, then decide
  * whether a fresh Gemini call is needed at all — two independent guards,
  * per §9.5 and D6:
@@ -73,7 +73,7 @@ export async function computeAndPersistRecommendations(
 ): Promise<ComputeRecommendationsResult> {
   const profile = buildProfileFromAnswers(answers);
 
-  // D15: card sourcing — MIMIR's live web search first, the curated DB
+  // D15: card sourcing — Ember's live web search first, the curated DB
   // catalog as a fallback that should rarely trigger. Everything after this
   // point (scoring, tools, D6 caching, delete-and-replace) is unchanged
   // regardless of which source won, since both land in the same `cards`
@@ -136,7 +136,7 @@ export async function computeAndPersistRecommendations(
     topExplanation = cached.explanation;
     explanationSource = "gemini"; // a cache hit only ever reuses a prior real explanation
   } else {
-    const tools = createMimirTools({ answers, profile, scored: topEligible, dbCardsById });
+    const tools = createEmberTools({ answers, profile, scored: topEligible, dbCardsById });
 
     // D7 requires the feature to degrade gracefully on ANY Gemini failure
     // (network error, 429 quota exhaustion, 5xx) — not just the cappedOut
@@ -154,7 +154,7 @@ export async function computeAndPersistRecommendations(
           {
             role: "user",
             content:
-              "Write MIMIR's explanation for this user's #1 recommended card now.",
+              "Write Ember's explanation for this user's #1 recommended card now.",
           },
         ],
         tools,
@@ -206,7 +206,7 @@ export async function computeAndPersistRecommendations(
       rank,
       score: s.score.toString(),
       explanation,
-      agent: "MIMIR",
+      agent: "Ember",
       profileSnapshot: answers,
       profileHash,
       cardsVersion,

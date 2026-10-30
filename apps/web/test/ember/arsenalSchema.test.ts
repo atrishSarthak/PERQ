@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { arsenalToggleSchema } from "@/lib/mimir/arsenalSchema";
+import { arsenalToggleSchema } from "@/lib/ember/arsenalSchema";
 
 describe("arsenalToggleSchema", () => {
   it("accepts a valid held toggle", () => {

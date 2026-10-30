@@ -205,7 +205,7 @@ export function ResultsView({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="font-display text-h1 font-bold text-text-primary">
-              MIMIR&apos;s Picks For You
+              Ember&apos;s Picks For You
             </h1>
             <p className="mt-1 font-body text-body text-text-secondary">
               Top {sorted.length} cards, ranked for your spending profile
@@ -294,7 +294,7 @@ export function ResultsView({
                   className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-gold"
                   style={{ backgroundColor: "rgba(184, 134, 11, 0.12)" }}
                 >
-                  <span aria-hidden="true">✦</span> MIMIR&apos;s Top Pick
+                  <span aria-hidden="true">✦</span> Ember&apos;s Top Pick
                 </p>
                 <ResultCard
                   card={topPick}

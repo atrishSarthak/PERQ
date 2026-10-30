@@ -13,14 +13,14 @@ Last updated: 2026-08-12
 `packages/scoring-engine` computes the full deterministic ranking as a pure, unit-testable function: `(rewardRate × categorySpend) − annualFee + milestoneBonusValue`, summed per category, no I/O. Gemini's tool-calling agent never changes the ranking — it receives the already-computed scores via tool calls and is grounded strictly in that output to write the explanation and surface trade-offs. This keeps the ranking reproducible and testable while satisfying §9.1's "reasoned, not calculated" bar through the explanation layer alone.
 
 ### D2 — Follow-up chat state (PRD §9.4)
-No reliance on Gemini's own session/interaction state. A `chat_messages` table (`id, user_id, role, content, created_at` — see D11, no FK to a specific recommendation snapshot) persists raw turns. Every chat request reconstructs the full grounding context fresh from Postgres — quiz answers, derived profile, the user's LATEST recommendation snapshot, and prior chat turns — and sends it with the new turn. This survives Vercel's stateless functions naturally and keeps the "MIMIR already knows your profile" requirement testable (assert the reconstructed context, not a black-box session).
+No reliance on Gemini's own session/interaction state. A `chat_messages` table (`id, user_id, role, content, created_at` — see D11, no FK to a specific recommendation snapshot) persists raw turns. Every chat request reconstructs the full grounding context fresh from Postgres — quiz answers, derived profile, the user's LATEST recommendation snapshot, and prior chat turns — and sends it with the new turn. This survives Vercel's stateless functions naturally and keeps the "Ember already knows your profile" requirement testable (assert the reconstructed context, not a black-box session).
 
-*(Noted, not adopted: Google's Interactions API, GA June 2026, offers server-side state via `previous_interaction_id`. Rejected for v1 — couples MIMIR's continuity to a ~2-month-old external API's retention guarantees instead of Postgres, and is harder to unit-test. Worth revisiting once mature.)*
+*(Noted, not adopted: Google's Interactions API, GA June 2026, offers server-side state via `previous_interaction_id`. Rejected for v1 — couples Ember's continuity to a ~2-month-old external API's retention guarantees instead of Postgres, and is harder to unit-test. Worth revisiting once mature.)*
 
 ### D3 — Narration transport (PRD §9.3, Design System §5)
-The quiz-submit endpoint returns a raw `ReadableStream` (SSE) from a Next.js Route Handler. As each real tool call resolves server-side, the server writes a step event; the "MIMIR is working" narration component consumes real progress, not a simulated animation. Requires `export const dynamic = 'force-dynamic'` and returning the `Response` before the loop completes (buffering it defeats streaming on Vercel).
+The quiz-submit endpoint returns a raw `ReadableStream` (SSE) from a Next.js Route Handler. As each real tool call resolves server-side, the server writes a step event; the "Ember is working" narration component consumes real progress, not a simulated animation. Requires `export const dynamic = 'force-dynamic'` and returning the `Response` before the loop completes (buffering it defeats streaming on Vercel).
 
-**Revised after outside-voice review:** narration is driven by actual tool-call events, not a fixed 3-step script. D1/D5's agent can call tools in any order, skip `getCardDetails` entirely, or call it multiple times across up to 10 rounds (D13) — there's no guaranteed sequence. Each SSE event fires directly off whichever tool call actually resolved (`getUserProfile` done → "MIMIR checked your profile"; `scoreCards` done → "MIMIR scored N cards"; each `getCardDetails(cardId)` resolution → generic "MIMIR is looking up {cardName}"; final text → "MIMIR is writing your recommendation"). The UI narrates what happened, not a script of what was expected to happen — this is what keeps §7's "nothing feels like background scraping" trust mechanic honest when the model's actual tool-call pattern varies run to run.
+**Revised after outside-voice review:** narration is driven by actual tool-call events, not a fixed 3-step script. D1/D5's agent can call tools in any order, skip `getCardDetails` entirely, or call it multiple times across up to 10 rounds (D13) — there's no guaranteed sequence. Each SSE event fires directly off whichever tool call actually resolved (`getUserProfile` done → "Ember checked your profile"; `scoreCards` done → "Ember scored N cards"; each `getCardDetails(cardId)` resolution → generic "Ember is looking up {cardName}"; final text → "Ember is writing your recommendation"). The UI narrates what happened, not a script of what was expected to happen — this is what keeps §7's "nothing feels like background scraping" trust mechanic honest when the model's actual tool-call pattern varies run to run.
 
 **Note:** POST-triggered SSE can't use the browser's `EventSource` (GET-only) — the client needs a `fetch()` + manual `ReadableStream` reader to consume the narration events and drive the eventual redirect to `/results`. Called out explicitly here so it's not missed as "just add EventSource" during build (implementation task T-below).
 
@@ -31,7 +31,7 @@ Two-layer API:
 
 ### D5 — `packages/ai` internal structure (PRD §4, Handbook §4/§5)
 - `packages/ai/src/client.ts` — generic `runGeminiAgent({ tools, systemPrompt, history })`: the multi-turn function-calling loop (model requests call → server executes → server returns result → repeat until final text). No Feature-1 knowledge.
-- `apps/web/lib/mimir/` — Feature-1-specific tool implementations (`getUserProfile`, `scoreCards` tool wrapper, `getCardDetails`), prompt templates, explanation cache, and fallback template logic. Calls the generic runner.
+- `apps/web/lib/ember/` — Feature-1-specific tool implementations (`getUserProfile`, `scoreCards` tool wrapper, `getCardDetails`), prompt templates, explanation cache, and fallback template logic. Calls the generic runner.
 
 Feature 2/3 add their own tool sets beside Feature 1's without touching it.
 
@@ -39,7 +39,7 @@ Feature 2/3 add their own tool sets beside Feature 1's without touching it.
 `recommendations.profile_hash` (sha256 of normalized `answers` jsonb), indexed with `(user_id, profile_hash, cards_version)` (see D10). Before calling Gemini, query for an existing row with a matching hash AND matching `cards_version`; reuse its explanation only on a full hit. Reuses the audit trail the PRD already locked (`profile_snapshot`) instead of standing up separate cache infrastructure.
 
 ### D7 — Gemini failure / quota-exhaustion fallback (PRD §9.5)
-`buildFallbackExplanation(scoredCard)` — a pure function in `apps/web/lib/mimir/` — generates grounded text directly from the already-computed score breakdown (e.g. *"MIMIR recommends the {card} — it scores highest for your {topCategory} spend of ₹{amount}/month"*), honoring Design System §5's "never a bare score" rule without an LLM call. `recommendations.explanation_source` (`'gemini' | 'fallback_template'`, default `'gemini'`) makes degraded rows queryable rather than silently indistinguishable from real ones. This path is also the target of the tool-loop cap in D-Perf-B below — no separate failure mode needed.
+`buildFallbackExplanation(scoredCard)` — a pure function in `apps/web/lib/ember/` — generates grounded text directly from the already-computed score breakdown (e.g. *"Ember recommends the {card} — it scores highest for your {topCategory} spend of ₹{amount}/month"*), honoring Design System §5's "never a bare score" rule without an LLM call. `recommendations.explanation_source` (`'gemini' | 'fallback_template'`, default `'gemini'`) makes degraded rows queryable rather than silently indistinguishable from real ones. This path is also the target of the tool-loop cap in D-Perf-B below — no separate failure mode needed.
 
 ### D8 — Tool-call execution boundary (PRD §3)
 Tools execute as in-process function calls within the same Route Handler invocation — direct calls into `packages/db` and `packages/scoring-engine`, no network hop, no extra auth boundary. Matches PRD §3's explicit rationale for a single Next.js deployment ("no cross-service auth boundary to get wrong").
@@ -51,7 +51,7 @@ Unlike the quiz-submit path (bounded by D6's cache + D13's tool-call cap), every
 D6's cache key becomes `(user_id, profile_hash, cards_version)` — `cards_version` is `max(source_updated_at)` across active cards (or a counter the seed script bumps). A seed-script run that changes any card's terms invalidates every cached explanation at once, closing the staleness gap the original `(user_id, profile_hash)`-only key left open.
 
 ### D11 — Chat continuity across profile edits (post outside-voice review)
-`chat_messages.user_id` (not `recommendation_id` — no FK to a specific snapshot). D2's context-reconstruction always pulls the user's LATEST `recommendations` snapshot at request time. A profile edit mid-conversation means MIMIR's next answer reflects the updated recommendation, consistent with §11's "fresh, editable recommendations" framing — no orphaned threads, no edit-blocking.
+`chat_messages.user_id` (not `recommendation_id` — no FK to a specific snapshot). D2's context-reconstruction always pulls the user's LATEST `recommendations` snapshot at request time. A profile edit mid-conversation means Ember's next answer reflects the updated recommendation, consistent with §11's "fresh, editable recommendations" framing — no orphaned threads, no edit-blocking.
 
 ### D12 — Profile-edit concurrency (post outside-voice review)
 Last-write-wins on `user_profile.answers`, no version column or optimistic-concurrency check. This is single-user-editing-their-own-row data, not multi-party — a lost intermediate write just means the final persisted state reflects the user's last click, which matches their own expectation. Explicit conflict-detection machinery would be over-engineered relative to the actual risk (a race window measured in milliseconds, self-correcting on next fetch).
@@ -63,13 +63,13 @@ Last-write-wins on `user_profile.answers`, no version column or optimistic-concu
 Every quiz-submit and every profile-edit re-score deletes the user's existing `recommendations` rows and inserts the fresh set inside the same transaction, rather than blind-inserting. Makes "the user's current recommendations" unambiguous — exactly one active set per user at all times — and makes a double-click/double-submit idempotent instead of accumulating duplicate/stale rows silently. Per-row auditability (`profile_snapshot`) is preserved; a full historical log of every past recommendation set is not — the PRD doesn't ask for one.
 
 ### D15 — Live web-search card sourcing, with a curated DB fallback (post-launch amendment)
-The card set `scoreCards` runs against is no longer only the seeded DB catalog. `apps/web/lib/mimir/resolveCardSet.ts` now resolves it per compute:
+The card set `scoreCards` runs against is no longer only the seeded DB catalog. `apps/web/lib/ember/resolveCardSet.ts` now resolves it per compute:
 
-1. **Primary — MIMIR web search.** A Gemini Google Search-grounded call (`packages/ai/src/webSearch.ts::searchGroundedText`) finds real, currently-marketed cards for the user's profile *shape*; a second, non-grounded call (`extractStructuredJson`) turns the cited findings into strict JSON matching the same field shape as the seed data. Any card whose `annualFee`/`rewardRates` can't be attributed to a real citation URL from the grounded call is dropped whole (`apps/web/lib/mimir/cardSearch.ts`) — never partially nulled, and never trusted on an invented source. Capped at 20 cards.
+1. **Primary — Ember web search.** A Gemini Google Search-grounded call (`packages/ai/src/webSearch.ts::searchGroundedText`) finds real, currently-marketed cards for the user's profile *shape*; a second, non-grounded call (`extractStructuredJson`) turns the cited findings into strict JSON matching the same field shape as the seed data. Any card whose `annualFee`/`rewardRates` can't be attributed to a real citation URL from the grounded call is dropped whole (`apps/web/lib/ember/cardSearch.ts`) — never partially nulled, and never trusted on an invented source. Capped at 20 cards.
 2. **Cached by profile shape, not per-request.** `computeSearchBucketKey` (`hash.ts`) buckets by income bracket + fee tolerance + priority categories only — not exact spend amounts — so many users share one search instead of triggering one per quiz submission. A bucket's results are reused for 14 days (`SEARCH_CACHE_TTL_MS`) before a refresh is triggered. This is what keeps Gemini usage bounded against the free-tier daily quota (D13's concern extends here).
 3. **Fallback — the curated DB catalog.** On a search failure, or fewer than `MIN_VALID_SEARCH_CARDS` (5) citation-backed results, `resolveCardSet` scores against `cards` where `origin = 'seeded'` instead (the 30-card set in `packages/db/data/cards.json`, PRD §7) — by design a rare path, never silently preferred.
 
-**Storage:** both origins live in the same `cards` table (`origin: 'seeded' | 'web_search'`, `searchBucketKey`, `sourceUrls`), not a separate table — `mapDbCardToScoringCard`, `createMimirTools`, and D6/D10's caching all continue to operate on that one shape unmodified regardless of which origin won. A bucket refresh soft-deletes its prior `web_search` rows (2C's pattern reused, not a hard delete — other users in the same bucket may still hold live `recommendations` FKs to them) before inserting the fresh set.
+**Storage:** both origins live in the same `cards` table (`origin: 'seeded' | 'web_search'`, `searchBucketKey`, `sourceUrls`), not a separate table — `mapDbCardToScoringCard`, `createEmberTools`, and D6/D10's caching all continue to operate on that one shape unmodified regardless of which origin won. A bucket refresh soft-deletes its prior `web_search` rows (2C's pattern reused, not a hard delete — other users in the same bucket may still hold live `recommendations` FKs to them) before inserting the fresh set.
 
 **Amends D8:** this is the one place a real external network call (Gemini's own search grounding) enters the pipeline — a deliberate, scoped exception to D8's "tools execute in-process, no network hop," not a silent override. It happens once per bucket refresh, before scoring, never inside the in-process explanation-tool loop D8 describes.
 
@@ -103,20 +103,20 @@ The card set `scoreCards` runs against is no longer only the seeded DB catalog. 
                     │                                         │  export const
                     ▼                                         │  dynamic =
      ┌─────────────────────────────┐   step event:            │  'force-dynamic'
-     │ packages/scoring-engine     │──▶"MIMIR checked your     │
+     │ packages/scoring-engine     │──▶"Ember checked your     │
      │ estimateSpendFromBucket(2B) │   profile" ───────────────┤
      │ scoreCards(profile, cards)  │                           │
      │  (active cards only, 2C)    │──▶ step event:             │
-     └──────────────┬──────────────┘   "MIMIR scored N cards"─┤
+     └──────────────┬──────────────┘   "Ember scored N cards"─┤
                      │ ScoredCard[]                            │
                      ▼                                         │
      ┌─────────────────────────────────────┐                  │
-     │ apps/web/lib/mimir                   │                  │
+     │ apps/web/lib/ember                   │                  │
      │  check profile_hash cache (D6)       │                  │
      │  ├─ HIT  → reuse cached explanation  │                  │
      │  └─ MISS ▼                           │                  │
      │     runGeminiAgent (D5, packages/ai) │──▶ step event:    │
-     │      tools: getUserProfile,           │   "MIMIR is       │
+     │      tools: getUserProfile,           │   "Ember is       │
      │      getCardDetails (D8, in-process)  │    writing your   │
      │      cap: 6 tool-call rounds          │    recommendation"┤
      │      (Perf-B)                         │                  │
@@ -212,13 +212,13 @@ packages/
 │   └── scripts/seed-cards.ts            upsert + soft-delete missing cards (2C)
 │
 └── ui/
-    └── (shadcn/ui-themed; "MIMIR is working" narration component
+    └── (shadcn/ui-themed; "Ember is working" narration component
          built once here per Design System §5, consumed by D3's SSE stream)
 
 apps/web/
 ├── lib/
 │   ├── auth.ts                          requireAuth() (2A)
-│   └── mimir/                           Feature-1-specific: tool implementations,
+│   └── ember/                           Feature-1-specific: tool implementations,
 │                                        prompt templates, cache lookup (D6),
 │                                        fallback template (D7)
 └── app/
@@ -231,7 +231,7 @@ apps/web/
         └── arsenal/toggle/               shared mutation (§12)
 ```
 
-**Why this satisfies PRD §4:** Feature 2 reuses `getBestCardForCategory` directly (no quiz-profile dependency) and `runGeminiAgent` with its own tool set (page-extraction tools instead of `getUserProfile`/`scoreCards`). Feature 3 reuses both plus `runGeminiAgent` again for its category-mapped channel extraction (Handbook §5: "reused, not rebuilt"). Nothing Feature-1-specific (prompts, cache, fallback templates) lives inside `packages/scoring-engine` or `packages/ai` — it's all in `apps/web/lib/mimir/`, so Feature 2/3 never have to pick Feature-1 code out of a shared package.
+**Why this satisfies PRD §4:** Feature 2 reuses `getBestCardForCategory` directly (no quiz-profile dependency) and `runGeminiAgent` with its own tool set (page-extraction tools instead of `getUserProfile`/`scoreCards`). Feature 3 reuses both plus `runGeminiAgent` again for its category-mapped channel extraction (Handbook §5: "reused, not rebuilt"). Nothing Feature-1-specific (prompts, cache, fallback templates) lives inside `packages/scoring-engine` or `packages/ai` — it's all in `apps/web/lib/ember/`, so Feature 2/3 never have to pick Feature-1 code out of a shared package.
 
 ---
 
@@ -259,7 +259,7 @@ apps/web/
 
 ## 6. Test Plan
 
-Full codepath trace, coverage diagram, and the eval-suite decision for MIMIR's two LLM-facing prompts are in the companion test-plan artifact:
+Full codepath trace, coverage diagram, and the eval-suite decision for Ember's two LLM-facing prompts are in the companion test-plan artifact:
 `~/.gstack/projects/PERQ/sarthakatrish-no-branch-eng-review-test-plan-20260812-050944.md`
 (consumed directly by `/qa` and `/qa-only`).
 
@@ -363,7 +363,7 @@ Synthesized from this review's findings. Each task derives from a specific findi
   - Surfaced by: D5, D13
   - Files: `packages/ai/src/client.ts`
   - Verify: unit tests with mocked tool responses (single call, multiple calls in one turn, tool throws, cap exceeded)
-- [ ] **T4 (P1, human: ~4h / CC: ~30min)** — packages/ui — "MIMIR is working" narration component (event-driven, per revised D3)
+- [ ] **T4 (P1, human: ~4h / CC: ~30min)** — packages/ui — "Ember is working" narration component (event-driven, per revised D3)
   - Surfaced by: D3 (revised), Design System §5
   - Files: `packages/ui/src/narration/*`
   - Verify: renders arbitrary event sequences, not just a fixed 3-step script
@@ -373,11 +373,11 @@ Synthesized from this review's findings. Each task derives from a specific findi
   - Verify: unauthenticated request to each route → 401/redirect
 - [ ] **T6 (P1, human: ~2d / CC: ~2h)** — apps/web — `/api/quiz/submit` SSE Route Handler: validate → write profile → score → agent loop → delete-and-replace recommendations (D14)
   - Surfaced by: D1, D3, D8, D14
-  - Files: `apps/web/app/api/quiz/submit/route.ts`, `apps/web/lib/mimir/*`
+  - Files: `apps/web/app/api/quiz/submit/route.ts`, `apps/web/lib/ember/*`
   - Verify: E2E — full quiz → SSE narration → results; double-submit produces no duplicate rows
-- [ ] **T7 (P1, human: ~1d / CC: ~1h)** — apps/web/lib/mimir — `buildFallbackExplanation`, `explanation_source` write, cache lookup (D6/D10)
+- [ ] **T7 (P1, human: ~1d / CC: ~1h)** — apps/web/lib/ember — `buildFallbackExplanation`, `explanation_source` write, cache lookup (D6/D10)
   - Surfaced by: D6, D7, D10
-  - Files: `apps/web/lib/mimir/fallback.ts`, `apps/web/lib/mimir/cache.ts`
+  - Files: `apps/web/lib/ember/fallback.ts`, `apps/web/lib/ember/cache.ts`
   - Verify: cache hit/miss on hash+version combinations; fallback text cites real score-breakdown fields
 - [ ] **T8 (P1, human: ~1d / CC: ~1h)** — apps/web — `/api/profile` edit → re-score → conditional re-explanation, last-write-wins (D12), inline error on failure (2D)
   - Surfaced by: §11, D12, 2D
@@ -405,7 +405,7 @@ Synthesized from this review's findings. Each task derives from a specific findi
   - Verify: narration renders live during a real quiz submission, redirect fires on stream completion
 - [ ] **T14 (P3, human: ~2h / CC: ~15min)** — Eval suite: grounding + specificity fixtures (5–10 synthetic profiles)
   - Surfaced by: Test review, eval-scope decision
-  - Files: `apps/web/eval/mimir-explanations.eval.ts`
+  - Files: `apps/web/eval/ember-explanations.eval.ts`
   - Verify: no hallucinated card facts; chat answers reference the actual ranked card; no urgency/scarcity language
 
 ---
@@ -443,7 +443,7 @@ Four reusable widget types cover all 13 questions, built once each in `packages/
 | `yes-no-with-conditional` | Q5 (gym + amount), Q11 |
 
 ### DR2 — Fallback-explanation visual parity (Pass 2)
-The D7 fallback-template explanation renders identically to a real MIMIR explanation — no user-facing "degraded" marker. `explanation_source` stays a backend-only field (already decided in D7); this confirms it has no UI surface.
+The D7 fallback-template explanation renders identically to a real Ember explanation — no user-facing "degraded" marker. `explanation_source` stays a backend-only field (already decided in D7); this confirms it has no UI surface.
 
 ### DR3 — Empty arsenal state (Pass 2)
 First-time users with no held cards: the "show cards I hold" filter stays visible but disabled, with helper text ("Add a card from your results below to start building your arsenal") rather than being hidden.
@@ -458,13 +458,13 @@ Each narration step (event-driven per D3) holds on screen for a minimum ~400ms b
 Rows for cards already in the user's arsenal use `--bg-surface` instead of `--bg-base` — a subtle background/border distinction using only already-locked tokens, no new decoration, so a 15–20 row list scans instead of blurring together.
 
 ### DR7 — Chat visual identity (Pass 5)
-User messages: simple `--bg-surface` bubble, right-aligned (standard convention). MIMIR's responses: unboxed text with a small "MIMIR" label set in the display font (Cabinet Grotesk) above each response, `--accent` used sparingly on the label only — reads as advice spoken directly, not a boxed chatbot reply, consistent with the brand tension (§1: wisdom + Gen-Z voice, never a bank, never generic bubble-chat).
+User messages: simple `--bg-surface` bubble, right-aligned (standard convention). Ember's responses: unboxed text with a small "Ember" label set in the display font (Cabinet Grotesk) above each response, `--accent` used sparingly on the label only — reads as advice spoken directly, not a boxed chatbot reply, consistent with the brand tension (§1: wisdom + Gen-Z voice, never a bank, never generic bubble-chat).
 
 ### DR8 — Mobile filters (Pass 6)
-Below a 768px breakpoint, the filters sidebar becomes a "Filters" button opening a bottom sheet/drawer (~80% viewport height); sort tabs stay visible above the list. Keeps MIMIR's Top Pick hero and the ranked list — the actual payoff — above the fold on mobile, where most of the target user base (Gen Z India) will land.
+Below a 768px breakpoint, the filters sidebar becomes a "Filters" button opening a bottom sheet/drawer (~80% viewport height); sort tabs stay visible above the list. Keeps Ember's Top Pick hero and the ranked list — the actual payoff — above the fold on mobile, where most of the target user base (Gen Z India) will land.
 
 ### DR9 — Narration accessibility (Pass 6)
-The narration container is an `aria-live="polite"` region; each step event updates its text content so screen-reader users hear "MIMIR checked your profile," "MIMIR scored N cards," etc. as they happen — the "show the work" trust mechanic (Handbook §7) is otherwise completely invisible to screen-reader users.
+The narration container is an `aria-live="polite"` region; each step event updates its text content so screen-reader users hear "Ember checked your profile," "Ember scored N cards," etc. as they happen — the "show the work" trust mechanic (Handbook §7) is otherwise completely invisible to screen-reader users.
 
 ### DR10 — Quiz keyboard contract (Pass 6)
 Each question's primary input auto-focuses on screen entry. Enter advances (where valid — single-select/scale questions); Escape/Alt+Left goes back; all controls are reachable via Tab in visual order; focus moves to the new question's input after navigation. 44px minimum touch targets on mobile.
@@ -502,10 +502,10 @@ None — all findings from this review were resolved directly into the plan (DR1
   - Surfaced by: Pass 4
   - Files: `apps/web/app/results/*`
   - Verify: arsenal-held rows visually distinct using only locked tokens
-- [ ] **T19 (P2, human: ~4h / CC: ~30min)** — packages/ui — Chat message components, unboxed MIMIR responses (DR7)
+- [ ] **T19 (P2, human: ~4h / CC: ~30min)** — packages/ui — Chat message components, unboxed Ember responses (DR7)
   - Surfaced by: Pass 5
   - Files: `packages/ui/src/chat/*`
-  - Verify: MIMIR responses render unboxed with display-font label; user messages bubbled
+  - Verify: Ember responses render unboxed with display-font label; user messages bubbled
 - [ ] **T20 (P1, human: ~1d / CC: ~1h)** — apps/web — Mobile filter drawer at <768px (DR8)
   - Surfaced by: Pass 6
   - Files: `apps/web/app/results/*`

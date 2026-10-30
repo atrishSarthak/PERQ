@@ -1,18 +1,18 @@
 "use client";
 
-import { useMimirChat } from "../mimir/MimirChatContext";
+import { useEmberChat } from "../ember/EmberChatContext";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
 /**
  * The whole widget is one clickable surface (design-reference mockup:
  * cursor:pointer on the outer container, no separate "open" button) that
- * opens the shell's existing MIMIR chat panel (Feature 1 §9.4's follow-up
+ * opens the shell's existing Ember chat panel (Feature 1 §9.4's follow-up
  * chat) — not a new bespoke chat UI. The "input" shown here is static bait
  * text, matching the mockup exactly (it was never a real <input> there
  * either — the whole card opens the drawer, where the real input lives).
  */
-export function AskMimirWidget() {
-  const { setOpen } = useMimirChat();
+export function AskEmberWidget() {
+  const { setOpen } = useEmberChat();
 
   return (
     <button
@@ -44,7 +44,7 @@ export function AskMimirWidget() {
 
       <span className="shrink-0">
         <span className="block font-display text-[17px] font-semibold" style={{ color: C.textPrimary }}>
-          Ask MIMIR anything
+          Ask Ember anything
         </span>
         <span className="mt-0.5 block font-body text-xs" style={{ color: C.textSecondary }}>
           Rewards math, comparisons, strategy

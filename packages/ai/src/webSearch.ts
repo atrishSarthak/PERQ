@@ -6,11 +6,11 @@ import { withModelFallback } from "./retry";
 // to D8's "tools execute in-process, no network hop" boundary — this is the
 // one place a real external network call (Gemini's own Google Search
 // grounding) enters the pipeline, and it happens BEFORE scoring, not as one
-// of the in-process explanation-time tools in apps/web/lib/mimir/tools.ts.
+// of the in-process explanation-time tools in apps/web/lib/ember/tools.ts.
 //
 // Kept feature-agnostic (D5) — no knowledge of cards/profiles here. Feature
 // 1's card-search orchestration (query building, schema validation, citation
-// checking) lives in apps/web/lib/mimir/cardSearch.ts.
+// checking) lives in apps/web/lib/ember/cardSearch.ts.
 
 // Kept in sync with client.ts's DEFAULT_MODEL_CHAIN — see that file's
 // comment for why two distinct model aliases (separate quota buckets) beat

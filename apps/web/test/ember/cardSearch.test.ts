@@ -10,7 +10,7 @@ vi.mock("@perq/ai", () => ({
 }));
 
 const { searchCardsForBucket, buildCardSearchQuery, MAX_SEARCH_CARDS } = await import(
-  "@/lib/mimir/cardSearch"
+  "@/lib/ember/cardSearch"
 );
 
 const answers: QuizAnswers = {

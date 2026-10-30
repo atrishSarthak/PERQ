@@ -70,7 +70,7 @@ export function GoalResultsView({
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-16">
       <div>
-        <p className="font-body text-body-sm text-text-secondary">MIMIR checked this for you:</p>
+        <p className="font-body text-body-sm text-text-secondary">Ember checked this for you:</p>
         <h1 className="mt-1 font-display text-body-lg font-semibold text-text-primary">
           &ldquo;{goalText}&rdquo;
         </h1>
@@ -95,7 +95,7 @@ export function GoalResultsView({
           style={{ backgroundColor: "var(--bg-surface-2)" }}
         >
           <p>
-            <span className="font-bold text-accent">✦ MIMIR:</span> {explanation}
+            <span className="font-bold text-accent">✦ Ember:</span> {explanation}
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function GoalResultsView({
             style={{ backgroundColor: "var(--bg-surface-2)" }}
           >
             <p>
-              <span className="font-bold text-accent">🏷 MIMIR found a live offer:</span>{" "}
+              <span className="font-bold text-accent">🏷 Ember found a live offer:</span>{" "}
               {cardOfferCitationUrl ? (
                 <a
                   href={cardOfferCitationUrl}
@@ -133,7 +133,7 @@ export function GoalResultsView({
 
       <div>
         <p className="mb-2 font-body text-caption font-semibold uppercase tracking-wide text-text-secondary">
-          What MIMIR checked
+          What Ember checked
         </p>
         <ul className="flex flex-col gap-1.5">
           {channelsChecked.map((c) => (
@@ -162,7 +162,7 @@ export function GoalResultsView({
         href="/goal"
         className="w-fit font-body text-body-sm font-semibold text-accent"
       >
-        Ask MIMIR about something else →
+        Ask Ember about something else →
       </Link>
     </div>
   );

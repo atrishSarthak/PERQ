@@ -18,21 +18,21 @@ export function buildGoalFallbackExplanation(winner: PaymentOptionScore): string
 
   if (winner.paymentMethod === "bnpl") {
     sentences.push(
-      `MIMIR recommends buying from ${winner.source}, priced at ${formatRupee(winner.price)}, using Buy Now Pay Later instead of a card. ${winner.bnplNote ?? ""}`.trim()
+      `Ember recommends buying from ${winner.source}, priced at ${formatRupee(winner.price)}, using Buy Now Pay Later instead of a card. ${winner.bnplNote ?? ""}`.trim()
     );
   } else if (winner.cardId && winner.cardName) {
     sentences.push(
-      `MIMIR recommends buying from ${winner.source} using your ${winner.cardName}, priced at ${formatRupee(winner.price)} with an estimated ${formatRupee(winner.rewardValue)} back in rewards.`
+      `Ember recommends buying from ${winner.source} using your ${winner.cardName}, priced at ${formatRupee(winner.price)} with an estimated ${formatRupee(winner.rewardValue)} back in rewards.`
     );
   } else {
     sentences.push(
-      `MIMIR recommends buying from ${winner.source}, priced at ${formatRupee(winner.price)}. None of your cards clearly beat paying another way for this one.`
+      `Ember recommends buying from ${winner.source}, priced at ${formatRupee(winner.price)}. None of your cards clearly beat paying another way for this one.`
     );
   }
 
   if (winner.utilizationWarning) {
     sentences.push(
-      "Heads up: using a card for this would push your utilization pretty high right now, so MIMIR weighed that in."
+      "Heads up: using a card for this would push your utilization pretty high right now, so Ember weighed that in."
     );
   }
 

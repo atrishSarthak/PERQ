@@ -36,7 +36,7 @@ ${markdown.slice(0, 30000)}`;
  * narration latency budget) — this is a single best-effort attempt per
  * candidate. On any failure (fetch failure, extraction failure, no price
  * found), the offer is KEPT with price still null, never discarded — it's
- * surfaced honestly in the "what MIMIR checked" transparency list as an
+ * surfaced honestly in the "what Ember checked" transparency list as an
  * unconfirmed listing, excluded only from scoring (the caller filters on
  * price != null before scoring).
  */

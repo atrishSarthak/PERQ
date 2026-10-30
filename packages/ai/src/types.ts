@@ -1,6 +1,6 @@
 // packages/ai is Feature-1-agnostic (D5) — no getUserProfile/scoreCards
 // knowledge here. Feature-specific tool implementations and prompts live in
-// apps/web/lib/mimir/ (Feature 1) and, later, their own equivalents for
+// apps/web/lib/ember/ (Feature 1) and, later, their own equivalents for
 // Feature 2/3, all calling this same generic runner.
 
 export interface JsonSchema {
@@ -77,7 +77,7 @@ export interface AgentResult {
   finalText: string | null;
   roundsUsed: number;
   // true when maxRounds was exceeded without the model returning final text —
-  // callers (Feature 1's apps/web/lib/mimir) fall back to the D7 template
+  // callers (Feature 1's apps/web/lib/ember) fall back to the D7 template
   // path on this, same as an outright model-call failure.
   cappedOut: boolean;
 }

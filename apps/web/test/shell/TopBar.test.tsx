@@ -8,7 +8,7 @@ vi.mock("next-auth/react", () => ({
 }));
 
 const { TopBar } = await import("@/app/(shell)/TopBar");
-const { MimirChatProvider } = await import("@/app/(shell)/mimir/MimirChatContext");
+const { EmberChatProvider } = await import("@/app/(shell)/ember/EmberChatContext");
 
 describe("TopBar — replaces the old unlabeled vertical icon rail", () => {
   beforeEach(() => {
@@ -17,9 +17,9 @@ describe("TopBar — replaces the old unlabeled vertical icon rail", () => {
 
   it("links the PERQ logo to /home", () => {
     render(
-      <MimirChatProvider>
+      <EmberChatProvider>
         <TopBar />
-      </MimirChatProvider>
+      </EmberChatProvider>
     );
     const link = screen.getByRole("link", { name: "PERQ home" });
     expect(link).toHaveAttribute("href", "/home");
@@ -27,18 +27,18 @@ describe("TopBar — replaces the old unlabeled vertical icon rail", () => {
 
   it("renders a real, labeled Sign out control, not an icon-only button", () => {
     render(
-      <MimirChatProvider>
+      <EmberChatProvider>
         <TopBar />
-      </MimirChatProvider>
+      </EmberChatProvider>
     );
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
   });
 
   it("signs out to /login when clicked", () => {
     render(
-      <MimirChatProvider>
+      <EmberChatProvider>
         <TopBar />
-      </MimirChatProvider>
+      </EmberChatProvider>
     );
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
     expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/login" });

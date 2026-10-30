@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ResponseSchema } from "@perq/ai";
 
-// Mirrors apps/web/lib/mimir/cardSearchSchema.ts's discipline: sourceUrl is
+// Mirrors apps/web/lib/ember/cardSearchSchema.ts's discipline: sourceUrl is
 // required and validated at the call site against the real citation set
 // returned by the grounded search — no fact reaches scoring ungrounded.
 // price is nullable: grounding's synthesized text sometimes names a real

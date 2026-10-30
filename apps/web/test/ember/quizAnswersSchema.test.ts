@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { quizAnswersSchema } from "@/lib/mimir/quizAnswersSchema";
+import { quizAnswersSchema } from "@/lib/ember/quizAnswersSchema";
 
 const validAnswers = {
   heldCardIds: [],

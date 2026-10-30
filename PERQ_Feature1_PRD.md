@@ -10,13 +10,13 @@ Last updated: 2026-08-11
 
 ## 1. Product Context
 
-**PERQ** is an AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for — credit cards, BNPL, cash/UPI — personalized to the user's actual financial picture. The product is powered by one named AI agent, **MIMIR**, across three planned features. This PRD covers only **Feature 1**.
+**PERQ** is an AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for — credit cards, BNPL, cash/UPI — personalized to the user's actual financial picture. The product is powered by one named AI agent, **Ember**, across three planned features. This PRD covers only **Feature 1**.
 
 **Feature 1 — Card Recommender:** a one-time onboarding quiz that captures a user's spend pattern and existing cards, then returns a ranked, explained set of credit card recommendations. It's the acquisition layer of the product (free, per the business model) and the foundation the other two features build on — Feature 2 (Chrome extension) reads the "card arsenal" this feature establishes, and Feature 3 (goal-based advisor) reasons against the same profile.
 
 **Target user:** Gen Z college students and first-jobbers in India — largely new to credit, price-sensitive, and allergic to anything that feels like a bank lecturing them or a social app manipulating them.
 
-**Brand positioning (governs every requirement below):** "Agentic, not conversational" and "show the work, don't hide it." Feature 1 is the one exception to "agentic" — a quiz is inherently input-driven — so it should be framed as *setup*, not MIMIR's hero moment. But even here, MIMIR should never feel like a static form-to-PDF generator: the explanation and follow-up chat are where the agentic feel has to show up.
+**Brand positioning (governs every requirement below):** "Agentic, not conversational" and "show the work, don't hide it." Feature 1 is the one exception to "agentic" — a quiz is inherently input-driven — so it should be framed as *setup*, not Ember's hero moment. But even here, Ember should never feel like a static form-to-PDF generator: the explanation and follow-up chat are where the agentic feel has to show up.
 
 ---
 
@@ -27,7 +27,7 @@ Last updated: 2026-08-11
 - Capture a user's spend pattern and existing cards through a short, low-friction quiz.
 - Produce a ranked list of card recommendations that is demonstrably reasoned, not just calculated — grounded in the user's actual data, explainable, and able to surface non-obvious trade-offs.
 - Let a returning user see fresh, editable recommendations without repeating the whole quiz.
-- Let a user ask MIMIR follow-up questions about their recommendation, with MIMIR fully aware of what it already told them.
+- Let a user ask Ember follow-up questions about their recommendation, with Ember fully aware of what it already told them.
 - Feel like a genuine financial product a Gen Z user would trust — not a spreadsheet, and not a social-media-style engagement trap.
 
 **Non-Goals (explicit boundaries — not deferred, not "later," out of scope for this feature)**
@@ -70,7 +70,7 @@ perq/
 │   ├── design-tokens/          # Colors, type scale, spacing — see Design System doc
 │   ├── db/                     # Drizzle schema, migrations, Neon client, card seed/update script
 │   ├── scoring-engine/         # Card-ranking logic — pure, testable, reused by Feature 2/3 later
-│   ├── ai/                     # Gemini client, MIMIR's tool-calling agent logic, prompt templates
+│   ├── ai/                     # Gemini client, Ember's tool-calling agent logic, prompt templates
 │   └── config/                 # Shared tsconfig/eslint/prettier
 ├── turbo.json
 └── pnpm-workspace.yaml
@@ -108,8 +108,8 @@ cards
 
 recommendations
   id, user_id, card_id, rank, score
-  explanation      text            -- MIMIR's grounded, plain-language reasoning
-  agent            text default 'MIMIR'
+  explanation      text            -- Ember's grounded, plain-language reasoning
+  agent            text default 'Ember'
   profile_snapshot jsonb           -- the user_profile.answers this recommendation was computed from
   created_at
 
@@ -121,7 +121,7 @@ user_card_arsenal
 
 **Why `user_profile` is a single mutable row, not an append-only log:** the returning-user flow (§11) needs to edit one answer at a time and re-render immediately — a current-state row is the natural fit. Auditability is still covered: every `recommendations` row snapshots the exact profile it was computed from, so a past recommendation stays explainable even after the user edits their profile later.
 
-**Intentionally not specified here:** any table for storing MIMIR follow-up chat/conversation state. Whether that's a persisted table, in-memory + re-hydrated context, or something else is left to the Claude Code build — see §9's framing of what's required versus what's open.
+**Intentionally not specified here:** any table for storing Ember follow-up chat/conversation state. Whether that's a persisted table, in-memory + re-hydrated context, or something else is left to the Claude Code build — see §9's framing of what's required versus what's open.
 
 ---
 
@@ -142,7 +142,7 @@ Auth.js (NextAuth), Drizzle adapter, Postgres-backed sessions. Suggested default
 
 ## 8. Quiz — Questions & Flow
 
-**Flow:** modal step wizard. One question per screen, a visible progress indicator ("Question 4 of 13"), and a back button. On the final step, transition into the "MIMIR is working" narration (§9) before landing on results.
+**Flow:** modal step wizard. One question per screen, a visible progress indicator ("Question 4 of 13"), and a back button. On the final step, transition into the "Ember is working" narration (§9) before landing on results.
 
 **Questions (13):**
 
@@ -164,7 +164,7 @@ Auth.js (NextAuth), Drizzle adapter, Postgres-backed sessions. Suggested default
 
 ---
 
-## 9. MIMIR — AI Agent Requirements
+## 9. Ember — AI Agent Requirements
 
 This section states requirements, not architecture. How Claude Code satisfies them is its engineering call; what follows is what "done" looks like.
 
@@ -180,11 +180,11 @@ Gemini must be invoked as a tool-calling agent — able to call functions to fet
 
 ### 9.3 Show the work
 
-Each step MIMIR takes should be visibly narrated in the UI as it happens — e.g. "MIMIR checked your profile," "MIMIR scored 118 cards," "MIMIR is writing your recommendation" — not a silent spinner. This is a standing brand principle (see Design System doc §5) and applies directly here.
+Each step Ember takes should be visibly narrated in the UI as it happens — e.g. "Ember checked your profile," "Ember scored 118 cards," "Ember is writing your recommendation" — not a silent spinner. This is a standing brand principle (see Design System doc §5) and applies directly here.
 
 ### 9.4 Follow-up chat — full context required
 
-After a recommendation is shown, the user can open a follow-up chat with MIMIR ("why not the travel card?", "what if I flew more?"). **MIMIR must already know, for that conversation, the user's quiz answers, their derived profile, and the specific recommendation(s) it just gave.** Every follow-up answer must read as a continuation of an already-informed conversation, not a fresh, context-less exchange — this is the single detail that most determines whether the product feels like a real agent or a wrapper around a stateless API call. Ask "why not the travel card" and MIMIR should reference the actual card it ranked for this actual user, not give a generic answer.
+After a recommendation is shown, the user can open a follow-up chat with Ember ("why not the travel card?", "what if I flew more?"). **Ember must already know, for that conversation, the user's quiz answers, their derived profile, and the specific recommendation(s) it just gave.** Every follow-up answer must read as a continuation of an already-informed conversation, not a fresh, context-less exchange — this is the single detail that most determines whether the product feels like a real agent or a wrapper around a stateless API call. Ask "why not the travel card" and Ember should reference the actual card it ranked for this actual user, not give a generic answer.
 
 How that context is carried — conversation history, re-supplied structured context per turn, stored session state, or something else — is, again, an implementation decision for Claude Code, not prescribed here.
 
@@ -201,9 +201,9 @@ How that context is carried — conversation history, re-supplied structured con
 **Layout:**
 
 - **Left sidebar — filters:** card network, issuer, annual fee range, category tags (Travel/Cashback/Dining/Fuel/Shopping/Lounge), "show cards I already hold" toggle, "₹0 joining fee only" toggle.
-- **Top — sort tabs:** *Best Match* (MIMIR's ranked pick) / *Lowest Fee* / *Highest Rewards*. These re-sort the same result set; they aren't separate queries.
-- **"MIMIR's Top Pick" hero card**, shown above the ranked list. Visually distinct from the rest of the list, but **deliberately not styled like a sponsored/ad placement** — looking like a paid slot would undercut the neutral-advisor trust the product depends on.
-- **Ranked list below:** each row shows the card (issuer/logo, name), MIMIR's one-line grounded reasoning, annual fee, and the arsenal CTA (§12).
+- **Top — sort tabs:** *Best Match* (Ember's ranked pick) / *Lowest Fee* / *Highest Rewards*. These re-sort the same result set; they aren't separate queries.
+- **"Ember's Top Pick" hero card**, shown above the ranked list. Visually distinct from the rest of the list, but **deliberately not styled like a sponsored/ad placement** — looking like a paid slot would undercut the neutral-advisor trust the product depends on.
+- **Ranked list below:** each row shows the card (issuer/logo, name), Ember's one-line grounded reasoning, annual fee, and the arsenal CTA (§12).
 
 ---
 
@@ -230,7 +230,7 @@ Every card shown anywhere in the results list — recommended or just browsed vi
 - All data is self-reported; no bank linking, no Account Aggregator, no third-party financial data pulls.
 - Advisory-only: the product never initiates a transaction, never stores payment credentials.
 - Every recommendation's explanation must visibly trace back to the user's own quiz/profile data — never to which card issuer might pay a higher affiliate commission, even once monetization is added later. This is a trust requirement to hold from day one, not retrofit.
-- No urgency or scarcity language anywhere in this feature ("only 2 spots left," countdowns, etc.) — MIMIR's tone should read as considered advice, consistent with the Design System doc's voice guide.
+- No urgency or scarcity language anywhere in this feature ("only 2 spots left," countdowns, etc.) — Ember's tone should read as considered advice, consistent with the Design System doc's voice guide.
 
 ---
 
@@ -239,12 +239,12 @@ Every card shown anywhere in the results list — recommended or just browsed vi
 Feature 1 is done when:
 
 - [ ] A new user can complete the 13-question modal quiz (with back/progress) and reach a results page.
-- [ ] Recommendations are computed against the real card database (100–120 cards) and shown with MIMIR-attributed, grounded explanations — with each computation step visibly narrated, not a silent spinner.
+- [ ] Recommendations are computed against the real card database (100–120 cards) and shown with Ember-attributed, grounded explanations — with each computation step visibly narrated, not a silent spinner.
 - [ ] The results page matches the Skyscanner-inspired layout: filters sidebar, sort tabs, a non-ad-styled "Top Pick" hero, and a ranked list below.
 - [ ] A card can be marked "in my arsenal" from either the quiz or the results page, with consistent state.
 - [ ] A returning user with a saved profile skips the quiz and sees results immediately.
 - [ ] A user can edit any single profile answer and see recommendations update without redoing the full quiz; a new Gemini explanation call only fires if the top card changes.
-- [ ] A user can open MIMIR's follow-up chat and get answers that reference their actual profile and actual given recommendations — verified by asking a question whose correct answer depends on session-specific data, not something a generic prompt could answer.
+- [ ] A user can open Ember's follow-up chat and get answers that reference their actual profile and actual given recommendations — verified by asking a question whose correct answer depends on session-specific data, not something a generic prompt could answer.
 - [ ] No Account Aggregator/bank-linking, no payment flow, and no gamification/urgency pattern exists anywhere in the built feature.
 - [ ] All UI is built from the Design System doc's tokens; both light and dark themes render correctly.
 - [ ] `GEMINI_API_KEY` and `DATABASE_URL` are never referenced from client-side code; `.env.example` lists every required variable with no values committed.

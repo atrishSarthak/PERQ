@@ -21,7 +21,7 @@ export interface ResolvedCardSet {
 
 /**
  * D15: resolves the card set computeAndPersistRecommendations should score
- * against — MIMIR's live web search first, the curated DB catalog as a
+ * against — Ember's live web search first, the curated DB catalog as a
  * fallback that "should rarely happen" (only on a genuine search failure
  * or too-few-valid-results, never silently preferred). A fresh cache hit
  * for this bucket costs zero Gemini calls; a cache miss/stale bucket costs
@@ -72,11 +72,11 @@ export async function resolveCardSet(
   const apiKey = process.env.GEMINI_API_KEY;
   if (apiKey) {
     try {
-      onNarrationStep?.("MIMIR is searching the web for cards");
+      onNarrationStep?.("Ember is searching the web for cards");
       const results = await searchCardsForBucket(answers, apiKey);
       if (results.length >= MIN_VALID_SEARCH_CARDS) {
         const inserted = await replaceBucketCards(searchBucketKey, results);
-        onNarrationStep?.(`MIMIR found ${inserted.length} cards from the web`);
+        onNarrationStep?.(`Ember found ${inserted.length} cards from the web`);
         return { activeCards: inserted, cardSourceMode: "web_search", searchBucketKey };
       }
     } catch {
@@ -85,7 +85,7 @@ export async function resolveCardSet(
     }
   }
 
-  onNarrationStep?.("MIMIR is using its trusted card list");
+  onNarrationStep?.("Ember is using its trusted card list");
   const fallbackCards = await db
     .select()
     .from(cards)

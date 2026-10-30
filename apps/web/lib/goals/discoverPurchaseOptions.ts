@@ -9,7 +9,7 @@ import {
 } from "./discoverySchema";
 
 // Token economy / cost bound — same spirit as MAX_SEARCH_CARDS in
-// apps/web/lib/mimir/cardSearch.ts.
+// apps/web/lib/ember/cardSearch.ts.
 export const MAX_DISCOVERED_OFFERS = 8;
 
 // PERQ is an India-only product (₹ pricing, Indian card issuers/BNPL
@@ -43,7 +43,7 @@ function buildDiscoveryQuery(facts: GoalFacts): string {
 
 /**
  * Requires every extracted listing be attributed to a real citation URL —
- * same discipline as apps/web/lib/mimir/cardSearch.ts's buildExtractionPrompt.
+ * same discipline as apps/web/lib/ember/cardSearch.ts's buildExtractionPrompt.
  */
 function buildExtractionPrompt(researchNotes: string, citationUris: string[]): string {
   return `From the research notes below, extract up to ${MAX_DISCOVERED_OFFERS} distinct real purchase listings/options as structured data.
@@ -158,7 +158,7 @@ async function discoverCardOffer(
  * Open-ended discovery: one required grounded search for the purchase
  * itself, one optional grounded search for a real card/bank offer (only run
  * if the first call found something). Structurally descended from
- * apps/web/lib/mimir/cardSearch.ts — same "search, cite, extract-with-
+ * apps/web/lib/ember/cardSearch.ts — same "search, cite, extract-with-
  * required-attribution, drop-uncited" pipeline, applied to purchase
  * listings instead of card data.
  */

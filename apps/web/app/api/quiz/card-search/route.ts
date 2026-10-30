@@ -27,7 +27,7 @@ const resultSchema = z.object({
  * Q1's CARD SEARCH web-fallback: when the local ~100-120 card database has
  * no match for what the user typed, look the card up on the web and offer
  * it as a selectable "add anyway" option. Deliberately lighter-weight than
- * D15's bucket card search (packages lib/mimir/cardSearch.ts) — that path
+ * D15's bucket card search (packages lib/ember/cardSearch.ts) — that path
  * extracts full reward-rate/fee data for scoring an entire card set; this
  * one just needs enough to render a mini card visual and store an ad-hoc
  * held-card reference. A card found this way never gets reward-rate data,

@@ -6,7 +6,6 @@ import type { TopPickData } from "./CardRecommenderWidget";
 import type { ArsenalCardData } from "./CardArsenalWidget";
 import type { CardOption } from "../quiz/QuizWizard";
 import { firstNameFrom } from "../results/cardHolderName";
-import { hasReachedDailyGoalSearchLimit, MAX_GOAL_SEARCHES_PER_DAY } from "@/lib/goals/rateLimit";
 
 function greetingFor(name: string): string {
   const hour = new Date().getHours();
@@ -28,7 +27,7 @@ export default async function HomePage() {
   const session = await auth();
   const userId = session!.user.id;
 
-  // These three don't depend on each other, only on userId — running them
+  // These two don't depend on each other, only on userId — running them
   // sequentially (as this page used to) means the page-transition overlay
   // (which can't shrink away until this Server Component actually finishes
   // rendering) sits fully opaque for the SUM of every round trip. In
@@ -36,7 +35,7 @@ export default async function HomePage() {
   // navigating back to /home specifically felt "stuck" longer than other
   // pages: results/page.tsx already parallelizes its two queries, this one
   // didn't.
-  const [[profile], arsenalCards, atGoalSearchDailyLimit] = await Promise.all([
+  const [[profile], arsenalCards] = await Promise.all([
     db.select({ id: userProfile.id }).from(userProfile).where(eq(userProfile.userId, userId)).limit(1),
     db
       .select({
@@ -48,7 +47,6 @@ export default async function HomePage() {
       .from(userCardArsenal)
       .innerJoin(cards, eq(cards.id, userCardArsenal.cardId))
       .where(and(eq(userCardArsenal.userId, userId), eq(userCardArsenal.status, "held"))),
-    hasReachedDailyGoalSearchLimit(userId),
   ]);
 
   let topPick: TopPickData | null = null;
@@ -102,8 +100,6 @@ export default async function HomePage() {
       topPick={topPick}
       arsenalCards={arsenalCards}
       cardOptions={cardOptions}
-      atGoalSearchDailyLimit={atGoalSearchDailyLimit}
-      goalSearchDailyLimit={MAX_GOAL_SEARCHES_PER_DAY}
     />
   );
 }

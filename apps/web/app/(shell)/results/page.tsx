@@ -8,7 +8,7 @@ import { ResultsView } from "./ResultsView";
 import { firstNameFrom } from "./cardHolderName";
 
 /**
- * MIMIR only ever recommends its actual top picks (computeAndPersistRecommendations
+ * Ember only ever recommends its actual top picks (computeAndPersistRecommendations
  * caps this at MAX_RECOMMENDATIONS — currently 20), not every card in
  * whatever source set was scored against, which can now run into the
  * hundreds (D15 + the expanded seeded catalog). So this page fetches the

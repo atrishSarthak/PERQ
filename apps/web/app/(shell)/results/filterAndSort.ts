@@ -54,9 +54,9 @@ export function filterCards(cardsList: ResultsCard[], filters: ResultsFilters): 
 }
 
 /**
- * All three sort tabs operate on the same set (only cards MIMIR actually
+ * All three sort tabs operate on the same set (only cards Ember actually
  * scored — i.e. eligible recommendations, per D1). best-match preserves
- * MIMIR's own authored rank; the other two are simple re-derivations of
+ * Ember's own authored rank; the other two are simple re-derivations of
  * already-stored fields, not new computation.
  */
 export function sortCards(cardsList: ResultsCard[], mode: SortMode): ResultsCard[] {

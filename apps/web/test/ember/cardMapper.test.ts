@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapDbCardToScoringCard } from "@/lib/mimir/cardMapper";
+import { mapDbCardToScoringCard } from "@/lib/ember/cardMapper";
 import type { Card as DbCard } from "@perq/db";
 
 function makeDbCard(overrides: Partial<DbCard> = {}): DbCard {

@@ -29,7 +29,7 @@ vi.mock("@perq/db", () => ({
   },
 }));
 
-const { buildGroundingContext } = await import("@/lib/mimir/chatContext");
+const { buildGroundingContext } = await import("@/lib/ember/chatContext");
 
 describe("buildGroundingContext (D2/D11)", () => {
   beforeEach(() => {

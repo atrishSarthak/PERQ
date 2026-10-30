@@ -9,7 +9,7 @@ export interface ClarificationTurn {
   answer: string;
 }
 
-// Bounded so MIMIR never interrogates a user indefinitely — ask one thing
+// Bounded so Ember never interrogates a user indefinitely — ask one thing
 // at a time, but never more than this many times before committing to a
 // best-effort answer or an honest decline.
 export const MAX_CLARIFYING_ROUNDS = 3;

@@ -3,18 +3,18 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import { parseSSEStream } from "../quiz/parseSSEStream";
 
-export interface MimirChatMessage {
+export interface EmberChatMessage {
   role: "user" | "assistant" | "error";
   content: string;
 }
 
-interface MimirChatContextValue {
+interface EmberChatContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
-  messages: MimirChatMessage[];
+  messages: EmberChatMessage[];
   sending: boolean;
   // True only for the gap between sending and the first chunk (or error)
-  // arriving — MimirChatPanel shows "MIMIR is thinking…" for this window,
+  // arriving — EmberChatPanel shows "Ember is thinking…" for this window,
   // then switches to the growing reply bubble once streaming actually
   // starts. Distinct from `sending`, which stays true for the whole
   // request (guards against a second send while one is in flight).
@@ -22,10 +22,10 @@ interface MimirChatContextValue {
   send: (text: string) => Promise<void>;
 }
 
-const MimirChatContext = createContext<MimirChatContextValue | null>(null);
+const EmberChatContext = createContext<EmberChatContextValue | null>(null);
 
 /**
- * Shell-wide MIMIR chat state, shared by the top bar's quick-ask input and
+ * Shell-wide Ember chat state, shared by the top bar's quick-ask input and
  * the right side panel that opens on first send — one conversation, two
  * entry points. Calls the same /api/chat endpoint the old per-page Chat
  * component used; server-side context is reconstructed fresh per request
@@ -38,9 +38,9 @@ const MimirChatContext = createContext<MimirChatContextValue | null>(null);
  * loop isn't itself streamed, see the route's comment), but the client
  * experience reads the same as a live-streaming reply.
  */
-export function MimirChatProvider({ children }: { children: React.ReactNode }) {
+export function EmberChatProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<MimirChatMessage[]>([]);
+  const [messages, setMessages] = useState<EmberChatMessage[]>([]);
   const [sending, setSending] = useState(false);
   const [awaitingReply, setAwaitingReply] = useState(false);
 
@@ -65,7 +65,7 @@ export function MimirChatProvider({ children }: { children: React.ReactNode }) {
           const data = await res.json().catch(() => ({}));
           setMessages((prev) => [
             ...prev,
-            { role: "error", content: data.error ?? "MIMIR couldn't respond — try again." },
+            { role: "error", content: data.error ?? "Ember couldn't respond — try again." },
           ]);
           return;
         }
@@ -89,14 +89,14 @@ export function MimirChatProvider({ children }: { children: React.ReactNode }) {
           } else if (e.type === "error") {
             setMessages((prev) => [
               ...prev,
-              { role: "error", content: e.message ?? "MIMIR couldn't respond — try again." },
+              { role: "error", content: e.message ?? "Ember couldn't respond — try again." },
             ]);
           }
         }
       } catch {
         setMessages((prev) => [
           ...prev,
-          { role: "error", content: "MIMIR couldn't respond — try again." },
+          { role: "error", content: "Ember couldn't respond — try again." },
         ]);
       } finally {
         setSending(false);
@@ -107,14 +107,14 @@ export function MimirChatProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <MimirChatContext.Provider value={{ open, setOpen, messages, sending, awaitingReply, send }}>
+    <EmberChatContext.Provider value={{ open, setOpen, messages, sending, awaitingReply, send }}>
       {children}
-    </MimirChatContext.Provider>
+    </EmberChatContext.Provider>
   );
 }
 
-export function useMimirChat() {
-  const ctx = useContext(MimirChatContext);
-  if (!ctx) throw new Error("useMimirChat must be used within a MimirChatProvider");
+export function useEmberChat() {
+  const ctx = useContext(EmberChatContext);
+  if (!ctx) throw new Error("useEmberChat must be used within a EmberChatProvider");
   return ctx;
 }

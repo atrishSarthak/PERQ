@@ -72,7 +72,7 @@ export function CardRecommenderWidget({
           {/* min-w-0 + min-h-0: without them, a flex child defaults to
               min-width/height:auto, which lets this column (and the
               line-clamped paragraph inside it) refuse to shrink below its
-              unclamped content size — the actual cause of a long MIMIR
+              unclamped content size — the actual cause of a long Ember
               explanation overflowing the widget's fixed-height row despite
               the line-clamp below. */}
           <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5">
@@ -80,7 +80,7 @@ export function CardRecommenderWidget({
               className="font-body text-[11px] font-semibold uppercase tracking-wide"
               style={{ color: "var(--accent)" }}
             >
-              Top pick from MIMIR
+              Top pick from Ember
             </p>
             <p className="truncate font-display text-xl font-semibold" style={{ color: C.textPrimary }}>
               {topPick.issuer} {topPick.name}
@@ -109,7 +109,7 @@ export function CardRecommenderWidget({
       ) : quizTaken ? (
         <div className="mt-3 flex flex-1 flex-col justify-center gap-2">
           <p className="font-body text-[15px] leading-relaxed" style={{ color: C.textSecondary }}>
-            None of the cards MIMIR checked matched your income eligibility this time.
+            None of the cards Ember checked matched your income eligibility this time.
           </p>
           <Link
             href="/results"
@@ -126,7 +126,7 @@ export function CardRecommenderWidget({
               Find your perfect card in 2 minutes
             </p>
             <p className="max-w-[380px] font-body text-[15px] leading-relaxed" style={{ color: C.textSecondary }}>
-              Answer a few quick questions about how you spend and MIMIR will match you with the cards worth
+              Answer a few quick questions about how you spend and Ember will match you with the cards worth
               having.
             </p>
             <button

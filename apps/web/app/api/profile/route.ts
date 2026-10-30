@@ -3,11 +3,11 @@ import { and, eq } from "drizzle-orm";
 import { db, recommendations, userProfile } from "@perq/db";
 import type { QuizAnswers } from "@perq/scoring-engine";
 import { requireAuth, isAuthed } from "@/lib/auth";
-import { profileEditSchema, validateFieldValue } from "@/lib/mimir/profileFieldSchema";
+import { profileEditSchema, validateFieldValue } from "@/lib/ember/profileFieldSchema";
 import {
   computeAndPersistRecommendations,
   type PreviousTopCard,
-} from "@/lib/mimir/computeRecommendations";
+} from "@/lib/ember/computeRecommendations";
 
 /**
  * PATCH /api/profile — edits one of the 13 quiz answers (PRD §11).

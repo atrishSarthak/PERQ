@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "eval": "tsx eval/mimir-explanations.eval.ts"
+    "eval": "tsx eval/ember.eval.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.2",

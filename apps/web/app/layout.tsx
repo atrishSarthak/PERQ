@@ -4,8 +4,8 @@ import "./globals.css";
 import { PageTransition } from "@/components/transitions/PageTransition";
 
 export const metadata: Metadata = {
-  title: "PERQ — MIMIR",
-  description: "MIMIR recommends the right credit card for you.",
+  title: "PERQ — Ember",
+  description: "Ember recommends the right credit card for you.",
 };
 
 export default function RootLayout({

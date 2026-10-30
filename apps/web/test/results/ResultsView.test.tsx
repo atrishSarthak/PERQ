@@ -9,15 +9,15 @@ vi.mock("next/navigation", () => ({
 }));
 
 const { ResultsView } = await import("@/app/(shell)/results/ResultsView");
-const { MimirChatProvider } = await import("@/app/(shell)/mimir/MimirChatContext");
+const { EmberChatProvider } = await import("@/app/(shell)/ember/EmberChatContext");
 
-// ResultCard's "Learn more" button uses useMimirChat(), so every render
-// needs a MimirChatProvider ancestor, same as the real (shell) layout.
+// ResultCard's "Learn more" button uses useEmberChat(), so every render
+// needs a EmberChatProvider ancestor, same as the real (shell) layout.
 function renderResultsView(props: React.ComponentProps<typeof ResultsView>) {
   return render(
-    <MimirChatProvider>
+    <EmberChatProvider>
       <ResultsView {...props} />
-    </MimirChatProvider>
+    </EmberChatProvider>
   );
 }
 

@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   const parsed = goalSubmitSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Tell MIMIR what you're trying to buy first.", issues: parsed.error.issues },
+      { error: "Tell Ember what you're trying to buy first.", issues: parsed.error.issues },
       { status: 400 }
     );
   }
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     if (await hasReachedDailyGoalSearchLimit(user.id)) {
       return NextResponse.json(
         {
-          error: `You've hit today's limit of ${MAX_GOAL_SEARCHES_PER_DAY} goal searches — MIMIR needs to pace these to keep the search budget fair for everyone. Try again tomorrow.`,
+          error: `You've hit today's limit of ${MAX_GOAL_SEARCHES_PER_DAY} goal searches — Ember needs to pace these to keep the search budget fair for everyone. Try again tomorrow.`,
         },
         { status: 429 }
       );

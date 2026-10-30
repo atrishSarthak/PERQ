@@ -6,7 +6,7 @@
  * read() call.
  *
  * Feature-agnostic despite living under quiz/ — shared by the quiz-submit
- * SSE stream and MimirChatContext's streamed chat replies. Not moved to a
+ * SSE stream and EmberChatContext's streamed chat replies. Not moved to a
  * more neutral location to avoid the import churn; feel free to relocate
  * if a third consumer shows up.
  */

@@ -30,7 +30,7 @@ const UTILIZATION_WARNING_THRESHOLD = 0.7;
 // large reward-value gap.
 const UTILIZATION_PENALTY_RATE = 0.05;
 
-// If the user's statement closes within this many days, MIMIR notes that
+// If the user's statement closes within this many days, Ember notes that
 // waiting maximizes interest-free float. Beyond this window, waiting isn't a
 // meaningfully different recommendation from buying now, so no note is
 // generated.

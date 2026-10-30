@@ -9,7 +9,7 @@ import { MAX_CLARIFYING_ROUNDS, type ClarificationTurn } from "./clarification";
  * same primitive Feature 1's card search already uses for its own non-grounded
  * step) that:
  *   1. Checks the goal is genuinely a "where/how should I buy this" purchase
- *      question — MIMIR's actual scope — declining honestly otherwise.
+ *      question — Ember's actual scope — declining honestly otherwise.
  *   2. Classifies directly into the existing 8-value SpendCategory taxonomy
  *      (the same one cards.rewardRates already uses everywhere else), not a
  *      bespoke category system.
@@ -67,19 +67,19 @@ function buildPrompt(
 ): string {
   const transcript =
     clarification.length > 0
-      ? `\n\nMIMIR already asked follow-up questions and the user answered:\n${clarification
+      ? `\n\nEmber already asked follow-up questions and the user answered:\n${clarification
           .map((t, i) => `Q${i + 1}: ${t.question}\nA${i + 1}: ${t.answer}`)
           .join("\n")}\n\nTreat these as already-known context — do not ask about anything already covered above.`
       : "";
 
   const proceedInstruction = mustProceed
-    ? `\n\nMIMIR has already asked the maximum number of clarifying questions for this goal. You MUST NOT set needsClarification to true again. Either commit to legitimate:true with your best-effort facts (using sensible, clearly-reasonable defaults for anything still missing — note any assumption briefly in "summary"), or decide the goal is unsupported. Never ask another question.`
+    ? `\n\nEmber has already asked the maximum number of clarifying questions for this goal. You MUST NOT set needsClarification to true again. Either commit to legitimate:true with your best-effort facts (using sensible, clearly-reasonable defaults for anything still missing — note any assumption briefly in "summary"), or decide the goal is unsupported. Never ask another question.`
     : "";
 
-  return `A user of a financial purchase-advisor app named MIMIR stated this purchase goal in plain language: "${goalText}"${transcript}
+  return `A user of a financial purchase-advisor app named Ember stated this purchase goal in plain language: "${goalText}"${transcript}
 
 Determine:
-1. "legitimate" — is this genuinely a "where should I buy this, and how should I pay for it" purchase question? MIMIR only helps with real purchase decisions (a product, an event/experience ticket, a booking, a service purchase) — set false for anything else (general chat, advice unrelated to buying something, or something too vague to ever become a concrete purchase search).
+1. "legitimate" — is this genuinely a "where should I buy this, and how should I pay for it" purchase question? Ember only helps with real purchase decisions (a product, an event/experience ticket, a booking, a service purchase) — set false for anything else (general chat, advice unrelated to buying something, or something too vague to ever become a concrete purchase search).
 2. If legitimate, "category" — classify the purchase into exactly ONE of these 8 spend categories, picking the closest fit: dining (restaurant/food-delivery purchases), travel (flights, attraction/experience tickets, event/concert tickets), hotels (hotel/stay bookings), fuel (fuel/EV charging), groceries (grocery delivery/purchases), ecommerce (physical products — electronics, appliances, general retail), utilities (bill/utility payments), general (anything else, including movie tickets, which don't fit any of the above cleanly). Always pick the single closest category — never leave this unset when legitimate is true.
 3. "summary" — a one-line normalized restatement of exactly what they're trying to buy.
 4. "subject" — the core product/event/service name.

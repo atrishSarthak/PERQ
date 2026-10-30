@@ -26,8 +26,8 @@ const MIN_STROKE_WIDTH = 2;
  * un-draws/thins back down once the new page has mounted — played on
  * every client-side navigation (next/link clicks, router.push —
  * next-transition-router's `auto` prop patches both). Gold, not accent
- * blue, deliberately — gold is reserved for MIMIR "brand moment"
- * flourishes (Top Pick badge, this), while blue stays for MIMIR-attributed
+ * blue, deliberately — gold is reserved for Ember "brand moment"
+ * flourishes (Top Pick badge, this), while blue stays for Ember-attributed
  * text/UI, per the existing color split.
  *
  * The PERQ wordmark sits centered on a fixed black strip the whole time

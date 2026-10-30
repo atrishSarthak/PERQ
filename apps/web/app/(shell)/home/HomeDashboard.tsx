@@ -1,10 +1,9 @@
 "use client";
 
-import { AskMimirWidget } from "./AskMimirWidget";
+import { AskEmberWidget } from "./AskEmberWidget";
 import { CardRecommenderWidget, type TopPickData } from "./CardRecommenderWidget";
 import { CardArsenalWidget, type ArsenalCardData } from "./CardArsenalWidget";
 import { ComingSoonWidget } from "./ComingSoonWidget";
-import { GoalAdvisorWidget } from "./GoalAdvisorWidget";
 import type { CardOption } from "../quiz/QuizWizard";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
@@ -19,8 +18,11 @@ import { DASHBOARD_COLORS as C } from "./dashboardTheme";
  * grid), which as a side effect makes the whole page's left/right column
  * rhythm consistent top to bottom:
  *   Card Recommender  1/1/auto/9   Card Arsenal  1/9/3/13 (spans rows 1-2)
- *   Ask MIMIR         2/1/auto/9
- *   Goal-Based        3/1/auto/9   MIMIR for Chrome  3/9/auto/13
+ *   Ask Ember         2/1/auto/9
+ *   Card Manager      3/1/auto/9   Ember for Chrome  3/9/auto/13
+ *
+ * Feature 3 (Goal-Based Advisor) is retired (docs/AUDIT.md §4): its widget
+ * is no longer rendered; the Card Manager placeholder takes its cell.
  */
 export function HomeDashboard({
   greeting,
@@ -29,8 +31,6 @@ export function HomeDashboard({
   topPick,
   arsenalCards,
   cardOptions,
-  atGoalSearchDailyLimit,
-  goalSearchDailyLimit,
 }: {
   greeting: string;
   dateString: string;
@@ -38,8 +38,6 @@ export function HomeDashboard({
   topPick: TopPickData | null;
   arsenalCards: ArsenalCardData[];
   cardOptions: CardOption[];
-  atGoalSearchDailyLimit: boolean;
-  goalSearchDailyLimit: number;
 }) {
   return (
     <div style={{ backgroundColor: C.pageBg, minHeight: "100vh" }} className="px-16 py-14 pb-24">
@@ -62,17 +60,20 @@ export function HomeDashboard({
         >
           <CardRecommenderWidget quizTaken={quizTaken} topPick={topPick} cardOptions={cardOptions} />
           <CardArsenalWidget cards={arsenalCards} />
-          <AskMimirWidget />
-          <GoalAdvisorWidget
-            atDailyLimit={atGoalSearchDailyLimit}
-            dailyLimit={goalSearchDailyLimit}
+          <AskEmberWidget />
+          <ComingSoonWidget
+            gridArea="3 / 1 / auto / 9"
+            size="sm"
+            badge="NEXT"
+            title="Card Manager arrives next"
+            body="Track what each card earns you, from your real spends."
           />
           <ComingSoonWidget
             gridArea="3 / 9 / auto / 13"
             size="sm"
             badge="SOON"
-            title="MIMIR for Chrome"
-            body="MIMIR watches for better offers while you shop, wherever you are."
+            title="Ember for Chrome"
+            body="Ember watches for better offers while you shop, wherever you are."
           />
         </div>
       </div>

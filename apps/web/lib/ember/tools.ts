@@ -2,7 +2,7 @@ import type { ToolDefinition } from "@perq/ai";
 import type { QuizAnswers, ScoredCard, UserProfile } from "@perq/scoring-engine";
 import type { Card as DbCard } from "@perq/db";
 
-export interface MimirToolContext {
+export interface EmberToolContext {
   answers: QuizAnswers;
   profile: UserProfile;
   scored: ScoredCard[]; // full ranked list, already computed (D1) before the agent runs
@@ -20,7 +20,7 @@ const TOP_N_FOR_MODEL = 10; // token economy — don't hand the model all ~118 c
  * they don't recompute it). Lives in apps/web, not packages/ai, per D5's
  * generic-runner/feature-specific-tools split.
  */
-export function createMimirTools(ctx: MimirToolContext): ToolDefinition[] {
+export function createEmberTools(ctx: EmberToolContext): ToolDefinition[] {
   const getUserProfile: ToolDefinition = {
     name: "getUserProfile",
     description:

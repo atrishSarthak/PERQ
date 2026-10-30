@@ -3,7 +3,7 @@ import type { AgentStepEvent } from "@perq/ai";
 /**
  * D3 (revised): narration is driven by actual tool-call events, not a
  * fixed script. Maps packages/ai's generic AgentStepEvent to a display
- * label — this mapping is Feature-1-specific (knows about MIMIR's tool
+ * label — this mapping is Feature-1-specific (knows about Ember's tool
  * names and card-name shape), so it lives in apps/web, not packages/ai or
  * packages/ui.
  *
@@ -20,23 +20,23 @@ export function narrationLabelForStep(
   if (event.type === "tool_call") {
     switch (event.toolName) {
       case "getUserProfile":
-        return "MIMIR is reading your profile";
+        return "Ember is checking your profile";
       case "scoreCards":
         return typeof scoredCardCount === "number"
-          ? `MIMIR is scoring ${scoredCardCount} cards`
-          : "MIMIR is scoring your cards";
+          ? `Ember compared ${scoredCardCount} cards`
+          : "Ember is comparing your cards";
       case "getCardDetails": {
         const cardId = event.args["cardId"];
         const cardName =
           typeof cardId === "string" ? resolveCardName?.(cardId) : undefined;
-        return cardName ? `MIMIR is looking up ${cardName}` : "MIMIR is looking up a card";
+        return cardName ? `Ember is looking up ${cardName}` : "Ember is looking up a card";
       }
       default:
         return null;
     }
   }
   if (event.type === "final") {
-    return "MIMIR is writing your recommendation";
+    return "Ember is writing your recommendation";
   }
   return null;
 }

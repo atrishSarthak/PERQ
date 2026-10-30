@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeCardsVersion, computeProfileHash, computeSearchBucketKey } from "@/lib/mimir/hash";
+import { computeCardsVersion, computeProfileHash, computeSearchBucketKey } from "@/lib/ember/hash";
 import type { QuizAnswers } from "@perq/scoring-engine";
 
 const baseAnswers: QuizAnswers = {

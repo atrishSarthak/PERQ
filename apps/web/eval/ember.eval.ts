@@ -8,7 +8,7 @@ config({ path: resolve(__dirname, "../../../.env") });
 import { scoreCards } from "@perq/scoring-engine";
 import { runGeminiAgent, createGeminiModelCaller, type ToolDefinition } from "@perq/ai";
 import { FIXTURES } from "./fixtures";
-import { EXPLANATION_SYSTEM_PROMPT } from "../lib/mimir/prompt";
+import { EXPLANATION_SYSTEM_PROMPT } from "../lib/ember/prompt";
 
 // PRD's own compliance bar (§13): no urgency/scarcity language anywhere,
 // ever — checked directly against real model output here, not assumed.
@@ -96,7 +96,7 @@ async function runFixture(fixture: (typeof FIXTURES)[number]): Promise<EvalResul
   const result = await runGeminiAgent({
     systemPrompt: EXPLANATION_SYSTEM_PROMPT,
     history: [
-      { role: "user", content: "Write MIMIR's explanation for this user's #1 recommended card now." },
+      { role: "user", content: "Write Ember's explanation for this user's #1 recommended card now." },
     ],
     tools,
     callModel: createGeminiModelCaller(requireGeminiKey()),
@@ -149,7 +149,7 @@ function requireGeminiKey(): string {
 }
 
 async function main() {
-  console.log(`Running MIMIR explanation eval suite (${FIXTURES.length} fixtures)...\n`);
+  console.log(`Running Ember explanation eval suite (${FIXTURES.length} fixtures)...\n`);
   const results: EvalResult[] = [];
 
   for (const fixture of FIXTURES) {

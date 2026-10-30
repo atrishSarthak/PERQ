@@ -24,7 +24,7 @@ export interface NarrationProps {
 const DEFAULT_MIN_STEP_DURATION_MS = 400;
 
 /**
- * The "MIMIR is working" narration component (PRD §9.3, Design System §5).
+ * The "Ember is working" narration component (PRD §9.3, Design System §5).
  * A structured, visible step-list — never a silent spinner. The list itself
  * is an aria-live="polite" region (DR9) so screen-reader users hear each
  * step as it's announced, not silence through the whole wait.

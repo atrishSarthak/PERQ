@@ -40,7 +40,7 @@ Deferred work captured with context, per `/plan-eng-review`. Not blockers for Fe
 
 **Why:** D2 rejected it for v1 specifically because it's ~2 months old with unproven retention guarantees — that reasoning has a shelf life, not a permanent verdict.
 
-**Pros:** Could simplify `apps/web/lib/mimir`'s chat context code later if the API proves reliable; worth a scheduled second look rather than an implicit "never revisit."
+**Pros:** Could simplify `apps/web/lib/ember`'s chat context code later if the API proves reliable; worth a scheduled second look rather than an implicit "never revisit."
 
 **Cons:** Speculative — no concrete trigger date, just "later"; low priority relative to shipping Feature 1.
 

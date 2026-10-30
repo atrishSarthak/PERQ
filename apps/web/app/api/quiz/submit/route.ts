@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, userProfile } from "@perq/db";
 import { requireAuth, isAuthed } from "@/lib/auth";
-import { quizAnswersSchema } from "@/lib/mimir/quizAnswersSchema";
-import { computeAndPersistRecommendations } from "@/lib/mimir/computeRecommendations";
+import { quizAnswersSchema } from "@/lib/ember/quizAnswersSchema";
+import { computeAndPersistRecommendations } from "@/lib/ember/computeRecommendations";
 
 // D3: SSE narration requires the route to opt out of static/cached
 // behavior and the Response to be returned before the loop completes —
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
       try {
         // Plain server-side step, not narrated — saving the form isn't an
-        // agentic action; MIMIR's own narration starts once the agent
+        // agentic action; Ember's own narration starts once the agent
         // reads this back via the getUserProfile tool.
         await db
           .insert(userProfile)

@@ -12,7 +12,7 @@ import type { QuizAnswers } from "@perq/scoring-engine";
 import { QUESTIONS } from "./questions";
 import { parseSSEStream } from "./parseSSEStream";
 import { CardSearchField, type CardSearchOption } from "./CardSearchField";
-import { MimirLoadingSequence } from "./MimirLoadingSequence";
+import { EmberLoadingSequence } from "./EmberLoadingSequence";
 
 export type CardOption = CardSearchOption;
 
@@ -33,7 +33,7 @@ function isAnswered(key: string, answers: Answers): boolean {
 /**
  * The onboarding quiz — a shadcn-style Questionnaire in a Dialog (Task 1):
  * one question per step inside a modal, progress indicator, Prev/Next, a
- * Submit that transitions into MIMIR's branded loading sequence before
+ * Submit that transitions into Ember's branded loading sequence before
  * dismissing into the results page underneath. Reused as-is by Task 2's
  * "Retake the Quiz" — the results page opens this same component in place,
  * passing an onComplete that closes the modal and refreshes instead of
@@ -161,7 +161,7 @@ export function QuizWizard({
             </button>
           </div>
         ) : (
-          <MimirLoadingSequence steps={narrationSteps} />
+          <EmberLoadingSequence steps={narrationSteps} />
         )
       ) : (
         <div ref={containerRef} onKeyDown={handleKeyDown} className="flex flex-col gap-6">

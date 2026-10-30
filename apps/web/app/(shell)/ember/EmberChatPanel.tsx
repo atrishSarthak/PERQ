@@ -5,16 +5,16 @@ import { useState } from "react";
 import { MessageScroller } from "@/components/ui/message-scroller";
 import { BubbleGroup } from "@/components/ui/bubble-group";
 import { Message } from "@/components/ui/message";
-import { useMimirChat, type MimirChatMessage } from "./MimirChatContext";
+import { useEmberChat, type EmberChatMessage } from "./EmberChatContext";
 
 /**
- * Right-side chat panel, opened by MimirChatContext on the first message
+ * Right-side chat panel, opened by EmberChatContext on the first message
  * sent from the top bar. Has its own input for continued back-and-forth —
- * the top bar's AskMimirBar is just the entry point, not the only way to
+ * the top bar's AskEmberBar is just the entry point, not the only way to
  * send a message once the conversation is going.
  */
-export function MimirChatPanel() {
-  const { open, setOpen, messages, sending, awaitingReply, send } = useMimirChat();
+export function EmberChatPanel() {
+  const { open, setOpen, messages, sending, awaitingReply, send } = useEmberChat();
   const [input, setInput] = useState("");
 
   async function handleSend() {
@@ -37,20 +37,20 @@ export function MimirChatPanel() {
       />
       <aside
         role="dialog"
-        aria-label="Chat with MIMIR"
+        aria-label="Chat with Ember"
         className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col shadow-xl"
         style={{ backgroundColor: "var(--bg-surface)", borderLeft: "1px solid var(--border)" }}
       >
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
           <div className="flex items-center gap-2">
             <Image
-              src="/mimir-avatar.png"
+              src="/ember-avatar.png"
               alt=""
               width={64}
               height={64}
               className="h-7 w-7 rounded-full"
             />
-            <p className="font-display text-h2 text-text-primary">MIMIR</p>
+            <p className="font-display text-h2 text-text-primary">Ember</p>
           </div>
           <button
             type="button"
@@ -65,7 +65,7 @@ export function MimirChatPanel() {
         <MessageScroller className="flex-1" autoScrollOn={messages.length}>
           {groups.length === 0 ? (
             <p className="font-body text-body-sm text-text-secondary">
-              Ask MIMIR anything about your results.
+              Ask Ember anything about your results.
             </p>
           ) : (
             groups.map((group, i) => {
@@ -87,7 +87,7 @@ export function MimirChatPanel() {
             })
           )}
           {awaitingReply && (
-            <p className="font-body text-body-sm text-text-secondary">MIMIR is thinking…</p>
+            <p className="font-body text-body-sm text-text-secondary">Ember is thinking…</p>
           )}
         </MessageScroller>
 
@@ -121,8 +121,8 @@ export function MimirChatPanel() {
   );
 }
 
-function groupMessages(messages: MimirChatMessage[]) {
-  const groups: { role: MimirChatMessage["role"]; messages: MimirChatMessage[] }[] = [];
+function groupMessages(messages: EmberChatMessage[]) {
+  const groups: { role: EmberChatMessage["role"]; messages: EmberChatMessage[] }[] = [];
   for (const m of messages) {
     const last = groups[groups.length - 1];
     if (last && last.role === m.role && m.role !== "error") {

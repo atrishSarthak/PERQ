@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { profileEditSchema, validateFieldValue } from "@/lib/mimir/profileFieldSchema";
+import { profileEditSchema, validateFieldValue } from "@/lib/ember/profileFieldSchema";
 
 describe("profileEditSchema", () => {
   it("accepts a valid field/value patch request shape", () => {

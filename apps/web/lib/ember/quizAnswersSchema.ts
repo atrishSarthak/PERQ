@@ -21,7 +21,7 @@ const spendCategory = z.enum([
 
 // Feature 3 Engineering Plan §11 / 2B: the 6 new financial-context/billing-
 // cycle fields join the existing 13 as more keys on this SAME object rather
-// than a separate schema/table — apps/web/lib/mimir/profileFieldSchema.ts
+// than a separate schema/table — apps/web/lib/ember/profileFieldSchema.ts
 // derives its editable-field list generically from this schema's shape, so
 // PATCH /api/profile supports editing any of these 6 with zero endpoint
 // code changes. All nullable/optional: a user who hasn't filled these in

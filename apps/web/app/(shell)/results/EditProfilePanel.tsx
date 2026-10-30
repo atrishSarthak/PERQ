@@ -136,7 +136,7 @@ export function EditProfilePanel({
           Financial context
         </h3>
         <p className="font-body text-body-sm text-text-secondary">
-          Powers MIMIR&rsquo;s billing-cycle timing advice on goal searches — e.g. suggesting you
+          Powers Ember&rsquo;s billing-cycle timing advice on goal searches — e.g. suggesting you
           wait a few days for your statement to close. Fully optional and self-reported, same as
           everything else in your profile.
         </p>

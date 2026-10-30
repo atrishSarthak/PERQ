@@ -4,7 +4,7 @@ import { FIXTURES } from "@/eval/fixtures";
 
 /**
  * The eval suite's deterministic-ranking assumption is a hard prerequisite
- * for its Gemini-grounding checks to mean anything (mimir-explanations.eval.ts
+ * for its Gemini-grounding checks to mean anything (ember-explanations.eval.ts
  * runs live, hits the real Gemini API, and costs free-tier quota — this
  * test verifies each fixture's expectedTopCardId against the real,
  * deterministic scoreCards() at zero cost, on every regular test run,

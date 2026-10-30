@@ -20,3 +20,13 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
    defaults to `packages/db/data/cards.json`.
 7. **Expo SDK 58** (current stable, 2026-09-29) for `apps/mobile`. Expo Go on the App Store tracks the
    newest SDK; RUNNING.md tells you to confirm the SDK shown in Expo Go.
+8. **Rename scope.** MIMIR → Ember in all tracked code, tests, prompts, UI copy, README/TODOS, the
+   tracked planning PRDs and the design-reference mockup. Not touched: applied drizzle migrations and
+   snapshots (history; migration `0005_ember_agent_default` changes both `agent` defaults and backfills
+   existing rows), `docs/AUDIT.md` and the handoff spec, and your **untracked** root drafts
+   (`PERQ_*_Plan.md`, `PERQ_Feature3_PRD.md`, `MIMIR_Avtar.png`), which I won't edit unasked.
+   `git grep -i mimir` outside those paths returns nothing.
+9. **Narration labels** follow the handoff copy: "Ember is checking your profile", "Ember compared
+   N cards", "Ember is writing your recommendation".
+10. **Goal advisor unlinked.** The home dashboard's Goal widget became a "Card Manager arrives next"
+    placeholder. The `/goal` routes still exist but nothing links to them.

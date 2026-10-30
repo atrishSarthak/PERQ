@@ -19,12 +19,12 @@ function secondCategoryLabel(scored: ScoredCard): { category: string; amount: nu
 // the user actually typed in. Rounding to the nearest ₹100 (rather than
 // showing raw figures like "₹5333") keeps that estimate nature visible in
 // the number itself, instead of reading as a suspiciously precise fact
-// MIMIR pulled from nowhere.
+// Ember pulled from nowhere.
 function roundEstimate(amount: number): number {
   return Math.round(amount / 100) * 100;
 }
 
-// Spend-category labels for MIMIR's sentence — only overridden where the raw
+// Spend-category labels for Ember's sentence — only overridden where the raw
 // scoring-engine key wouldn't read naturally in a sentence; "dining",
 // "travel", "hotels", "fuel", "groceries" already do.
 const CATEGORY_SPEND_LABELS: Partial<Record<string, string>> = {
@@ -66,10 +66,10 @@ function pick<T>(options: T[], seed: string): T {
  *      them (not a failure to report).
  *
  * Always names a real card + a real underlying factor (Design System §5:
- * "never a bare score or a vague 'recommended for you'"), written as MIMIR
+ * "never a bare score or a vague 'recommended for you'"), written as Ember
  * would actually say it — direct, personified, no em dashes, and not the
- * same "MIMIR recommends the X" sentence shape every single time. Every ₹
- * figure is explicitly framed as MIMIR's own estimate ("~₹X/month" or
+ * same "Ember recommends the X" sentence shape every single time. Every ₹
+ * figure is explicitly framed as Ember's own estimate ("~₹X/month" or
  * "roughly ₹X/month"), never stated as if the user typed that exact number.
  */
 export function buildTemplateExplanation(scored: ScoredCard, cardName: string): string {
@@ -80,8 +80,8 @@ export function buildTemplateExplanation(scored: ScoredCard, cardName: string): 
     return pick(
       [
         `The ${cardName} is a solid all-rounder for your overall spend pattern.`,
-        `Nothing in your spend screams one category, so MIMIR likes the ${cardName}'s broad rewards for your overall spend pattern.`,
-        `MIMIR's take: the ${cardName} covers your overall spend pattern well without leaning on any one category.`,
+        `Nothing in your spend screams one category, so Ember likes the ${cardName}'s broad rewards for your overall spend pattern.`,
+        `Ember's take: the ${cardName} covers your overall spend pattern well without leaning on any one category.`,
       ],
       seed
     );
@@ -93,12 +93,12 @@ export function buildTemplateExplanation(scored: ScoredCard, cardName: string): 
   return pick(
     [
       `You're putting an estimated ~₹${amount}/month into ${category}. The ${cardName} rewards exactly that, so it's the obvious pick.`,
-      `MIMIR ran the numbers: your ${category} spend, roughly ₹${amount}/month based on your answers, lines up perfectly with what the ${cardName} pays back on.`,
+      `Ember ran the numbers: your ${category} spend, roughly ₹${amount}/month based on your answers, lines up perfectly with what the ${cardName} pays back on.`,
       `The ${cardName} earns its keep here. Your ${category} habit alone runs an estimated ~₹${amount}/month, right in its sweet spot.`,
       `Given you're spending an estimated ₹${amount}/month on ${category}, the ${cardName} is the one that actually pays you back for it.`,
-      `MIMIR likes the ${cardName} for you. It rewards ${category} best, and that's roughly ₹${amount} of your monthly spend right there.`,
-      `~₹${amount}/month on ${category} is real money, by MIMIR's estimate. The ${cardName} is built to hand a chunk of it back.`,
-      `MIMIR's reading of your spend: ${category} is where the ${cardName} pulls its weight, worth an estimated ₹${amount} every month.`,
+      `Ember likes the ${cardName} for you. It rewards ${category} best, and that's roughly ₹${amount} of your monthly spend right there.`,
+      `~₹${amount}/month on ${category} is real money, by Ember's estimate. The ${cardName} is built to hand a chunk of it back.`,
+      `Ember's reading of your spend: ${category} is where the ${cardName} pulls its weight, worth an estimated ₹${amount} every month.`,
       `That ~₹${amount}/month you're estimated to spend on ${category}? The ${cardName} turns it into real rewards.`,
     ],
     seed
@@ -106,7 +106,7 @@ export function buildTemplateExplanation(scored: ScoredCard, cardName: string): 
 }
 
 /**
- * The MIMIR's-Top-Pick-specific explanation — deliberately longer than
+ * The Ember's-Top-Pick-specific explanation — deliberately longer than
  * buildTemplateExplanation's one-liner (the results page only asks this
  * much of the #1 card; ranks 2+ stay terse by design, see above). Used as
  * the D7 fallback for the top pick when Gemini fails/is quota-exhausted —
@@ -129,7 +129,7 @@ export function buildTopPickTemplateExplanation(scored: ScoredCard, cardName: st
       pick(
         [
           `The ${cardName} tops your list because your ${category} spend, an estimated ~₹${amount}/month based on your answers, lines up almost exactly with what it rewards best.`,
-          `MIMIR put the ${cardName} at #1 for one clear reason: your ${category} habit, roughly ₹${amount}/month, is squarely in this card's sweet spot.`,
+          `Ember put the ${cardName} at #1 for one clear reason: your ${category} habit, roughly ₹${amount}/month, is squarely in this card's sweet spot.`,
           `Here's why the ${cardName} wins: it pays you back hardest on ${category}, and that's an estimated ₹${amount} of your spend every month.`,
         ],
         seed
@@ -144,7 +144,7 @@ export function buildTopPickTemplateExplanation(scored: ScoredCard, cardName: st
   if (second) {
     const category2 = spendLabel(second.category);
     sentences.push(
-      `It also holds up on ${category2} (~₹${second.amount}/month by MIMIR's estimate), so this isn't a one-trick pick.`
+      `It also holds up on ${category2} (~₹${second.amount}/month by Ember's estimate), so this isn't a one-trick pick.`
     );
   }
 

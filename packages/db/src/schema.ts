@@ -128,7 +128,7 @@ export const cards = pgTable(
       .notNull()
       .defaultNow(),
     // D15: 'seeded' (the curated fallback catalog, PRD §7) | 'web_search'
-    // (MIMIR's live Gemini-grounded search results). searchBucketKey
+    // (Ember's live Gemini-grounded search results). searchBucketKey
     // partitions web_search rows by the coarse profile shape
     // (computeSearchBucketKey) they were searched for — null for seeded
     // rows. sourceUrls carries the citation URLs a web_search row's terms
@@ -168,7 +168,7 @@ export const recommendations = pgTable(
     rank: integer("rank").notNull(),
     score: numeric("score").notNull(),
     explanation: text("explanation").notNull(),
-    agent: text("agent").notNull().default("MIMIR"),
+    agent: text("agent").notNull().default("Ember"),
     // the exact user_profile.answers this recommendation was computed from —
     // keeps a past recommendation explainable even after later profile edits.
     profileSnapshot: jsonb("profile_snapshot").notNull(),
@@ -320,7 +320,7 @@ export const goalRecommendations = pgTable(
     // the "show the work" transparency requirement. Shape:
     // { source: string, sourceUrl: string, outcome: 'succeeded' | 'unconfirmed_price', price?: number }[]
     channelsChecked: jsonb("channels_checked").notNull(),
-    agent: text("agent").notNull().default("MIMIR"),
+    agent: text("agent").notNull().default("Ember"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({

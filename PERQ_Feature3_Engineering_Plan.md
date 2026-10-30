@@ -83,8 +83,8 @@ fetching starts. It returns both the category AND category-specific structured e
 call — e.g. `{category:'movie', movieName, city}` | `{category:'attraction', attractionName,
 city}` | `{category:'electronics', productName}` | `'unsupported'`. On `'unsupported'`, OR on a
 matched category missing a required entity (e.g. no city named for a movie goal), the flow ends
-immediately — zero Firecrawl calls, zero cost, honest narration ("MIMIR isn't sure this fits
-movies, attractions, or electronics yet" / "MIMIR needs to know which city" as appropriate).
+immediately — zero Firecrawl calls, zero cost, honest narration ("Ember isn't sure this fits
+movies, attractions, or electronics yet" / "Ember needs to know which city" as appropriate).
 `goals.category` stores `'unsupported'` explicitly (queryable, distinct from "not yet
 classified"), not null. Only a fully-resolved category + entity set proceeds to D2's deterministic
 channel fetching and D1's scoring+narration call.
@@ -163,13 +163,13 @@ If D1's Gemini narration call itself fails/times out/exceeds the tool-round cap 
 "all channels failed" (D5), this is channel data succeeding but the *explanation* step failing —
 the same `buildFallbackExplanation`-style pattern from Feature 1's D7 applies: a pure function
 generates grounded text directly from `scorePaymentOptions`' already-computed breakdown (e.g.
-*"MIMIR recommends buying on {channel} with your {card} — it's the best combination of price and
+*"Ember recommends buying on {channel} with your {card} — it's the best combination of price and
 rewards for this purchase"*), honoring Design System §5's "never a bare score" rule without an
 LLM call. Not asked as a fresh decision — direct reuse of an already-proven, already-tested
 pattern in this codebase, not a live design fork.
 
 **Total-failure path (both channels fail — D5's `'failed'` on every channel in the category):**
-per PRD §12, this is the *only* case that shows "MIMIR couldn't complete this search right now."
+per PRD §12, this is the *only* case that shows "Ember couldn't complete this search right now."
 No `goal_recommendations` row is written (there's nothing to recommend); the `goals` row still
 exists (it still counted against D8's cap — the search was genuinely attempted).
 
@@ -181,7 +181,7 @@ exists (it still counted against D8's cap — the search was genuinely attempted
 `packages/fetch` exports one thing: `fetchPage(url, options)` — timeout/retry per D4, zero
 awareness of "BookMyShow" or "movies" as concepts. The fixed channel list, per-channel
 search-URL templates, and the category enum all live in `apps/web/lib/goals/channels.ts` —
-mirroring exactly how Feature-1-specific tool definitions live in `apps/web/lib/mimir`, not
+mirroring exactly how Feature-1-specific tool definitions live in `apps/web/lib/ember`, not
 `packages/ai` (D5 in the Feature 1 plan). When Feature 2 becomes the second consumer, it needs
 page-fetching for arbitrary shopping-page URLs it discovers, not a fixed channel list; a
 channel-aware `packages/fetch` would carry dead weight Feature 2 has to ignore or fight.
@@ -189,7 +189,7 @@ channel-aware `packages/fetch` would carry dead weight Feature 2 has to ignore o
 ### 2B — Financial-context fields extend `quizAnswersSchema` in place (PRD §11)
 The 6 new fields (credit score range, EMI count, statement date, due date, outstanding balance,
 credit limit) join the existing 13 as more keys on the same zod object in
-`apps/web/lib/mimir/quizAnswersSchema.ts` (19 fields total). `apps/web/lib/mimir/
+`apps/web/lib/ember/quizAnswersSchema.ts` (19 fields total). `apps/web/lib/ember/
 profileFieldSchema.ts` needs **zero code changes** — its field list already derives generically
 from `quizAnswersSchema.shape`, so `PATCH /api/profile` immediately supports editing any of the 6
 new fields with no new endpoint code. Satisfies PRD §11's "same profile-editing surface"
@@ -219,7 +219,7 @@ requirement by construction, not by convention.
                                                             │
                                               D6: classifyGoal (single-turn,
                                               no tools) ──▶ step event:
-                                                            "MIMIR is figuring out
+                                                            "Ember is figuring out
                                                              what you mean"
                                           ┌─────────────────┴──────────────────┐
                                           ▼                                    ▼
@@ -227,7 +227,7 @@ requirement by construction, not by convention.
                                           │                                    │
                           update goals.category = X          update goals.category
                                           │                   = 'unsupported'; emit
-                          D2: deterministic channel lookup     "MIMIR isn't sure this
+                          D2: deterministic channel lookup     "Ember isn't sure this
                           (channels.ts, category → 2 fixed     fits movies, attractions,
                           channels, no model discretion)       or electronics yet";
                                           │                    done, stream closes
@@ -256,14 +256,14 @@ requirement by construction, not by convention.
        │                              │      channel_fetch_cache  │                              │      channel_fetch_cache
        └──────────────────┬───────────┴───────────┬──────────────┴──────────────┬───────────────┴──────┘
                            ▼                       ▼                             ▼
-                    step event per channel: "MIMIR checked {channel}" / "MIMIR couldn't check {channel}"
+                    step event per channel: "Ember checked {channel}" / "Ember couldn't check {channel}"
                                           │
                           ┌───────────────┴────────────────┐
                           ▼                                 ▼
               BOTH channels 'failed'              at least one channel
               (D9 total-failure path)             'succeeded' or 'checked_empty'
                           │                                 │
-          emit "MIMIR couldn't complete            2B: load arsenal (single
+          emit "Ember couldn't complete            2B: load arsenal (single
           this search right now"; NO               query, Perf-A-style) +
           goal_recommendations row written         financial-context fields
           (goals row already counted, D8)                    │
@@ -272,7 +272,7 @@ requirement by construction, not by convention.
                           │                         reward rate + billing-
                           │                         cycle float/utilization)
                           │                                   │
-                          │                        step event: "MIMIR is
+                          │                        step event: "Ember is
                           │                        comparing your options"
                           │                                   │
                           │                        Gemini narration call,
@@ -283,7 +283,7 @@ requirement by construction, not by convention.
                           │                      success          fail/cap (D9)
                           │                          │                 │
                           │                   step event:       buildFallback-
-                          │                   "MIMIR is         Explanation
+                          │                   "Ember is         Explanation
                           │                   writing your      (grounded in
                           │                   recommendation"   score breakdown)
                           │                          └────────┬────────┘
@@ -345,7 +345,7 @@ apps/web/
 │       ├── hash.ts                       D3: computeQueryKey (date-scoped)
 │       ├── rateLimit.ts                  D8: goals COUNT check
 │       ├── narrationLabels.ts            new file (not a change to
-│       │                                 mimir/narrationLabels.ts) — maps
+│       │                                 ember/narrationLabels.ts) — maps
 │       │                                 Feature-3 tool/step names to labels
 │       ├── computeGoalRecommendation.ts  orchestration: classify → fetch →
 │       │                                 score → narrate → persist (mirrors
@@ -401,7 +401,7 @@ conversation transcript for the full ASCII diagram. Summary:
   (matching `QuizWizard.test.tsx`/`ResultsView.test.tsx`'s existing pattern), not an assumed
   Playwright suite.
 - **Eval suite (confirmed):** `apps/web/eval/goal-recommendations.eval.ts`, mirroring
-  `mimir-explanations.eval.ts`'s pattern — 5-10 synthetic fixtures across all 3 categories,
+  `ember-explanations.eval.ts`'s pattern — 5-10 synthetic fixtures across all 3 categories,
   asserting (1) classification correctly routes realistic phrasings and honestly declines
   unsupported goals, (2) narration is grounded only in `scorePaymentOptions`' actual output
   fields, (3) §13's banned-phrase list (already defined in the existing eval fixture pattern)
@@ -459,14 +459,14 @@ conversation transcript for the full ASCII diagram. Summary:
 | Multi-turn tool-calling agent loop | `packages/ai/src/runGeminiAgent.ts` (D5, Feature 1) | Reused unmodified for D1's narration call — no second generic runner built. |
 | Single-turn structured-output model call | `packages/ai`'s `ModelCaller`/`callModel` shape | Reused for D6's classification call (a `runGeminiAgent` invocation with zero tools, one round). |
 | Transient-retry-with-backoff pattern | `packages/ai/src/client.ts` (`MAX_TRANSIENT_RETRIES`, `RETRY_BASE_DELAY_MS`) | Same shape applied to D4's Firecrawl retry policy, not reinvented. |
-| Shared-cache-with-TTL, soft-delete-on-refresh pattern | `apps/web/lib/mimir/resolveCardSet.ts` + `hash.ts` (D15, Feature 1) | Direct precedent for D3/D7's `channel_fetch_cache` design — bucket key computation, freshness check, fallback-on-failure shape all reused conceptually. |
-| Strict-schema-validated LLM extraction, "never partially nulled" | `apps/web/lib/mimir/cardSearchSchema.ts` (D15) | Direct precedent for D5's channel-extraction schema. |
-| "MIMIR is working" narration component | `packages/ui/src/narration/Narration.tsx` (Design System §5, Feature 1) | Reused as-is — no new UI component. Only a new `apps/web/lib/goals/narrationLabels.ts` mapping file is needed (sibling to, not a change to, `mimir/narrationLabels.ts`). |
+| Shared-cache-with-TTL, soft-delete-on-refresh pattern | `apps/web/lib/ember/resolveCardSet.ts` + `hash.ts` (D15, Feature 1) | Direct precedent for D3/D7's `channel_fetch_cache` design — bucket key computation, freshness check, fallback-on-failure shape all reused conceptually. |
+| Strict-schema-validated LLM extraction, "never partially nulled" | `apps/web/lib/ember/cardSearchSchema.ts` (D15) | Direct precedent for D5's channel-extraction schema. |
+| "Ember is working" narration component | `packages/ui/src/narration/Narration.tsx` (Design System §5, Feature 1) | Reused as-is — no new UI component. Only a new `apps/web/lib/goals/narrationLabels.ts` mapping file is needed (sibling to, not a change to, `ember/narrationLabels.ts`). |
 | SSE narration transport | `apps/web/app/api/quiz/submit/route.ts` (D3, Feature 1) | Direct template for `/api/goals/submit` — same `ReadableStream`/`force-dynamic` shape. |
-| Single-field profile edit, generic by schema shape | `apps/web/lib/mimir/profileFieldSchema.ts` (Feature 1) | Reused with zero code changes once `quizAnswersSchema` is extended (2B). |
+| Single-field profile edit, generic by schema shape | `apps/web/lib/ember/profileFieldSchema.ts` (Feature 1) | Reused with zero code changes once `quizAnswersSchema` is extended (2B). |
 | Auth guard | `apps/web/lib/auth.ts` `requireAuth()`/`isAuthed()` (2A, Feature 1) | Reused as-is, first line of `/api/goals/submit`. |
 | Delete-and-replace / upsert-on-conflict pattern | `userProfile`'s `onConflictDoUpdate` (`quiz/submit/route.ts:41-47`) | Direct precedent for D7's cache upsert. |
-| Fallback-template-on-LLM-failure pattern | `apps/web/lib/mimir/explanationTemplate.ts` (D7, Feature 1) | Direct precedent for D9's narration-call fallback. |
+| Fallback-template-on-LLM-failure pattern | `apps/web/lib/ember/explanationTemplate.ts` (D7, Feature 1) | Direct precedent for D9's narration-call fallback. |
 
 Nothing above is unnecessarily rebuilt — every reuse point above is a conscious application of an
 already-proven pattern in this codebase (Search Before Building, Layer 1).
@@ -481,7 +481,7 @@ already-proven pattern in this codebase (Search Before Building, Layer 1).
 | Classification call | Gemini call fails/times out | Yes (planned) | Not explicitly locked — same D9-style fallback recommended: treat as total-search failure, same UX as D9's "couldn't complete this search" | Explicit failure message, not a silent hang |
 | Channel fetch | Firecrawl timeout/429 exhausted | Yes (planned, eval + unit) | Yes (D5 `'failed'`, D4 retry first) | Distinct "couldn't check {channel}" narration, other channel still shown |
 | Channel extraction | Gemini returns malformed/partial data | Yes (planned) | Yes (D5, strict validation discards whole result) | Same as a channel failure — never a silently wrong price |
-| Both channels fail | Total pipeline failure | Yes (planned) | Yes (D9 total-failure path) | "MIMIR couldn't complete this search right now" — never a broken/endless loading state |
+| Both channels fail | Total pipeline failure | Yes (planned) | Yes (D9 total-failure path) | "Ember couldn't complete this search right now" — never a broken/endless loading state |
 | Narration call fails post-channel-success | Gemini call fails/caps out | Yes (planned, eval + unit) | Yes (D9 fallback template) | Recommendation still shown, template-worded |
 | `channel_fetch_cache` write race | Two requests miss cache simultaneously | Yes (planned) | Yes (D7 unique index + upsert) | No visible difference — no duplicate rows, no crash |
 | Empty card arsenal | User has no held cards | Yes (planned) | Yes (Perf-A load returns empty set gracefully) | Channel-only recommendation, no card suggested |
@@ -574,7 +574,7 @@ in from A+B+C; E fans in from everything, sequenced last by design.
   (+unique idx on channel+query_key), `goal_recommendations`; extend `quizAnswersSchema` to 19
   fields
   - Surfaced by: D3, D5, D7, D8, 2B
-  - Files: `packages/db/schema.ts`, migrations, `apps/web/lib/mimir/quizAnswersSchema.ts`
+  - Files: `packages/db/schema.ts`, migrations, `apps/web/lib/ember/quizAnswersSchema.ts`
   - Verify: migration applies cleanly; regression suite (§6) confirms 13 original fields unchanged
 
 - [ ] **T2 (P1, human: ~4h / CC: ~30min)** — packages/fetch — `fetchPage(url, options)` with

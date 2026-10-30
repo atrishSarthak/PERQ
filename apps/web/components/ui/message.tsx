@@ -6,9 +6,9 @@ import remarkGfm from "remark-gfm";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Both roles render as boxed bubbles, color-coded by voice: MIMIR's
-// replies in accent blue (the "MIMIR-attributed" color used everywhere
-// else — the "✦ MIMIR:" label, narration), the user's own messages in
+// Both roles render as boxed bubbles, color-coded by voice: Ember's
+// replies in accent blue (the "Ember-attributed" color used everywhere
+// else — the "✦ Ember:" label, narration), the user's own messages in
 // gold, so the two voices are visually distinct at a glance.
 const messageVariants = cva("max-w-[85%] rounded-lg px-3 py-2 font-body text-body text-white", {
   variants: {
@@ -20,7 +20,7 @@ const messageVariants = cva("max-w-[85%] rounded-lg px-3 py-2 font-body text-bod
   defaultVariants: { role: "assistant" },
 });
 
-// MIMIR's replies are real Markdown (headings, bold, lists — Gemini writes
+// Ember's replies are real Markdown (headings, bold, lists — Gemini writes
 // them that way on its own) — rendering `content` as plain text left the
 // raw `###`/`**`/`*` syntax visible. These overrides keep every element
 // legible against the bubble's solid color background (white text

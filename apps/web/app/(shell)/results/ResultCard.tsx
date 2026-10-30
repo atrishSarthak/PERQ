@@ -1,7 +1,7 @@
 import type { ResultsCard } from "./types";
 import { CardVisual } from "./CardVisual";
 import { getRewardHighlight } from "./rewardHighlight";
-import { useMimirChat } from "../mimir/MimirChatContext";
+import { useEmberChat } from "../ember/EmberChatContext";
 
 function formatRupee(amount: number): string {
   return `₹${amount.toLocaleString("en-IN")}`;
@@ -19,13 +19,13 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 /**
- * The result card component used for both MIMIR's Top Pick and every card
+ * The result card component used for both Ember's Top Pick and every card
  * in "More Matches" — only the border (isTopPick) differs; the "Top Pick"
  * label itself is rendered by the caller, above the card, not inside it.
  *
  * Layout: card visual (left) and name/stats (right) sit in a row up top,
  * with the arsenal button at the top-right of that row (same right edge
- * as the container); MIMIR's explanation runs full-width beneath both.
+ * as the container); Ember's explanation runs full-width beneath both.
  */
 export function ResultCard({
   card,
@@ -41,9 +41,9 @@ export function ResultCard({
   isTopPick?: boolean;
 }) {
   const held = card.arsenalStatus === "held";
-  const { send } = useMimirChat();
+  const { send } = useEmberChat();
 
-  function askMimirToElaborate() {
+  function askEmberToElaborate() {
     void send(
       `Tell me more about the ${card.issuer} ${card.name}. Why does it fit my profile, and what should I know before applying?`
     );
@@ -114,13 +114,13 @@ export function ResultCard({
         style={{ backgroundColor: "var(--bg-surface-2)" }}
       >
         <p>
-          <span className="font-bold text-accent">✦ MIMIR:</span>{" "}
+          <span className="font-bold text-accent">✦ Ember:</span>{" "}
           {card.recommendation?.explanation ?? "Not yet scored for your profile."}
         </p>
         {card.recommendation && (
           <button
             type="button"
-            onClick={askMimirToElaborate}
+            onClick={askEmberToElaborate}
             className="mt-2 font-body text-caption text-accent opacity-70 underline decoration-dotted underline-offset-2 hover:opacity-100"
           >
             Learn more

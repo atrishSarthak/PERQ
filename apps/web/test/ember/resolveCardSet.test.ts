@@ -42,12 +42,12 @@ vi.mock("@perq/db", () => {
 });
 
 const searchCardsForBucketMock = vi.fn();
-vi.mock("@/lib/mimir/cardSearch", () => ({
+vi.mock("@/lib/ember/cardSearch", () => ({
   searchCardsForBucket: (...args: unknown[]) => searchCardsForBucketMock(...args),
   MIN_VALID_SEARCH_CARDS: 5,
 }));
 
-const { resolveCardSet, SEARCH_CACHE_TTL_MS } = await import("@/lib/mimir/resolveCardSet");
+const { resolveCardSet, SEARCH_CACHE_TTL_MS } = await import("@/lib/ember/resolveCardSet");
 
 const answers: QuizAnswers = {
   heldCardIds: [],
@@ -137,7 +137,7 @@ describe("resolveCardSet (D15)", () => {
 
     expect(result.cardSourceMode).toBe("db_fallback");
     expect(result.activeCards).toEqual(dbState.fallbackCards);
-    expect(onNarrationStep).toHaveBeenCalledWith("MIMIR is using its trusted card list");
+    expect(onNarrationStep).toHaveBeenCalledWith("Ember is using its trusted card list");
   });
 
   it("falls back to the seeded DB set when search returns too few valid cards", async () => {

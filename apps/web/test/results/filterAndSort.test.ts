@@ -110,7 +110,7 @@ describe("sortCards", () => {
     expect(sortCards(cardsList, "best-match").map((c) => c.cardId)).toEqual(["a"]);
   });
 
-  it("best-match sorts by MIMIR's authored rank ascending", () => {
+  it("best-match sorts by Ember's authored rank ascending", () => {
     const cardsList = [
       makeCard({ cardId: "a", recommendation: { rank: 2, score: 50, explanation: "x" } }),
       makeCard({ cardId: "b", recommendation: { rank: 1, score: 10, explanation: "x" } }),

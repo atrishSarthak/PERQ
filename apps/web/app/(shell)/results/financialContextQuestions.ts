@@ -53,7 +53,7 @@ export const FINANCIAL_CONTEXT_QUESTIONS: FinancialQuestionDef[] = [
     key: "statementDate",
     type: "day-of-month",
     prompt: "What day of the month does your card statement close?",
-    subtext: "Lets MIMIR suggest waiting to buy until after it closes, when that helps.",
+    subtext: "Lets Ember suggest waiting to buy until after it closes, when that helps.",
   },
   {
     key: "paymentDueDate",

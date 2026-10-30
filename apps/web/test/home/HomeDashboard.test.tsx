@@ -7,8 +7,8 @@ vi.mock("next/navigation", () => ({
 }));
 
 const { HomeDashboard } = await import("@/app/(shell)/home/HomeDashboard");
-const { MimirChatProvider } = await import("@/app/(shell)/mimir/MimirChatContext");
-const { MimirChatPanel } = await import("@/app/(shell)/mimir/MimirChatPanel");
+const { EmberChatProvider } = await import("@/app/(shell)/ember/EmberChatContext");
+const { EmberChatPanel } = await import("@/app/(shell)/ember/EmberChatPanel");
 
 const cardOptions = [
   { value: "card-1", label: "Test Bank Test Card", name: "Test Card", issuer: "Test Bank", network: "Visa" },
@@ -16,7 +16,7 @@ const cardOptions = [
 
 function renderDashboard(props: Partial<React.ComponentProps<typeof HomeDashboard>> = {}) {
   return render(
-    <MimirChatProvider>
+    <EmberChatProvider>
       <HomeDashboard
         greeting="Good morning, Taylor"
         dateString="Sunday, August 16"
@@ -24,12 +24,10 @@ function renderDashboard(props: Partial<React.ComponentProps<typeof HomeDashboar
         topPick={null}
         arsenalCards={[]}
         cardOptions={cardOptions}
-        atGoalSearchDailyLimit={false}
-        goalSearchDailyLimit={3}
         {...props}
       />
-      <MimirChatPanel />
-    </MimirChatProvider>
+      <EmberChatPanel />
+    </EmberChatProvider>
   );
 }
 
@@ -43,7 +41,7 @@ describe("HomeDashboard", () => {
   it("shows the take-the-quiz CTA when the quiz hasn't been taken", () => {
     renderDashboard({ quizTaken: false, topPick: null });
     expect(screen.getByText("Take the quiz")).toBeInTheDocument();
-    expect(screen.queryByText("Top pick from MIMIR")).not.toBeInTheDocument();
+    expect(screen.queryByText("Top pick from Ember")).not.toBeInTheDocument();
   });
 
   it("opens the real QuizWizard modal on Take the quiz, starting at question 1", () => {
@@ -63,7 +61,7 @@ describe("HomeDashboard", () => {
         explanation: "Your dining spend makes this the obvious pick.",
       },
     });
-    expect(screen.getByText("Top pick from MIMIR")).toBeInTheDocument();
+    expect(screen.getByText("Top pick from Ember")).toBeInTheDocument();
     expect(screen.getByText("HDFC Bank Swiggy HDFC Bank Credit Card")).toBeInTheDocument();
     expect(screen.getByText(/Your dining spend makes this the obvious pick/)).toBeInTheDocument();
     expect(screen.getByText("See all recommendations →")).toBeInTheDocument();
@@ -95,33 +93,22 @@ describe("HomeDashboard", () => {
     expect(screen.queryByText("No cards added yet")).not.toBeInTheDocument();
   });
 
-  it("opens the shared MIMIR chat panel when Ask MIMIR anything is clicked", () => {
+  it("opens the shared Ember chat panel when Ask Ember anything is clicked", () => {
     renderDashboard();
-    expect(screen.queryByRole("dialog", { name: "Chat with MIMIR" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText("Ask MIMIR anything"));
-    expect(screen.getByRole("dialog", { name: "Chat with MIMIR" })).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Chat with Ember" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText("Ask Ember anything"));
+    expect(screen.getByRole("dialog", { name: "Chat with Ember" })).toBeInTheDocument();
   });
 
   it("still renders the static coming-soon widget for Feature 2 (Chrome extension)", () => {
     renderDashboard();
-    expect(screen.getByText("MIMIR for Chrome")).toBeInTheDocument();
+    expect(screen.getByText("Ember for Chrome")).toBeInTheDocument();
     expect(screen.getByText("SOON")).toBeInTheDocument();
   });
 
-  it("renders the live Goal-Based Advisor widget as a link into /goal", () => {
+  it("no longer links to the retired Goal-Based Advisor; shows the Card Manager placeholder", () => {
     renderDashboard();
-    const widget = screen.getByText("Ask MIMIR where to buy it").closest("a");
-    expect(widget).toHaveAttribute("href", "/goal");
-    expect(screen.queryByText("COMING SOON")).not.toBeInTheDocument();
-  });
-
-  it("shows a plain rate-limit message on the Goal Advisor widget when the daily cap is hit", () => {
-    renderDashboard({ atGoalSearchDailyLimit: true });
-    expect(screen.getByText(/today.s 3 searches/)).toBeInTheDocument();
-  });
-
-  it("does not show a rate-limit message when under the daily cap", () => {
-    renderDashboard({ atGoalSearchDailyLimit: false });
-    expect(screen.queryByText(/today.s 3 searches/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Ask Ember where to buy it")).not.toBeInTheDocument();
+    expect(screen.getByText("Card Manager arrives next")).toBeInTheDocument();
   });
 });

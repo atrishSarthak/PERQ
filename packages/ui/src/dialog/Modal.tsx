@@ -16,7 +16,7 @@ export interface ModalProps {
  * The one Dialog/modal primitive for the app — a plain fixed-overlay
  * pattern (no portal library needed; `position: fixed` already escapes
  * normal layout flow, the same technique the results page's mobile drawer
- * and MimirChatPanel already use), styled to the charcoal-surface/pure-
+ * and EmberChatPanel already use), styled to the charcoal-surface/pure-
  * black-page system (Task 1 STYLE spec). Used for the quiz's Questionnaire
  * Dialog and the "Retake the Quiz" confirmation.
  */

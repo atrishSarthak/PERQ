@@ -28,7 +28,7 @@ function resolveModelChain(modelName?: string): string[] {
 
 // Our own JsonSchema stays SDK-agnostic (types.ts has zero external
 // dependencies) — this is the one place that adapts it to the genai SDK's
-// stricter Schema shape. Tool authors (apps/web/lib/mimir) are responsible
+// stricter Schema shape. Tool authors (apps/web/lib/ember) are responsible
 // for supplying properties shaped like genai's Schema; a runtime mismatch
 // surfaces as a Gemini API error, not a silent miscast.
 function toGenAiSchema(schema: JsonSchema): Schema {

@@ -15,8 +15,8 @@ still needs the same real-source verification pass the original 30 did —
 
 ## Role since D15 (Engineering Plan amendment)
 
-This is no longer the primary card-recommendation source — MIMIR now scores
-against a live Gemini web search by default (`apps/web/lib/mimir/
+This is no longer the primary card-recommendation source — Ember now scores
+against a live Gemini web search by default (`apps/web/lib/ember/
 cardSearch.ts`), capped to ~20 cards and cached per profile-shape bucket,
 and always re-searched fresh (not served from a stale cache) the moment a
 user finishes the quiz — new signup or "Retake the Quiz" — so the search
