@@ -64,6 +64,27 @@ function RootNavigator() {
         <Stack.Protected guard={signedIn}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="(onboarding)" options={{ gestureEnabled: false }} />
+          <Stack.Screen
+            name="card/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: true,
+              title: "See the math",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="edit/[key]"
+            options={{
+              presentation: "modal",
+              headerShown: true,
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
         </Stack.Protected>
         <Stack.Screen
           name="diagnostics"

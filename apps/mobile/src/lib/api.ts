@@ -1,5 +1,13 @@
 import { fetch as expoFetch } from "expo/fetch";
+import { z } from "zod";
 import {
+  arsenalResponseSchema,
+  cardListResponseSchema,
+  chatHistoryResponseSchema,
+  resultsResponseSchema,
+  type ProfilePatch,
+  type QuizAnswersV2,
+  type EmberEvent,
   authResponseSchema,
   healthResponseSchema,
   meResponseSchema,
@@ -7,8 +15,10 @@ import {
   type SignupRequest,
 } from "@perq/shared";
 import { API_URL } from "./config";
-import { createHttp } from "./http";
+import { ApiError, createHttp } from "./http";
+export { ApiError };
 import { getToken } from "./session";
+import { createSseParser } from "./sse";
 
 // Typed client for the PERQ API (handoff §0.7). Every response is
 // zod-parsed against the schemas in packages/shared.
@@ -35,6 +45,50 @@ export const api = {
   login: (body: LoginRequest) =>
     http.request("/api/mobile/auth/login", { method: "POST", body, schema: authResponseSchema, auth: false }),
   me: () => http.request("/api/mobile/auth/me", { schema: meResponseSchema }),
+  cards: () => http.request("/api/cards", { schema: cardListResponseSchema, auth: false }),
+  results: () => http.request("/api/recommender/results", { schema: resultsResponseSchema }),
+  saveAnswers: (answers: QuizAnswersV2) =>
+    http.request("/api/recommender/profile", { method: "PUT", body: answers, schema: resultsResponseSchema }),
+  editAnswer: (patch: ProfilePatch) =>
+    http.request("/api/recommender/profile", { method: "PATCH", body: patch, schema: resultsResponseSchema }),
+  setHeld: (cardId: string, held: boolean) =>
+    http.request(`/api/arsenal/${encodeURIComponent(cardId)}`, { method: "PATCH", body: { held }, schema: arsenalResponseSchema }),
+  chatHistory: () => http.request("/api/ember/chat", { schema: chatHistoryResponseSchema }),
 };
 
-export { ApiError } from "./http";
+/**
+ * POSTs to a streaming Ember route and calls onEvent for each server-sent
+ * event as it arrives (expo/fetch streams response bodies in Expo Go).
+ */
+export async function streamEmber(
+  path: "/api/recommender/explain" | "/api/ember/chat",
+  body: unknown,
+  onEvent: (e: EmberEvent) => void,
+  signal?: AbortSignal
+): Promise<void> {
+  const token = await getToken();
+  const res = await expoFetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body ?? {}),
+    signal,
+  });
+  if (!res.ok || !res.body) {
+    const err = z.object({ error: z.string() }).safeParse(await res.json().catch(() => null));
+    throw new ApiError(err.success ? err.data.error : `Request failed (${res.status})`, res.status, "http");
+  }
+  const parse = createSseParser();
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    for (const e of parse(decoder.decode(value, { stream: true }))) onEvent(e);
+  }
+}
+
+

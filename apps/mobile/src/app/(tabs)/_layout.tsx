@@ -1,6 +1,8 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { SymbolView, type SymbolViewProps } from "expo-symbols";
 import type { ColorValue } from "react-native";
+import { Loading } from "@/components/StateViews";
+import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
 function icon(name: SymbolViewProps["name"]) {
@@ -9,6 +11,10 @@ function icon(name: SymbolViewProps["name"]) {
 
 export default function TabsLayout() {
   const t = useTheme();
+  const results = useResults();
+  // No saved answers yet (or an unreadable old profile) → the quiz first.
+  if (results.isLoading) return <Loading />;
+  if (results.data === null) return <Redirect href="/quiz" />;
   return (
     <Tabs
       screenOptions={{

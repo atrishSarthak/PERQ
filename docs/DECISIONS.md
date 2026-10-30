@@ -161,3 +161,12 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
 50. **Chat thread** is `recommender`, keeps the last 12 messages as history, and is capped at 40 user
     turns. The old `/api/chat` and `/api/quiz/submit` (old engine + D15 web search) stay until the web
     moves over at checkpoint 14.
+51. **Mobile flow:** a signed-in user with no saved answers is sent to the quiz from the tabs layout.
+    The quiz is a pure reducer (`features/quiz/reducer.ts`, unit-tested); the FD question appears as
+    question 8 when it applies, so progress reads "n of 8" for students and incomes under ₹25k.
+52. **Explanations after edits:** when the Top Pick changes and has no explanation, the Cards tab asks
+    Ember in the background and shows its current step under the one-line reason until the text arrives.
+53. **The Top Pick card is plain:** a chartreuse outline and a small "EMBER'S PICK" badge (the only
+    chartreuse fill), no imagery or call to apply, so it doesn't read as an ad.
+54. **Web preview only:** the session token falls back to `localStorage` on web, because SecureStore
+    doesn't exist there. On iPhone it's always the Keychain.
