@@ -133,3 +133,11 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
 42. **Leakage** compares the best eligible verified card with the best held verified card. Held cards
     that are unverified or not in the catalogue can't be valued and are ignored. With no card the
     message says what the best card would add instead of "leaking".
+43. **Recommender API** (`apps/web/lib/recommender/service.ts`): GET results always recomputes (fast and
+    deterministic) and rewrites the `recommendations` rows only when the profile hash changes. The Top
+    Pick's Ember explanation carries over while the Top Pick stays the same; otherwise results return
+    `explanation: null` and the app calls `/api/recommender/explain`.
+44. **Held cards:** `user_card_arsenal` is the single source of truth. The quiz's `cardsHeld`, the
+    results toggle and the Profile toggle all write through it, and `answers.cardsHeld` mirrors it.
+45. **Public finder rate limit:** 30 requests per IP per 10 minutes, in memory. On Vercel that's per
+    warm instance; fine for a demo. It needs a shared store (e.g. Upstash) before real launch.

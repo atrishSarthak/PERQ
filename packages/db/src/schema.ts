@@ -211,6 +211,11 @@ export const recommendations = pgTable(
     // tracks D7's fallback; distinct concern (card SOURCING vs explanation
     // GENERATION can fail independently).
     cardSourceMode: text("card_source_mode").notNull().default("db_fallback"),
+    // Card Recommender v2 (handoff §7): the finance-engine figures this row
+    // was ranked on, so a past explanation stays checkable against its numbers.
+    year1Value: integer("year1_value"),
+    ongoingValue: integer("ongoing_value"),
+    breakdown: jsonb("breakdown"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({
@@ -370,6 +375,8 @@ export const chatMessages = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     role: text("role").notNull(), // 'user' | 'assistant'
     content: text("content").notNull(),
+    // Conversation thread (handoff §1.4): 'recommender' for the card chat.
+    thread: text("thread").notNull().default("recommender"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({
