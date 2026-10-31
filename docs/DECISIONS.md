@@ -1,10 +1,10 @@
 # Decisions log (Step 0 + Step 1)
 
-Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. Newest at the bottom.
+Judgement calls made while working through `docs/specs/PERQ_Handoff_Step0_Step1.md`. Newest at the bottom.
 
 1. **File name.** The session prompt said `docs/DISIONS.md`; the handoff says `docs/DECISIONS.md`.
    I used `DECISIONS.md` and read the prompt's spelling as a typo.
-2. **Spec location.** The handoff was at the repo root; moved to `docs/PERQ_Handoff_Step0_Step1.md`.
+2. **Spec location.** The handoff was at the repo root; moved to `docs/specs/PERQ_Handoff_Step0_Step1.md`.
 3. **Uncommitted work at start.** The working tree had uncommitted Feature 3 edits and a useful
    `packages/ai` model-fallback chain (flash → flash-lite on 429). I committed the code as-is in one
    snapshot commit before checkpoint 1, so checkpoint commits only hold checkpoint work. Untracked root
@@ -178,3 +178,8 @@ Judgement calls made while working through `docs/PERQ_Handoff_Step0_Step1.md`. N
     asks for with Feature 3.
 57. **Logo:** the existing PERQ logo image is the old gold wordmark. I didn't redraw the brand logo;
     swap `apps/web/public/perq-logo.png` when the new-palette version exists.
+58. **Repo tidy-up (on request).** The root keeps only README, CLAUDE.md and workspace config.
+    Specs are in `docs/specs/`, product docs/PRDs/plans/design system in `docs/product/`, future-feature
+    plans in `docs/plans/`, the mockup in `docs/design-reference/`, images in `docs/assets/`, and the
+    session prompt in `docs/prompts/`. Your previously untracked drafts are now committed there, as
+    you asked to include all docs.

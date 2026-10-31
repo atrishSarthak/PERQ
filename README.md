@@ -1,37 +1,51 @@
 # PERQ
 
-An AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for — credit cards, BNPL, cash/UPI — personalized to the user's actual financial picture. Powered by one named AI agent, **Ember**.
+An AI financial advisor for Gen Z Indians, reasoning across every way a purchase can be paid for, personalised to the user's actual financial picture. Powered by one named AI agent, **Ember**.
 
-This repo currently builds **Feature 1: Card Recommender** — a one-time onboarding quiz that captures a user's spend pattern and existing cards, then returns a ranked, Ember-explained set of credit card recommendations. It's the foundation Feature 2 (Chrome extension) and Feature 3 (goal-based advisor) will be built on top of later.
+The current build is **Step 0 (foundation)** and **Step 1 (Card Recommender v2)**: a 7-question quiz, a 40-card catalogue checked on the banks' own pages, ₹/year values computed by a tested finance engine, and Ember explaining the result. It runs as an Expo app (iPhone via Expo Go) and on the web, including a public no-login card finder.
 
-## Docs
+## Start here
 
-Read in this order before making changes:
-
-1. [`PERQ_New_Handbook.md`](./PERQ_New_Handbook.md) — full product context, all three planned features, business model, brand positioning.
-2. [`PERQ_Feature1_PRD.md`](./PERQ_Feature1_PRD.md) — the spec for Feature 1. Source of truth for scope, data model, tech stack, acceptance criteria.
-3. [`PERQ_Design_System.md`](./PERQ_Design_System.md) — locked design tokens, voice, component conventions.
-4. [`PERQ_Feature1_Engineering_Plan.md`](./PERQ_Feature1_Engineering_Plan.md) — locked architecture (eng review + design review, both CLEAR). Build order follows its T1–T21 task list.
-5. [`TODOS.md`](./TODOS.md) — deferred work, not forgotten.
-
-## Tech stack
-
-Next.js (App Router) + TypeScript, Tailwind + shadcn/ui, Postgres via Neon, Drizzle ORM, Auth.js, Google Gemini API, Turborepo + pnpm workspaces. See the PRD §3 for details.
+- [`docs/RUNNING.md`](./docs/RUNNING.md): run it locally and open it on your iPhone.
+- [`docs/specs/PERQ_Handoff_Step0_Step1.md`](./docs/specs/PERQ_Handoff_Step0_Step1.md): the spec for the current build.
+- [`docs/DECISIONS.md`](./docs/DECISIONS.md): every judgement call made while building it.
+- [`docs/AUDIT.md`](./docs/AUDIT.md): repo audit, plus code retired and waiting for deletion.
+- [`packages/db/data/CARDS_README.md`](./packages/db/data/CARDS_README.md): the 40 cards, with source links.
 
 ## Repo structure
 
 ```
 apps/
-  web/            Next.js app — all of Feature 1's UI and routes
+  web/              Next.js: landing + public card finder, all API routes
+  mobile/           Expo (Expo Router): the PERQ app
 packages/
-  ui/             shadcn/ui-based components, themed with design tokens
-  design-tokens/  Colors, type scale, spacing
-  db/             Drizzle schema, migrations, Neon client, card seed script
-  scoring-engine/ Card-ranking logic — pure, testable, reused by Feature 2/3
-  ai/             Gemini client, Ember's tool-calling agent logic
-  config/         Shared tsconfig/eslint/prettier
+  ai/               Ember runner (runEmber), tool registry, Gemini client, grounding checks
+  finance-engine/   pure money math (rewards, caps, fees, GST, leakage)
+  scoring-engine/   card ranking (recommend), built on finance-engine
+  db/               Drizzle schema, migrations, card catalogue + seed script
+  design-tokens/    tokens.ts → Tailwind preset (web) + theme (mobile)
+  shared/           zod schemas and types shared by web and mobile (quiz, cards, API)
+  ui/               web components
+  fetch/            retired Feature 3 helper (to delete)
+  config/           tsconfig bases
+docs/
+  specs/            build handoffs
+  product/          handbook, PRDs, engineering plans, design system
+  plans/            plans for upcoming features (Card Manager, Swiggy, budget assistant)
+  design-reference/ approved design mockups
+  assets/           brand images
+  prompts/          session prompts used to drive builds
 ```
 
-## Status
+## Common commands
 
-Building Feature 1 against the Engineering Plan's T1–T21 task list.
+```
+pnpm install
+pnpm db:migrate && pnpm db:seed-cards
+pnpm dev:web          # Next.js on 0.0.0.0:3000
+pnpm dev:mobile       # Expo; scan the QR with the iPhone Camera
+pnpm test             # all unit tests
+pnpm eval             # live Ember eval (uses Gemini quota)
+```
+
+Product background: [`docs/product/PERQ_New_Handbook.md`](./docs/product/PERQ_New_Handbook.md). Deferred work: [`docs/TODOS.md`](./docs/TODOS.md).

@@ -8,7 +8,7 @@ import type { CardOption } from "../quiz/QuizWizard";
 import { DASHBOARD_COLORS as C } from "./dashboardTheme";
 
 /**
- * The bento grid, adapted from design-reference/PERQ Dashboard
+ * The bento grid, adapted from docs/design-reference/PERQ Dashboard
  * standalone.html — 12-column grid, 3 fixed row heights, widgets placed
  * via grid-area so every cell tiles with no gaps. Card Arsenal's column
  * span was narrowed from the mockup's 8/5 split (cols 1-7 / 8-12) to a

@@ -1,6 +1,6 @@
 # PERQ repo audit (Step 0.1)
 
-Audited 2026-10-31 against `docs/PERQ_Handoff_Step0_Step1.md`, at commit `33100e1`
+Audited 2026-10-31 against `docs/specs/PERQ_Handoff_Step0_Step1.md`, at commit `33100e1`
 plus the uncommitted working-tree changes listed at the end.
 
 ## 1. Folder structure

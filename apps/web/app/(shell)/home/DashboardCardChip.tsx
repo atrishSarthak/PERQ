@@ -2,7 +2,7 @@ import { getBankGradient, getLast4 } from "../results/bankBrand";
 
 /**
  * The small gradient card chip used in both the Card Recommender widget's
- * top-pick preview and the Card Arsenal grid (design-reference/PERQ
+ * top-pick preview and the Card Arsenal grid (docs/design-reference/PERQ
  * Dashboard standalone.html) — network-chip rectangle + network label top
  * row, card name + masked last4 bottom row. Deliberately simpler than the
  * full CardVisual on the results page (no holder name/expiry — this is a

@@ -26,7 +26,7 @@ function startOfUtcDay(now: Date): Date {
  * classification even runs — a capped-out user triggers zero spend, not
  * even a classification call. UTC calendar day boundary (no per-user
  * timezone captured anywhere — the 5:30am IST quirk this creates is
- * tracked in TODOS.md, not fixed here).
+ * tracked in docs/TODOS.md, not fixed here).
  *
  * Known, accepted TOCTOU race (D8): this is a COUNT-then-INSERT check, not
  * an atomic increment — two concurrent requests can both pass this check
