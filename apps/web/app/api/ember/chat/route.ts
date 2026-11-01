@@ -92,6 +92,9 @@ export async function POST(req: Request) {
   if (!rec && !money) return NextResponse.json({ error: "Take the quiz or upload a statement first." }, { status: 404 });
   if (threadRef?.startsWith("nudge:") && !nudgeRow) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const nudge = nudgeRow ? money?.nudges.find((n) => n.id === nudgeRow.id) ?? null : null;
+  const cardState = threadRef?.startsWith("card:") ? money?.state.cards.find((c) => c.cardAccountId === threadRef.slice(5)) : undefined;
+  if (threadRef?.startsWith("card:") && !cardState) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const card = cardState ? { cardAccountId: cardState.cardAccountId, label: cardState.label } : null;
 
   const history = (await db.select({ role: chatMessages.role, content: chatMessages.content }).from(chatMessages).where(threadWhere(auth.id, threadRef)).orderBy(asc(chatMessages.createdAt)))
     .slice(-HISTORY_TURNS)
@@ -105,6 +108,7 @@ export async function POST(req: Request) {
       recommender: rec ? { answers: rec.answers, result: rec.result, catalogue: rec.catalogue, heldCardIds: rec.heldCardIds } : null,
       money,
       nudge,
+      card,
       callModel: geminiCaller(),
       onLabel: (label) => emit({ type: "step", label }),
       onProposal: (proposal) => emit({ type: "proposal", proposal }),

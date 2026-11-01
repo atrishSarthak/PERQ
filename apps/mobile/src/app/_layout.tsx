@@ -113,6 +113,81 @@ function RootNavigator() {
             }}
           />
           <Stack.Screen
+            name="account/[id]"
+            options={{
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="transactions"
+            options={{
+              title: "Transactions",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="chat/[ref]"
+            options={{
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="inbox"
+            options={{
+              title: "Ember's nudges",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="budgets"
+            options={{
+              title: "Budgets & goals",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="activity"
+            options={{
+              title: "What Ember did",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="privacy"
+            options={{
+              title: "Privacy & data",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
             name="edit/[key]"
             options={{
               presentation: "modal",

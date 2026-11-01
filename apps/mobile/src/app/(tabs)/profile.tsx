@@ -42,6 +42,26 @@ export default function Profile() {
       </Pressable>
       <Text tone="muted">{user?.email}</Text>
 
+      <Card>
+        <Text variant="heading">Money</Text>
+        {[
+          { label: "Budgets & goals", href: "/budgets" as const },
+          { label: "What Ember did", href: "/activity" as const },
+          { label: "Privacy & data", href: "/privacy" as const },
+        ].map((l) => (
+          <Pressable
+            key={l.href}
+            accessibilityRole="button"
+            onPress={() => router.push(l.href)}
+            style={{ paddingVertical: t.spacing[2], borderTopWidth: 1, borderTopColor: t.colors.border }}
+          >
+            <Text tone="link" variant="bodyStrong">
+              {l.label} ›
+            </Text>
+          </Pressable>
+        ))}
+      </Card>
+
       {answers ? (
         <Card>
           <Text variant="heading">Your answers</Text>

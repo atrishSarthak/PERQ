@@ -355,3 +355,26 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 95. **`PATCH /api/card-accounts/:id` came early** (checkpoint 10, not 11) because the nudge chat's
     "Mark as paid" needs it. `markPaid` sets `marked_paid_at` on the latest statement. It's the user's
     own flag, and Ember never claims a bill was paid.
+96. **Checkpoints 11 and 12 are one commit.** Home links to the inbox and budgets, and both checkpoints
+    edit the same API client, route layout and shared schemas, so a split would leave a commit that
+    doesn't typecheck.
+97. **Card detail is `/account/[id]`.** `/card/[id]` is already Step 1's "See the math" for a catalogue
+    card. Category bars on Home open `/transactions?category=`, and due amounts open the card. That
+    meets "every ₹ figure taps to its source" for the figures that have a source screen. Card threads
+    open `/chat/card:<id>`, and the chat prompt tells Ember which card the thread is about.
+98. **Recategorise remembers per merchant** (default on). It moves the user's other transactions from
+    the same merchant and kind, and writes `user_merchant_overrides`. It never touches the shared cache.
+99. **Budget prefill** uses finance-engine `averageMonthlySpend`: per card, the mean of its latest 3
+    reconciled cycles, summed across cards. Purchases add, refunds and cashback subtract, and
+    transfers/fees/EMI/cash are excluded. The UI rounds each figure up to ₹500. The same function feeds
+    the recommender sync (checkpoint 13). The screen saves the recurring default (`month = null`). A
+    per-month budget is supported by the API and not exposed in the UI yet.
+100. **Savings goals API is `/api/goals`** (GET/POST) and `/api/goals/:id` (PATCH). Feature 3's
+    `/api/goals/submit` is a static segment, so it doesn't clash.
+101. **Deleting all financial data** removes card accounts (which cascade to statements and
+    transactions), nudges, nudge/card chats, budgets, goals, merchant overrides, the state cache and
+    activity. It resets the profile to quiz spend. **Consents stay** as the dated record of what the
+    user agreed to. `DELETE /api/me` deletes the account, and every user table cascades from `user`.
+    The phone also forgets remembered statement passwords and cancels scheduled local notifications.
+102. **Inbox swipe-to-dismiss** uses RN `PanResponder` (no new native module), with an accessibility
+    "Dismiss" action for VoiceOver.

@@ -3,12 +3,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { EmberAvatar } from "@/components/EmberAvatar";
 import { Text } from "@/components/Text";
 import { ChatThread } from "@/features/chat/ChatThread";
+import { useConfirmProposal } from "@/lib/moneyQueries";
 import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
 export default function EmberTab() {
   const t = useTheme();
   const results = useResults();
+  const confirmProposal = useConfirmProposal();
   const ranked = results.data?.result.ranked ?? [];
   const chips = [
     ranked[1] ? `Why not ${ranked[1].name}?` : null,
@@ -22,6 +24,7 @@ export default function EmberTab() {
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: t.colors.bg }}>
       <ChatThread
         chips={chips}
+        onConfirmProposal={confirmProposal}
         emptyText="Ask me why a card ranked where it did, where your money went, or which card to use. I only use the numbers PERQ computed for you."
         header={
           <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3], paddingHorizontal: t.spacing[5], paddingVertical: t.spacing[3] }}>

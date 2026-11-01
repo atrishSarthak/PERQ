@@ -5,7 +5,7 @@ import { chatFallback, type EmberAnswer } from "../recommender/run";
 import { labelsForEvent, WRITING_LABEL } from "../recommender/narration";
 import { CHAT_SYSTEM_PROMPT } from "../recommender/prompts";
 import { createRecommenderTools } from "../recommender/tools";
-import { MONEY_RULES, MONEY_TOOLS_GUIDE, nudgeThreadPrompt } from "./prompts";
+import { cardThreadPrompt, MONEY_RULES, MONEY_TOOLS_GUIDE, nudgeThreadPrompt } from "./prompts";
 import { createMoneyTools, type MoneyNudge, type MoneyProposal, type MoneyToolContext } from "./tools";
 
 // One Ember chat turn with whichever tool sets the user has data for:
@@ -26,6 +26,8 @@ export interface ChatTurnInput {
   recommender: RecommenderChatContext | null;
   money: MoneyToolContext | null;
   nudge?: MoneyNudge | null;
+  /** A card thread's card (thread_ref card:<id>). */
+  card?: { cardAccountId: string; label: string } | null;
   callModel: ModelCaller | null;
   onLabel?: (label: string) => void;
   onProposal?: (p: MoneyProposal) => void;
@@ -35,11 +37,11 @@ export interface ChatTurnInput {
 const NO_STATEMENT = `
 The user hasn't uploaded a statement yet. For questions about bills, dues, utilisation or spending, say you need a statement and suggest "Upload a statement" on Home.`;
 
-export function systemPromptFor(input: Pick<ChatTurnInput, "recommender" | "money" | "nudge">): string {
+export function systemPromptFor(input: Pick<ChatTurnInput, "recommender" | "money" | "nudge" | "card">): string {
   const base = input.recommender
     ? CHAT_SYSTEM_PROMPT
     : "You are Ember, PERQ's money assistant, helping a user with their credit cards, bills and spending.";
-  return [base, input.money ? MONEY_TOOLS_GUIDE + MONEY_RULES : NO_STATEMENT + MONEY_RULES, input.nudge ? nudgeThreadPrompt(input.nudge) : ""].join("\n");
+  return [base, input.money ? MONEY_TOOLS_GUIDE + MONEY_RULES : NO_STATEMENT + MONEY_RULES, input.nudge ? nudgeThreadPrompt(input.nudge) : "", input.card ? cardThreadPrompt(input.card) : ""].join("\n");
 }
 
 /** Deterministic answer when Gemini can't answer, or answered with an ungrounded number. */

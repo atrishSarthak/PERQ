@@ -7,8 +7,19 @@ import { invalidateState, logActivity } from "@/lib/money/activity";
 import { afterMoneyWrite } from "@/lib/money/hooks";
 import { loadCatalogue } from "@/lib/recommender/catalog";
 import { setHeld } from "@/lib/recommender/service";
+import { cardAccountDetail } from "@/lib/money/accounts";
+import { nowFor } from "@/lib/money/clock";
 
 export const dynamic = "force-dynamic";
+
+/** GET /api/card-accounts/:id: card detail (state, missed rewards, statement history). */
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAuth(req);
+  if (!isAuthed(auth)) return auth;
+  const { id } = await params;
+  const detail = await cardAccountDetail(auth.id, id, await nowFor(auth.id));
+  return detail ? NextResponse.json(detail) : NextResponse.json({ error: "Not found" }, { status: 404 });
+}
 
 /** PATCH /api/card-accounts/:id: label, catalogue link, balance override, mark paid, days. */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {

@@ -22,3 +22,8 @@ This conversation is about a nudge Ember sent (nudgeId ${n.id}, rule ${n.ruleId}
 "${n.title}: ${n.body}"
 Call explainNudge with that id before quoting its numbers. Buttons like "Mark as paid" and "Remind me tomorrow" are in the app; don't claim to do them yourself.`;
 }
+
+export function cardThreadPrompt(c: { cardAccountId: string; label: string }): string {
+  return `
+This conversation is about the user's ${c.label} (cardAccountId ${c.cardAccountId}). Unless they ask about another card, pass that id to the card tools and filter getTransactions by it.`;
+}
