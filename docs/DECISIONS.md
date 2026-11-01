@@ -192,3 +192,15 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 
 59. **Spec location.** The Step 2 handoff arrived at the repo root and was moved to `docs/specs/`
     beside the Step 0/1 handoff.
+60. **Schema (migration 0009).** Additions beyond the handoff's table list: `user_merchant_overrides`
+    (per-user recategorisations must be remembered but never written to the shared
+    `merchant_categories`); `statements.marked_paid_at` (mark-as-paid belongs to a statement's due,
+    not the card); `user_profile.spend_source` + `synced_spend` (§9 kept off the quiz answers);
+    `user.is_demo` (demo reset/time travel only touch demo users); `consents` is append-only for a
+    dated history. Savings goals are in **`savings_goals`**, because `goals` is the retired Feature 3
+    goal-search table. `chat_messages.thread_ref` sits beside the existing `thread`.
+61. **IDs are app-generated** (Drizzle `$defaultFn(randomUUID)`) like every existing table, not DB
+    defaults. Enum-like columns are `text`, validated by zod in `packages/shared/src/money.ts`.
+62. **Delete cascade verified against Neon** on 2026-11-01: deleting a user removed every row in
+    card_accounts, statements, transactions, nudges, financial_state_cache, savings_goals,
+    activity_events and consents.

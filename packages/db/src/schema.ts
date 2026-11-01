@@ -9,6 +9,7 @@ import {
   primaryKey,
   uniqueIndex,
   index,
+  date,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "@auth/core/adapters";
 
@@ -27,6 +28,8 @@ export const users = pgTable("user", {
   // suggests email/password to start, Google OAuth as an easy low-friction
   // add later; not a blocking decision either way).
   passwordHash: text("password_hash"),
+  // Step 2 demo mode: only demo users can be reset or time-travelled.
+  isDemo: boolean("is_demo").notNull().default(false),
 });
 
 export const accounts = pgTable(
@@ -93,6 +96,11 @@ export const userProfile = pgTable("user_profile", {
   // row in the whole cards table (which now spans many buckets/users).
   lastCardSourceMode: text("last_card_source_mode"),
   lastSearchBucketKey: text("last_search_bucket_key"),
+  // Step 2 §9: which spend the recommender uses. 'quiz' = bucket estimates
+  // from answers; 'statements' = averaged real spend in synced_spend
+  // ({ monthly: Record<category, ₹>, statementCount, dataThrough }).
+  spendSource: text("spend_source").notNull().default("quiz"),
+  syncedSpend: jsonb("synced_spend"),
   updatedAt: timestamp("updated_at", { mode: "date" })
     .notNull()
     .defaultNow(),
@@ -377,10 +385,13 @@ export const chatMessages = pgTable(
     content: text("content").notNull(),
     // Conversation thread (handoff §1.4): 'recommender' for the card chat.
     thread: text("thread").notNull().default("recommender"),
+    // Step 2: ties a conversation to one object, e.g. 'nudge:<id>' or 'card:<id>'.
+    threadRef: text("thread_ref"),
     createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   },
   (t) => ({
     userIdx: index("chat_messages_user_idx").on(t.userId, t.createdAt),
+    threadRefIdx: index("chat_messages_thread_ref_idx").on(t.userId, t.threadRef),
   })
 );
 
@@ -406,3 +417,252 @@ export const agentRuns = pgTable(
     userCreatedIdx: index("agent_runs_user_created_idx").on(t.userId, t.createdAt),
   })
 );
+
+
+// ===========================================================================
+// Step 2: Money Manager (docs/specs/PERQ_Handoff_Step2_Money_Manager.md §4).
+// Money is integer rupees. Statement PDFs and passwords are NEVER stored:
+// only the structured figures and transaction lines extracted from them.
+// Enum-like text columns are validated by zod in packages/shared/src/money.ts.
+// ===========================================================================
+
+const id = () =>
+  text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID());
+const userRef = () =>
+  text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" });
+const createdAt = () => timestamp("created_at", { mode: "date" }).notNull().defaultNow();
+
+export const cardAccounts = pgTable(
+  "card_accounts",
+  {
+    id: id(),
+    userId: userRef(),
+    // Catalogue card this account is (null when the user's card isn't in the
+    // catalogue: rupee rules that need card terms skip it).
+    cardId: text("card_id").references(() => cards.id, { onDelete: "set null" }),
+    issuer: text("issuer").notNull(),
+    cardLabel: text("card_label").notNull(),
+    last4: text("last4").notNull(),
+    statementDay: integer("statement_day"), // 1–31
+    dueDay: integer("due_day"), // 1–31
+    creditLimit: integer("credit_limit"),
+    feeAnniversaryMonth: integer("fee_anniversary_month"), // 1–12
+    // "Update current balance": drives utilisation until the next statement.
+    currentBalanceOverride: integer("current_balance_override"),
+    currentBalanceUpdatedAt: timestamp("current_balance_updated_at", { mode: "date" }),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    userCardIdx: uniqueIndex("card_accounts_user_issuer_last4_idx").on(t.userId, t.issuer, t.last4),
+  })
+);
+
+export const statements = pgTable(
+  "statements",
+  {
+    id: id(),
+    userId: userRef(),
+    cardAccountId: text("card_account_id")
+      .notNull()
+      .references(() => cardAccounts.id, { onDelete: "cascade" }),
+    statementDate: date("statement_date").notNull(),
+    periodStart: date("period_start"),
+    periodEnd: date("period_end"),
+    dueDate: date("due_date"),
+    totalDue: integer("total_due"),
+    minimumDue: integer("minimum_due"),
+    previousBalance: integer("previous_balance"),
+    paymentsCredits: integer("payments_credits"),
+    purchasesDebits: integer("purchases_debits"),
+    feesCharges: integer("fees_charges"),
+    financeCharges: integer("finance_charges"),
+    creditLimit: integer("credit_limit"),
+    availableLimit: integer("available_limit"),
+    // Printed points block; every field null when the statement doesn't print it.
+    pointsOpening: integer("points_opening"),
+    pointsEarned: integer("points_earned"),
+    pointsRedeemed: integer("points_redeemed"),
+    pointsClosing: integer("points_closing"),
+    pointsExpiring: integer("points_expiring"),
+    pointsExpiryDate: date("points_expiry_date"),
+    // "Mark as paid": a flag only, no money moves. Silences due nudges.
+    markedPaidAt: timestamp("marked_paid_at", { mode: "date" }),
+    reconciled: boolean("reconciled").notNull().default(false),
+    reconcileDiff: integer("reconcile_diff"),
+    parserVersion: text("parser_version").notNull(),
+    model: text("model"),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    // Re-uploading the same statement replaces it (§4).
+    cardDateIdx: uniqueIndex("statements_card_date_idx").on(t.cardAccountId, t.statementDate),
+    userDateIdx: index("statements_user_date_idx").on(t.userId, t.statementDate),
+  })
+);
+
+export const transactions = pgTable(
+  "transactions",
+  {
+    id: id(),
+    userId: userRef(),
+    statementId: text("statement_id")
+      .notNull()
+      .references(() => statements.id, { onDelete: "cascade" }),
+    cardAccountId: text("card_account_id")
+      .notNull()
+      .references(() => cardAccounts.id, { onDelete: "cascade" }),
+    txnDate: date("txn_date").notNull(),
+    // Full card numbers are stripped before insert (§12); last 4 at most.
+    descriptionRaw: text("description_raw").notNull(),
+    merchantNormalized: text("merchant_normalized").notNull(),
+    amount: integer("amount").notNull(), // ₹, always positive; see direction
+    direction: text("direction").notNull(), // 'debit' | 'credit'
+    kind: text("kind").notNull(), // purchase | payment | refund | fee | interest | emi | cashback | other
+    category: text("category").notNull(), // 17 spend categories (packages/shared money.ts)
+    categorySource: text("category_source").notNull(), // rule | cache | ai | user
+    isInternational: boolean("is_international").notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    userDateIdx: index("transactions_user_date_idx").on(t.userId, t.txnDate),
+    statementIdx: index("transactions_statement_idx").on(t.statementId),
+    userMerchantIdx: index("transactions_user_merchant_idx").on(t.userId, t.merchantNormalized),
+  })
+);
+
+// Shared across users: merchant name → category only, never personal data.
+export const merchantCategories = pgTable("merchant_categories", {
+  merchantNormalized: text("merchant_normalized").primaryKey(),
+  category: text("category").notNull(),
+  source: text("source").notNull(), // 'rule' | 'ai'
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+// A user's own recategorisations, remembered for their future statements and
+// never written to the shared cache (§5.5).
+export const userMerchantOverrides = pgTable(
+  "user_merchant_overrides",
+  {
+    userId: userRef(),
+    merchantNormalized: text("merchant_normalized").notNull(),
+    category: text("category").notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.userId, t.merchantNormalized] }) })
+);
+
+export const budgets = pgTable(
+  "budgets",
+  {
+    id: id(),
+    userId: userRef(),
+    month: text("month"), // 'YYYY-MM'; null = the recurring default (one per user, enforced in code)
+    totalLimit: integer("total_limit"),
+    categoryLimits: jsonb("category_limits").notNull().default({}), // { category: ₹ }
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({ userMonthIdx: uniqueIndex("budgets_user_month_idx").on(t.userId, t.month) })
+);
+
+// Named savings_goals: `goals` is the retired Feature 3 goal-search table.
+export const savingsGoals = pgTable(
+  "savings_goals",
+  {
+    id: id(),
+    userId: userRef(),
+    name: text("name").notNull(),
+    targetAmount: integer("target_amount").notNull(),
+    targetDate: date("target_date"),
+    savedAmount: integer("saved_amount").notNull().default(0),
+    status: text("status").notNull().default("active"), // active | done | archived
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({ userIdx: index("savings_goals_user_idx").on(t.userId) })
+);
+
+export const nudges = pgTable(
+  "nudges",
+  {
+    id: id(),
+    userId: userRef(),
+    ruleId: text("rule_id").notNull(),
+    dedupeKey: text("dedupe_key").notNull(),
+    cardAccountId: text("card_account_id").references(() => cardAccounts.id, { onDelete: "set null" }),
+    priority: integer("priority").notNull(),
+    payload: jsonb("payload").notNull(), // the exact numbers the rule computed
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    bodySource: text("body_source").notNull().default("template"), // 'ai' | 'template'
+    status: text("status").notNull().default("queued"), // queued|sent|opened|acted|dismissed|expired|suppressed
+    scheduledFor: timestamp("scheduled_for", { mode: "date" }),
+    sentAt: timestamp("sent_at", { mode: "date" }),
+    openedAt: timestamp("opened_at", { mode: "date" }),
+    actedAt: timestamp("acted_at", { mode: "date" }),
+    dismissedAt: timestamp("dismissed_at", { mode: "date" }),
+    expiresAt: timestamp("expires_at", { mode: "date" }),
+    createdAt: createdAt(),
+  },
+  (t) => ({
+    dedupeIdx: uniqueIndex("nudges_user_dedupe_idx").on(t.userId, t.dedupeKey),
+    sentIdx: index("nudges_user_sent_idx").on(t.userId, t.sentAt),
+    statusIdx: index("nudges_user_status_idx").on(t.userId, t.status),
+  })
+);
+
+export const pushTokens = pgTable("push_tokens", {
+  id: id(),
+  userId: userRef(),
+  expoToken: text("expo_token").notNull().unique(),
+  platform: text("platform").notNull(),
+  createdAt: createdAt(),
+  lastSeenAt: timestamp("last_seen_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+// Append-only: the latest row per (user, source) is the current consent; the
+// history is shown with dates on the Privacy screen.
+export const consents = pgTable(
+  "consents",
+  {
+    id: id(),
+    userId: userRef(),
+    source: text("source").notNull(), // 'statements' | 'notifications'
+    granted: boolean("granted").notNull(),
+    noticeVersion: text("notice_version").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => ({ userSourceIdx: index("consents_user_source_idx").on(t.userId, t.source, t.createdAt) })
+);
+
+// "What Ember did": summaries are built by code from counts and names,
+// never from transaction text or amounts beyond what the user already sees.
+export const activityEvents = pgTable(
+  "activity_events",
+  {
+    id: id(),
+    userId: userRef(),
+    type: text("type").notNull(), // statement_parsed | nudge_sent | budget_set | goal_created | ...
+    summary: text("summary").notNull(),
+    refTable: text("ref_table"),
+    refId: text("ref_id"),
+    createdAt: createdAt(),
+  },
+  (t) => ({ userCreatedIdx: index("activity_events_user_created_idx").on(t.userId, t.createdAt) })
+);
+
+// financial_state is computed by a pure function; this is only a cache,
+// deleted on any write to the user's money data (§4).
+export const financialStateCache = pgTable("financial_state_cache", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  version: integer("version").notNull(),
+  computedAt: timestamp("computed_at", { mode: "date" }).notNull().defaultNow(),
+  state: jsonb("state").notNull(),
+});
