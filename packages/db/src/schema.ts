@@ -1,5 +1,6 @@
 import {
   pgTable,
+  bigint,
   boolean,
   text,
   timestamp,
@@ -30,6 +31,8 @@ export const users = pgTable("user", {
   passwordHash: text("password_hash"),
   // Step 2 demo mode: only demo users can be reset or time-travelled.
   isDemo: boolean("is_demo").notNull().default(false),
+  // Demo time travel (Step 2 §13.4): ms added to the real clock for this demo user only.
+  demoClockOffsetMs: bigint("demo_clock_offset_ms", { mode: "number" }),
 });
 
 export const accounts = pgTable(

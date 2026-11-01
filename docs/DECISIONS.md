@@ -389,3 +389,20 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     statement reverts to the quiz. `getUserProfile` (Ember) reports `spendSource` and the statement
     count. The results response carries `spendSync` for the Home/Cards prompt, the "Based on your last
     N statements" line, and the Profile switch. `statementCount` counts statements across all cards.
+104. **Demo data is generated in code (`apps/web/lib/money/demo.ts`), not by parsing PDFs.** It is
+    deterministic and synthetic: Axis ACE (cashback) and SBI SimplyCLICK (points), three reconciled
+    statements each, 119 transactions, a budget and a goal. The real engine is not tuned for the demo.
+    The rows are built so that on **22 Nov 2026 09:00 IST** it finds: ACE ₹22,120 due in 2 days,
+    SimplyCLICK at 74% (a ₹37,000 balance entered 21 Nov) with its statement closing in 4 days, ₹340
+    missed (a ₹7,158 bill on SimplyCLICK, where ACE pays 4.75% more), ₹590 fees (₹500 late fee + ₹90
+    GST), 4,200 points ≈ ₹1,050, and food delivery at ₹4,100 of ₹5,000. Every other transaction is on
+    the card that's already best for its category. Loading marks the user `is_demo`, replaces their
+    financial data and runs the engine. Reset clears both. Real users get 403 on reset and time travel.
+105. **Time travel** is `user.demo_clock_offset_ms` (migration 0011), added to the real clock by
+    `nowFor`, so demo time keeps moving from the chosen moment. Diagnostics has −1 day / +1 day /
+    +1 week / back to 22 Nov. Each jump runs the engine and re-syncs local notifications. Real users
+    always get the real clock.
+106. **Queued nudges are re-checked before sending (bug found in the demo).** A nudge held by the cap
+    is sent only if today's evaluation produces the same dedupe key again. It then goes out with
+    today's payload, copy and "why". Otherwise it expires. Before this fix, "₹4,100 of ₹5,000 with
+    9 days left" went out three days later, when only 5 days were left.

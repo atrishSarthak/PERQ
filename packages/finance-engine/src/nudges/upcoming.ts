@@ -39,8 +39,7 @@ export function simulateUpcoming(
     const due = waiting.filter((q) => !q.scheduledFor || Date.parse(q.scheduledFor) <= at.getTime());
     const plan = planNudges({ candidates: evaluateRules(state, at, seen, config), queued: due, history: seen, now: at, config });
     for (const q of plan.sendQueued) {
-      const stored = waiting.find((w) => w.id === q.id)!;
-      out.push({ ruleId: q.ruleId, dedupeKey: q.dedupeKey, at: at.toISOString(), title: stored.title, body: stored.body });
+      out.push({ ruleId: q.ruleId, dedupeKey: q.dedupeKey, at: at.toISOString(), title: q.current.templateTitle, body: q.current.templateBody });
       seen.push({ ruleId: q.ruleId, dedupeKey: q.dedupeKey, status: "sent", sentAt: at.toISOString(), dismissedAt: null, actedAt: null, createdAt: at.toISOString() });
     }
     const gone = new Set([...plan.sendQueued.map((q) => q.id), ...plan.expire]);

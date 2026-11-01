@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "demo_clock_offset_ms" bigint;

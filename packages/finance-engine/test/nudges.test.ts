@@ -206,15 +206,27 @@ describe("planNudges (§7.1 steps 3–5)", () => {
     expect(planNudges({ candidates, queued: [], history: acted, now }).sendFresh[0]!.ruleId).toBe("due_today");
   });
 
-  it("previously queued nudges compete for today's slots and expire when stale", () => {
+  it("previously queued nudges compete for today's slots, with today's numbers", () => {
     const queued = [
-      { id: "q1", ruleId: "due_today", dedupeKey: "due_today:other", priority: 99, expiresAt: "2026-11-20T00:00:00Z" },
-      { id: "q2", ruleId: "points_value", dedupeKey: "pv:old", priority: 45, expiresAt: "2026-11-01T00:00:00Z" },
+      { id: "q1", ruleId: "points_value", dedupeKey: candidates.find((c) => c.ruleId === "points_value")!.dedupeKey, priority: 99, expiresAt: "2026-12-20T00:00:00Z" },
+      { id: "q2", ruleId: "due_soon", dedupeKey: "due_soon:old", priority: 99, expiresAt: "2026-12-01T00:00:00Z" },
     ];
-    const p = planNudges({ candidates, queued, history: [], now });
-    expect(p.sendQueued.map((q) => q.id)).toEqual(["q1"]);
-    expect(p.sendFresh).toHaveLength(1);
-    expect(p.expire).toEqual(["q2"]);
+    const points = candidates.find((c) => c.ruleId === "points_value")!;
+    const history = queued.map((x) => hist({ ruleId: x.ruleId, dedupeKey: x.dedupeKey, status: "queued" }));
+    const q = planNudges({ candidates: [points], queued, history, now });
+    // Sent from the queue with today's copy, not re-created as a fresh nudge.
+    expect(q.sendQueued.map((x) => x.id)).toEqual(["q1"]);
+    expect(q.sendQueued[0]!.current.templateBody).toMatch(/4,200 points/);
+    expect(q.sendFresh).toHaveLength(0);
+    expect(q.expire).toEqual(["q2"]);
+  });
+
+  it("a queued nudge whose rule no longer fires expires instead of sending stale numbers", () => {
+    const budget = candidates.find((c) => c.ruleId === "budget_pace")!;
+    const later = new Date("2026-11-26T04:30:00Z"); // < 7 days left: budget_pace no longer fires
+    const p = planNudges({ candidates: run(input((i) => (i.now = later))), queued: [{ id: "b", ruleId: "budget_pace", dedupeKey: budget.dedupeKey, priority: 60, expiresAt: budget.expiresAt }], history: [], now: later });
+    expect(p.expire).toContain("b");
+    expect(p.sendQueued).toHaveLength(0);
   });
 
   it("config holds every threshold in one place", () => {
@@ -265,11 +277,16 @@ describe("simulateUpcoming (Expo Go local-notification fallback)", () => {
 });
 
 describe("simulateUpcoming with stored queued nudges", () => {
-  it("sends them on their day alongside fresh ones, within the cap", () => {
+  it("sends them on their day with that day's copy, within the cap", () => {
     const i = input((x) => (x.now = new Date("2026-11-10T14:00:00Z")));
-    const stored = { id: "q1", ruleId: "fees_charged", dedupeKey: "stored:1", priority: 99, expiresAt: "2026-12-01T00:00:00Z", scheduledFor: "2026-11-11T03:30:00.000Z", title: "T", body: "B" };
-    const up = simulateUpcoming(i, [{ ruleId: "fees_charged", dedupeKey: "stored:1", status: "queued", sentAt: null, dismissedAt: null, actedAt: null, createdAt: "2026-11-10T00:00:00Z" }], [stored]);
-    expect(up.find((u) => u.dedupeKey === "stored:1")).toMatchObject({ at: "2026-11-11T03:30:00.000Z", title: "T" });
-    expect(up.filter((u) => u.at === "2026-11-11T03:30:00.000Z")).toHaveLength(2);
+    const goal = evaluateRules(buildFinancialState({ ...i, now: new Date("2026-11-11T03:30:00Z") }), new Date("2026-11-11T03:30:00Z"), []).find((c) => c.ruleId === "goal_progress")!;
+    const stored = { id: "q1", ruleId: "goal_progress", dedupeKey: goal.dedupeKey, priority: 35, expiresAt: goal.expiresAt, scheduledFor: "2026-11-11T03:30:00.000Z", title: "old", body: "old" };
+    const hist = [{ ruleId: "goal_progress", dedupeKey: goal.dedupeKey, status: "queued", sentAt: null, dismissedAt: null, actedAt: null, createdAt: "2026-11-10T00:00:00Z" }];
+    const up = simulateUpcoming(i, hist, [stored]);
+    const sent = up.find((u) => u.dedupeKey === goal.dedupeKey)!;
+    expect(sent.body).toMatch(/^Goa trip fund is ₹[\d,]+ behind plan\./);
+    const perDay = new Map<string, number>();
+    up.forEach((u) => perDay.set(u.at, (perDay.get(u.at) ?? 0) + 1));
+    expect(Math.max(...perDay.values())).toBeLessThanOrEqual(2);
   });
 });

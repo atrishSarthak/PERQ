@@ -7,7 +7,6 @@ import {
   simulateUpcoming,
   type NudgeCandidate,
   type NudgeHistoryEntry,
-  type NudgePayload,
   type UpcomingNudge,
 } from "@perq/finance-engine";
 import { logActivity } from "./activity";
@@ -84,12 +83,12 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
     if (inserted) sent.push({ id: inserted.id, title: copy.title, body: copy.body });
   }
   for (const q of plan.sendQueued) {
-    const r = rows.find((x) => x.id === q.id)!;
-    // Queued rows still hold the template in title/body.
-    const copy = await writeNudgeCopy({ ruleId: r.ruleId, payload: r.payload as NudgePayload, templateTitle: r.title, templateBody: r.body });
+    // Today's candidate, so the payload, copy and "why" reflect today's state.
+    const c = q.current;
+    const copy = await writeNudgeCopy(c);
     await db
       .update(nudges)
-      .set({ status: "sent", sentAt: now, title: copy.title, body: copy.body, bodySource: copy.source })
+      .set({ status: "sent", sentAt: now, title: copy.title, body: copy.body, bodySource: copy.source, payload: c.payload, priority: c.priority, why: c.why, expiresAt: new Date(c.expiresAt) })
       .where(and(eq(nudges.userId, userId), eq(nudges.id, q.id)));
     sent.push({ id: q.id, title: copy.title, body: copy.body });
   }

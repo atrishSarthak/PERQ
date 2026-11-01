@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Screen } from "@/components/Screen";
 import { Text } from "@/components/Text";
+import { DemoControls } from "@/features/money/DemoControls";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { API_URL } from "@/lib/config";
@@ -44,6 +45,7 @@ export default function Diagnostics() {
         {row("App / Expo SDK", `${Constants.expoConfig?.version ?? "?"} / ${Constants.expoConfig?.sdkVersion ?? "?"}`)}
       </Card>
       <Button label="Check again" onPress={() => health.refetch()} loading={health.isFetching} />
+      {status === "signedIn" ? <DemoControls /> : null}
       <Text variant="small" tone="muted" style={{ marginTop: t.spacing[2] }}>
         If the check fails: make sure the phone and laptop share Wi-Fi, the web server runs with
         `pnpm dev:web`, and the URL above is your laptop's LAN IP. Or point EXPO_PUBLIC_API_URL at the

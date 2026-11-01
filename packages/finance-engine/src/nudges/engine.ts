@@ -77,8 +77,8 @@ export interface QueuedNudge {
 export interface NudgePlan {
   /** New candidates to send now. */
   sendFresh: (NudgeCandidate & { priority: number })[];
-  /** Previously queued nudges to send now. */
-  sendQueued: QueuedNudge[];
+  /** Previously queued nudges to send now, with today's candidate (fresh numbers and copy). */
+  sendQueued: (QueuedNudge & { current: NudgeCandidate })[];
   /** New candidates to store as queued (cap reached or quiet hours), with when to retry. */
   queueFresh: (NudgeCandidate & { priority: number; scheduledFor: string })[];
   /** Queued nudges that expired. */
@@ -110,8 +110,14 @@ export function planNudges(input: {
     .filter((c) => !seen.has(c.dedupeKey) && live(c.expiresAt))
     .filter((c, i, all) => all.findIndex((x) => x.dedupeKey === c.dedupeKey) === i)
     .map((c) => ({ ...c, priority: adjust(c.ruleId, c.priority) }));
-  const expire = input.queued.filter((q) => !live(q.expiresAt)).map((q) => q.id);
-  const queued = input.queued.filter((q) => live(q.expiresAt)).map((q) => ({ ...q, priority: adjust(q.ruleId, q.priority) }));
+  // A queued nudge is only still true if today's evaluation produces it again;
+  // it goes out with today's payload, so its numbers are never stale.
+  const current = new Map(input.candidates.map((c) => [c.dedupeKey, c]));
+  const stillTrue = (q: QueuedNudge) => live(q.expiresAt) && current.has(q.dedupeKey);
+  const expire = input.queued.filter((q) => !stillTrue(q)).map((q) => q.id);
+  const queued = input.queued
+    .filter(stillTrue)
+    .map((q) => ({ ...q, current: current.get(q.dedupeKey)!, priority: adjust(q.ruleId, current.get(q.dedupeKey)!.priority) }));
 
   const today = istDate(now);
   const sentToday = input.history.filter((h) => h.sentAt && istDate(new Date(h.sentAt)) === today).length;
@@ -131,7 +137,7 @@ export function planNudges(input: {
 
   return {
     sendFresh: chosen.filter((p) => p.kind === "fresh").map((p) => p.item as (typeof fresh)[number]),
-    sendQueued: chosen.filter((p) => p.kind === "queued").map((p) => p.item as QueuedNudge),
+    sendQueued: chosen.filter((p) => p.kind === "queued").map((p) => p.item as QueuedNudge & { current: NudgeCandidate }),
     queueFresh: pool
       .slice(capRemaining)
       .filter((p) => p.kind === "fresh")

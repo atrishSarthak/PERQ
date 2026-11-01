@@ -69,6 +69,12 @@ export const moneyApi = {
   activity: () => http.request("/api/activity", { schema: activityResponseSchema }),
   deleteFinancialData: () => http.request("/api/me/financial-data", { method: "DELETE", schema: z.object({ deleted: z.boolean() }) }),
   deleteAccount: () => http.request("/api/me", { method: "DELETE", schema: z.object({ deleted: z.boolean() }) }),
+  demoLoad: () =>
+    http.request("/api/demo/load", { method: "POST", schema: z.object({ transactions: z.number(), nudgesSent: z.number(), now: z.string() }) }),
+  demoReset: () => http.request("/api/demo/reset", { method: "POST", schema: z.object({ reset: z.boolean() }) }),
+  demoClock: () => http.request("/api/demo/clock", { schema: z.object({ isDemo: z.boolean(), now: z.string() }) }),
+  demoTravel: (body: { days: number } | { date: string } | { reset: true }) =>
+    http.request("/api/demo/clock", { method: "POST", body, schema: z.object({ now: z.string(), nudgesSent: z.number(), quietHours: z.boolean() }) }),
   markPaid: (cardAccountId: string) =>
     http.request(`/api/card-accounts/${encodeURIComponent(cardAccountId)}`, { method: "PATCH", body: { markPaid: true }, schema: z.object({ ok: z.boolean() }) }),
   registerPush: (token: string, platform: "ios" | "android") =>
