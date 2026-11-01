@@ -295,3 +295,35 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 82. **High-utilisation levels.** Spec §7.2 gives one rule. It's split into `warn` (≥ 70% and the statement
     closes within 5 days, priority 75, with "pay ₹X to get under 30%") and `info` (≥ 30%, priority 40), so
     it is urgent only when acting on it still changes the reported figure.
+83. **Push in Expo Go: local-notification fallback.** Checked against the SDK 58 docs (AUDIT Step 2 #11).
+    Expo Go dropped remote push on Android in SDK 53. On iOS, `getExpoPushTokenAsync` needs an EAS
+    `projectId`, and this app has none (creating one needs an Expo account and `eas init`, which this
+    step doesn't do). So in Expo Go the app runs in **local mode**: on sign-in and on every foreground
+    it fetches `GET /api/nudges/upcoming` and replaces its scheduled local notifications with that list.
+    The list comes from `simulateUpcoming`, which is the same rules and planner run forward over 7 days
+    at 09:00 IST, including nudges already queued, so cap and quiet hours hold on the device too.
+    Tapping one opens `/nudge/key:<dedupeKey>`, and opening the inbox runs the engine (throttled to
+    every 5 minutes) so that nudge exists by then. The server push path (`expo-server-sdk`,
+    `/api/push/register`, `DeviceNotRegistered` cleanup) is built and used automatically once a
+    projectId is in app.json (`extra.eas.projectId`). Local notifications use template copy.
+    Remote pushes use the Gemini copy.
+84. **Nudge copy.** Gemini sees only the rule id, the payload and the template, and has an 8-second
+    budget. `validateNudgeCopy` (finance-engine) rejects: text over 90/160 characters, any number not in
+    the payload or the code-written template (which covers constants like "30%"), shorthand like "₹18k"
+    or "1.2 lakh", exclamation marks, and urgency words. A rejection sends the template, and the log line
+    keeps the reason with digits masked. Copy is written only when a nudge is sent; queued rows hold the
+    template until then.
+85. **`nudges.why`** (migration 0010) keeps each rule's plain-English explanation from creation time. Then
+    "Why am I seeing this?" still matches the nudge after newer statements change the state.
+    `/api/nudges/:id/why` adds the rule description, labelled payload figures and the data date.
+86. **Notification consent** is its own `consents` row (source `notifications`), recorded by the explainer
+    screen shown on the first Home visit after sign-in. That screen comes before the OS prompt. Push and
+    the upcoming list both check it.
+87. **Cron** lives in `apps/web/vercel.json` (`30 3 * * *`). It needs `CRON_SECRET` and iterates users
+    with an active card account, 10 at a time with `allSettled`. `pnpm nudges:run --user <id> [--now
+    YYYY-MM-DD] [--upcoming]` runs the same code locally. A date-only `--now` means 09:00 IST that day.
+88. **Gemini data terms (§12).** On the free tier, Google may use prompts and responses to improve its
+    products, and humans may review them. The paid tier (Cloud Billing on the key) excludes that. What
+    Gemini receives here is statement text (extraction fallback only), merchant names (categorisation)
+    and nudge payloads (copy). **Recommendation: move the key to the paid tier before any real user's
+    statement is processed.** Until then, use only synthetic statements.

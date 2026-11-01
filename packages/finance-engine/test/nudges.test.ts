@@ -13,6 +13,8 @@ import {
   type StateInput,
   type StateStatement,
   type StateTransaction,
+  simulateUpcoming,
+  validateNudgeCopy,
 } from "../src";
 
 const ace: CardTerms = { id: "axis-ace", name: "Axis Ace", rewardRates: { food_delivery: 4, bills: 5, other: 1.5 }, redemptionValue: null, feeWaiverSpend: 200000, annualFee: 499 };
@@ -217,5 +219,57 @@ describe("planNudges (§7.1 steps 3–5)", () => {
 
   it("config holds every threshold in one place", () => {
     expect(NUDGE_CONFIG.dailyCap).toBe(2);
+  });
+});
+
+describe("nudge copy validation (§7.1 step 6)", () => {
+  const [due] = byRule(run(input()), "due_soon");
+  const tpl = { title: due!.templateTitle, body: due!.templateBody };
+
+  it("every rule's own template passes", () => {
+    for (const c of run(input())) expect([c.ruleId, validateNudgeCopy({ title: c.templateTitle, body: c.templateBody }, c.payload, { title: c.templateTitle, body: c.templateBody })]).toEqual([c.ruleId, { ok: true }]);
+  });
+
+  it("accepts a rewording that keeps the payload's numbers", () => {
+    expect(validateNudgeCopy({ title: "HDFC Millennia bill on Saturday", body: "₹18,240 is due on 14 Nov. Paying it in full keeps interest away." }, due!.payload, tpl)).toEqual({ ok: true });
+  });
+
+  it("rejects invented numbers, shorthand amounts, urgency words and long text", () => {
+    expect(validateNudgeCopy({ title: "Bill due", body: "₹18,000 is due on Saturday." }, due!.payload, tpl)).toMatchObject({ ok: false, reason: "number not in payload: 18000" });
+    expect(validateNudgeCopy({ title: "Bill due", body: "About ₹18k is due on Saturday." }, due!.payload, tpl)).toMatchObject({ ok: false });
+    expect(validateNudgeCopy({ title: "Pay now", body: "Hurry, ₹18,240 is due Saturday." }, due!.payload, tpl)).toMatchObject({ ok: false, reason: "banned word: hurry" });
+    expect(validateNudgeCopy({ title: "Bill due!", body: "₹18,240 is due Saturday." }, due!.payload, tpl)).toMatchObject({ ok: false });
+    expect(validateNudgeCopy({ title: "x", body: "a".repeat(161) }, due!.payload, tpl)).toMatchObject({ ok: false, reason: "body too long" });
+  });
+});
+
+describe("simulateUpcoming (Expo Go local-notification fallback)", () => {
+  it("plans the next days at 09:00 IST with the cap and without repeats", () => {
+    const i = input((x) => (x.now = new Date("2026-11-10T14:00:00Z"))); // 19:30 IST on the 10th
+    const up = simulateUpcoming(i, []);
+    expect(up.every((u) => u.at.endsWith("T03:30:00.000Z"))).toBe(true);
+    const perDay = new Map<string, number>();
+    up.forEach((u) => perDay.set(u.at, (perDay.get(u.at) ?? 0) + 1));
+    expect(Math.max(...perDay.values())).toBeLessThanOrEqual(2);
+    expect(new Set(up.map((u) => u.dedupeKey)).size).toBe(up.length);
+    expect(up[0]!.at).toBe("2026-11-11T03:30:00.000Z");
+    // The 12 Nov due-today nudge for Axis lands on the 12th.
+    expect(up.find((u) => u.ruleId === "due_today")?.at).toBe("2026-11-12T03:30:00.000Z");
+  });
+
+  it("skips anything already in history", () => {
+    const i = input((x) => (x.now = new Date("2026-11-10T14:00:00Z")));
+    const hist = [{ ruleId: "due_today", dedupeKey: "due_today:axis:2026-10-16", status: "dismissed", sentAt: null, dismissedAt: null, actedAt: null, createdAt: "2026-11-10T00:00:00Z" }];
+    expect(simulateUpcoming(i, hist).some((u) => u.dedupeKey === "due_today:axis:2026-10-16")).toBe(false);
+  });
+});
+
+describe("simulateUpcoming with stored queued nudges", () => {
+  it("sends them on their day alongside fresh ones, within the cap", () => {
+    const i = input((x) => (x.now = new Date("2026-11-10T14:00:00Z")));
+    const stored = { id: "q1", ruleId: "fees_charged", dedupeKey: "stored:1", priority: 99, expiresAt: "2026-12-01T00:00:00Z", scheduledFor: "2026-11-11T03:30:00.000Z", title: "T", body: "B" };
+    const up = simulateUpcoming(i, [{ ruleId: "fees_charged", dedupeKey: "stored:1", status: "queued", sentAt: null, dismissedAt: null, actedAt: null, createdAt: "2026-11-10T00:00:00Z" }], [stored]);
+    expect(up.find((u) => u.dedupeKey === "stored:1")).toMatchObject({ at: "2026-11-11T03:30:00.000Z", title: "T" });
+    expect(up.filter((u) => u.at === "2026-11-11T03:30:00.000Z")).toHaveLength(2);
   });
 });

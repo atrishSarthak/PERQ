@@ -71,6 +71,13 @@
       "when": 1793524373917,
       "tag": "0009_money_manager",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793526578313,
+      "tag": "0010_nudge_why",
+      "breakpoints": true
     }
   ]
 }

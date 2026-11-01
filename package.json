@@ -16,7 +16,8 @@
     "db:generate": "pnpm --filter @perq/db db:generate",
     "db:migrate": "pnpm --filter @perq/db db:migrate",
     "db:seed-cards": "pnpm --filter @perq/db db:seed-cards",
-    "statements:fake": "pnpm --filter @perq/statements fake"
+    "statements:fake": "pnpm --filter @perq/statements fake",
+    "nudges:run": "pnpm --filter @perq/web nudges:run"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

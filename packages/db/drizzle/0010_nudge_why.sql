@@ -1,0 +1,1 @@
+ALTER TABLE "nudges" ADD COLUMN "why" text;

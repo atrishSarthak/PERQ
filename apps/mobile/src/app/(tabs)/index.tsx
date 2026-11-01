@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { formatInr } from "@perq/finance-engine";
@@ -9,6 +10,7 @@ import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
 import { LeakageBanner } from "@/features/results/components";
 import { useAuth } from "@/lib/auth";
+import { hasAskedForNotifications } from "@/lib/notifications";
 import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -21,6 +23,10 @@ export default function Home() {
   const t = useTheme();
   const { user } = useAuth();
   const results = useResults();
+  // First visit to Home after sign-in: explain notifications before any OS prompt.
+  useEffect(() => {
+    hasAskedForNotifications().then((asked) => !asked && router.push("/notifications"));
+  }, []);
   if (results.isLoading) return <Loading />;
   if (results.error) return <ErrorState message={results.error.message} onRetry={() => results.refetch()} />;
   const data = results.data;

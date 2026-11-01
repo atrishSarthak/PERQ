@@ -10,3 +10,4 @@ export * from "./quizReducer";
 export * from "./money";
 export * from "./statement";
 export * from "./statementApi";
+export * from "./nudgeApi";

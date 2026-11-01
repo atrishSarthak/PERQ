@@ -600,6 +600,7 @@ export const nudges = pgTable(
     title: text("title").notNull(),
     body: text("body").notNull(),
     bodySource: text("body_source").notNull().default("template"), // 'ai' | 'template'
+    why: text("why"), // the rule's plain-English explanation at creation time
     status: text("status").notNull().default("queued"), // queued|sent|opened|acted|dismissed|expired|suppressed
     scheduledFor: timestamp("scheduled_for", { mode: "date" }),
     sentAt: timestamp("sent_at", { mode: "date" }),

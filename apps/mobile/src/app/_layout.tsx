@@ -1,5 +1,7 @@
 import { useEffect } from "react";
-import { Stack } from "expo-router";
+import { AppState } from "react-native";
+import { router, Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
@@ -11,6 +13,7 @@ import {
 import { QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { pathForNotification, syncNotifications } from "@/lib/notifications";
 import { queryClient } from "@/lib/queryClient";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
@@ -51,6 +54,8 @@ function RootNavigator() {
     if (status !== "loading") SplashScreen.hideAsync().catch(() => {});
   }, [status]);
 
+  useNotificationSync(status === "signedIn");
+
   if (status === "loading") return null;
   const signedIn = status === "signedIn";
 
@@ -86,6 +91,28 @@ function RootNavigator() {
             }}
           />
           <Stack.Screen
+            name="notifications"
+            options={{
+              presentation: "modal",
+              headerShown: true,
+              title: "Notifications",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="nudge/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: true,
+              title: "Ember noticed",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
             name="edit/[key]"
             options={{
               presentation: "modal",
@@ -109,4 +136,25 @@ function RootNavigator() {
       </Stack>
     </>
   );
+}
+
+/** Keeps the push token or the local schedule current, and opens tapped notifications. */
+function useNotificationSync(signedIn: boolean) {
+  useEffect(() => {
+    if (!signedIn) return;
+    const sync = () => syncNotifications().catch(() => {});
+    sync();
+    const open = (data: unknown) => {
+      const path = pathForNotification(data);
+      if (path) router.push(path as never);
+    };
+    const last = Notifications.getLastNotificationResponse();
+    if (last) open(last.notification.request.content.data);
+    const tap = Notifications.addNotificationResponseReceivedListener((r) => open(r.notification.request.content.data));
+    const app = AppState.addEventListener("change", (s) => s === "active" && sync());
+    return () => {
+      tap.remove();
+      app.remove();
+    };
+  }, [signedIn]);
 }
