@@ -1,0 +1,217 @@
+{
+  "password": "ARJU1503",
+  "layout": "A",
+  "expected": {
+    "issuer": "HDFC Bank",
+    "cardName": "Millennia",
+    "last4": "4821",
+    "statementDate": "2026-10-15",
+    "periodStart": "2026-09-15",
+    "periodEnd": "2026-10-15",
+    "dueDate": "2026-11-02",
+    "totalDue": 29796.59,
+    "minimumDue": 1489.83,
+    "previousBalance": 18240.5,
+    "paymentsCredits": 18775.52,
+    "purchasesDebits": 30321.24,
+    "feesCharges": 10.37,
+    "financeCharges": 0,
+    "creditLimit": 150000,
+    "availableLimit": 120203.41,
+    "points": null,
+    "transactions": [
+      {
+        "date": "2026-09-17",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 1185.12,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-17",
+        "description": "HPCL FUEL STATION PUNE",
+        "amount": 686.96,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-17",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-17",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 111.54,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-18",
+        "description": "PAYMENT RECEIVED - THANK YOU",
+        "amount": 18240.5,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-09-19",
+        "description": "SWIGGY*ORDER BANGALORE",
+        "amount": 674.73,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "HPCL FUEL STATION PUNE",
+        "amount": 2080.44,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "UPI-SWIGGY INSTAMART-6378221",
+        "amount": 397.67,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-21",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 558.8,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-22",
+        "description": "BIGBASKET INNOVATIVE RETAIL",
+        "amount": 2005.27,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-27",
+        "description": "MYNTRA DESIGNS BANGALORE",
+        "amount": 825.23,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-27",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "JIO PREPAID RECHARGE",
+        "amount": 265.85,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-30",
+        "description": "AMAZON PAY INDIA PRIVA BANGALORE",
+        "amount": 911.84,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-01",
+        "description": "AMAZON PAY INDIA PRIVA BANGALORE",
+        "amount": 3512.17,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-03",
+        "description": "CASHBACK CREDITED",
+        "amount": 123,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-10-03",
+        "description": "REFUND AMAZON PAY INDIA PRIVA",
+        "amount": 412.02,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-10-04",
+        "description": "BIGBASKET INNOVATIVE RETAIL",
+        "amount": 1792.01,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-04",
+        "description": "ZOMATO ONLINE ORDER",
+        "amount": 690.81,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-05",
+        "description": "AMAZON PAY INDIA PRIVA BANGALORE",
+        "amount": 3352.86,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-06",
+        "description": "AUTOPAY SI 4532015112830366 GOOGLE PLAY",
+        "amount": 182.31,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-07",
+        "description": "THIRD WAVE COFFEE BANGALORE",
+        "amount": 445.85,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-08",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 792.4,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-08",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 1234.26,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-08",
+        "description": "ZOMATO ONLINE ORDER",
+        "amount": 221.16,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-11",
+        "description": "JIO PREPAID RECHARGE",
+        "amount": 468.75,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-11",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 134.35,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-13",
+        "description": "FLIPKART INTERNET PVT LTD",
+        "amount": 629.34,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-13",
+        "description": "MAKEMYTRIP INDIA PVT LTD",
+        "amount": 6318.89,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-13",
+        "description": "UPI-BLINKIT-COMMERCE PVT LTD",
+        "amount": 591.63,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-15",
+        "description": "IGST ON FEES @18%",
+        "amount": 1.58,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-15",
+        "description": "MARKUP FEE ON INTL TXN",
+        "amount": 8.79,
+        "direction": "debit"
+      }
+    ]
+  }
+}

@@ -8,3 +8,4 @@ export * from "./recommendation";
 export * from "./api";
 export * from "./quizReducer";
 export * from "./money";
+export * from "./statement";

@@ -1,0 +1,356 @@
+{
+  "password": "ROHA0510",
+  "layout": "C",
+  "expected": {
+    "issuer": "Axis Bank",
+    "cardName": "Axis Bank ACE Credit Card",
+    "last4": "0093",
+    "statementDate": "2026-10-05",
+    "periodStart": "2026-09-05",
+    "periodEnd": "2026-10-05",
+    "dueDate": "2026-10-23",
+    "totalDue": 46081.35,
+    "minimumDue": 2304.07,
+    "previousBalance": 9450.75,
+    "paymentsCredits": 9931.36,
+    "purchasesDebits": 46546.41,
+    "feesCharges": 15.55,
+    "financeCharges": 0,
+    "creditLimit": 120000,
+    "availableLimit": 73918.65,
+    "points": {
+      "opening": 3649,
+      "earned": 930,
+      "redeemed": 0,
+      "closing": 4579,
+      "expiring": 400,
+      "expiryDate": "2026-11-19"
+    },
+    "transactions": [
+      {
+        "date": "2026-09-06",
+        "description": "MYNTRA DESIGNS BANGALORE",
+        "amount": 3306.53,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-07",
+        "description": "AMAZON PAY INDIA PRIVA BANGALORE",
+        "amount": 4240.43,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-07",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 818.24,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-07",
+        "description": "IRCTC E TICKETING NEW DELHI",
+        "amount": 1440.15,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-08",
+        "description": "PAYMENT RECEIVED - THANK YOU",
+        "amount": 9450.75,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-09-08",
+        "description": "UPI-RAJU KIRANA STORES-PAYTM",
+        "amount": 579.8,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-10",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 1622.76,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-10",
+        "description": "AUTOPAY SI 4532015112830366 GOOGLE PLAY",
+        "amount": 187.08,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-10",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 205.99,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-11",
+        "description": "ZEPTO MARKETPLACE PVT LTD MUMBAI",
+        "amount": 526.43,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-11",
+        "description": "ZOMATO ONLINE ORDER",
+        "amount": 365,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-12",
+        "description": "SWIGGY*ORDER BANGALORE",
+        "amount": 712.64,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-12",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 208.05,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-13",
+        "description": "BIGBASKET INNOVATIVE RETAIL",
+        "amount": 1240.04,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-13",
+        "description": "PAYU*ZOMATO GURGAON",
+        "amount": 450.59,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-13",
+        "description": "THIRD WAVE COFFEE BANGALORE",
+        "amount": 498.24,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-13",
+        "description": "UPI-SWIGGY INSTAMART-6378221",
+        "amount": 508.65,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-14",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 586.11,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-16",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 1475.96,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-17",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 786.62,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-18",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 1278.36,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-18",
+        "description": "UPI-SWIGGY INSTAMART-6378221",
+        "amount": 855.33,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-19",
+        "description": "BESCOM ELECTRICITY BILL",
+        "amount": 1796.77,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-19",
+        "description": "THIRD WAVE COFFEE BANGALORE",
+        "amount": 689.56,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "AIRTEL PAYMENTS BANK MUMBAI",
+        "amount": 989.51,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "HPCL FUEL STATION PUNE",
+        "amount": 1489.43,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "IOCL PETROL PUMP KORAMANGALA",
+        "amount": 987.2,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-20",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-21",
+        "description": "BESCOM ELECTRICITY BILL",
+        "amount": 1887.03,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-21",
+        "description": "PAYU*ZOMATO GURGAON",
+        "amount": 1064.88,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-21",
+        "description": "REFUND AMAZON PAY INDIA PRIVA",
+        "amount": 348.97,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-09-21",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-23",
+        "description": "JIO PREPAID RECHARGE",
+        "amount": 623.66,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "BESCOM ELECTRICITY BILL",
+        "amount": 1408.94,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "CASHBACK CREDITED",
+        "amount": 131.64,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "IRCTC E TICKETING NEW DELHI",
+        "amount": 2384.99,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "IRCTC E TICKETING NEW DELHI",
+        "amount": 1623.08,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "RAZ*URBAN COMPANY",
+        "amount": 565.94,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-25",
+        "description": "AIRTEL PAYMENTS BANK MUMBAI",
+        "amount": 549.43,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-25",
+        "description": "THIRD WAVE COFFEE BANGALORE",
+        "amount": 296.53,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-26",
+        "description": "HPCL FUEL STATION PUNE",
+        "amount": 1820.44,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-26",
+        "description": "PAYU*ZOMATO GURGAON",
+        "amount": 678.54,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-27",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 126.46,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "BIGBASKET INNOVATIVE RETAIL",
+        "amount": 1472.35,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "IRCTC E TICKETING NEW DELHI",
+        "amount": 1006.98,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "JIO PREPAID RECHARGE",
+        "amount": 242.52,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "THIRD WAVE COFFEE BANGALORE",
+        "amount": 661.31,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-01",
+        "description": "PAYU*ZOMATO GURGAON",
+        "amount": 353.7,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-01",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-02",
+        "description": "PVR CINEMAS FORUM MALL",
+        "amount": 827.03,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-03",
+        "description": "UPI-RAJU KIRANA STORES-PAYTM",
+        "amount": 320.32,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-04",
+        "description": "PAYU*ZOMATO GURGAON",
+        "amount": 410.31,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-05",
+        "description": "IGST ON FEES @18%",
+        "amount": 2.37,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-05",
+        "description": "MARKUP FEE ON INTL TXN",
+        "amount": 13.18,
+        "direction": "debit"
+      }
+    ]
+  }
+}

@@ -15,7 +15,8 @@
     "eval": "pnpm --filter @perq/web eval",
     "db:generate": "pnpm --filter @perq/db db:generate",
     "db:migrate": "pnpm --filter @perq/db db:migrate",
-    "db:seed-cards": "pnpm --filter @perq/db db:seed-cards"
+    "db:seed-cards": "pnpm --filter @perq/db db:seed-cards",
+    "statements:fake": "pnpm --filter @perq/statements fake"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

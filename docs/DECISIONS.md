@@ -204,3 +204,13 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 62. **Delete cascade verified against Neon** on 2026-11-01: deleting a user removed every row in
     card_accounts, statements, transactions, nudges, financial_state_cache, savings_goals,
     activity_events and consents.
+63. **Statements live in a new `packages/statements`** (server-only: PDF decrypt/extract, extraction
+    orchestration, synthetic generator). finance-engine stays pure and React Native-safe, so
+    reconciliation, categorisation rules, state and nudge rules live there instead.
+64. **Synthetic statements** (`pnpm statements:fake`): seeded, reproducible, pdfkit with an AES user
+    password, layouts A (HDFC-like summary box + table with "Cr"), B (SBI-like two columns with
+    Debit/Credit columns) and C (Axis-like, 3 pages with a points block). They print "Rs." because
+    Helvetica has no ₹ glyph, which matches many real statements. Every holder and card number is
+    fictional, and each file says "SYNTHETIC TEST STATEMENT" on it. One line deliberately carries a full
+    16-digit test card number (Visa's public test number), so §12 stripping is exercised. Real
+    statements belong in `fixtures/private/`, which is gitignored.

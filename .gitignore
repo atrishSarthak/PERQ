@@ -36,3 +36,7 @@ coverage/
 playwright-report/
 test-results/
 .gstack/
+
+# Real bank statements used for private testing. NEVER commit these.
+fixtures/private/
+**/fixtures/private/

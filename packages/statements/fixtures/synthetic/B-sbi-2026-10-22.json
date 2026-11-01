@@ -1,0 +1,181 @@
+{
+  "password": "PRIY2208",
+  "layout": "B",
+  "expected": {
+    "issuer": "SBI Card",
+    "cardName": "CASHBACK SBI Card",
+    "last4": "7710",
+    "statementDate": "2026-10-22",
+    "periodStart": "2026-09-22",
+    "periodEnd": "2026-10-22",
+    "dueDate": "2026-11-09",
+    "totalDue": 23168.38,
+    "minimumDue": 1158.42,
+    "previousBalance": 12300,
+    "paymentsCredits": 5566.32,
+    "purchasesDebits": 15534.5,
+    "feesCharges": 623.45,
+    "financeCharges": 276.75,
+    "creditLimit": 80000,
+    "availableLimit": 56831.62,
+    "points": null,
+    "transactions": [
+      {
+        "date": "2026-09-24",
+        "description": "AIRTEL PAYMENTS BANK MUMBAI",
+        "amount": 469.28,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-24",
+        "description": "LATE PAYMENT FEE",
+        "amount": 500,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-25",
+        "description": "HPCL FUEL STATION PUNE",
+        "amount": 1722.36,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-25",
+        "description": "PAYMENT RECEIVED - THANK YOU",
+        "amount": 4920,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-09-26",
+        "description": "UPI-BLINKIT-COMMERCE PVT LTD",
+        "amount": 513.33,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-26",
+        "description": "ZEPTO MARKETPLACE PVT LTD MUMBAI",
+        "amount": 1170.16,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-27",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 1618.59,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-28",
+        "description": "APOLLO PHARMACY HSR LAYOUT",
+        "amount": 721.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-29",
+        "description": "AMAZON PAY INDIA PRIVA BANGALORE",
+        "amount": 4346.17,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-09-30",
+        "description": "AIRTEL PAYMENTS BANK MUMBAI",
+        "amount": 551.94,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-01",
+        "description": "AIRTEL PAYMENTS BANK MUMBAI",
+        "amount": 553.76,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-06",
+        "description": "UPI-CHAI POINT-9876543210@YBL",
+        "amount": 78.99,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-08",
+        "description": "SPOTIFY AB STOCKHOLM",
+        "amount": 125.5,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-09",
+        "description": "CASHBACK CREDITED",
+        "amount": 150.27,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-10-09",
+        "description": "PVR CINEMAS FORUM MALL",
+        "amount": 443.47,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-10",
+        "description": "REFUND AMAZON PAY INDIA PRIVA",
+        "amount": 496.05,
+        "direction": "credit"
+      },
+      {
+        "date": "2026-10-11",
+        "description": "PVR CINEMAS FORUM MALL",
+        "amount": 1036.9,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-12",
+        "description": "ZOMATO ONLINE ORDER",
+        "amount": 279.39,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-13",
+        "description": "NETFLIX.COM SINGAPORE",
+        "amount": 684.45,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-15",
+        "description": "UPI-RAJU KIRANA STORES-PAYTM",
+        "amount": 408.74,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-20",
+        "description": "UPI-RAJU KIRANA STORES-PAYTM",
+        "amount": 98.66,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-20",
+        "description": "ZEPTO MARKETPLACE PVT LTD MUMBAI",
+        "amount": 534.68,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-21",
+        "description": "AUTOPAY SI 4532015112830366 GOOGLE PLAY",
+        "amount": 176.63,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-22",
+        "description": "FINANCE CHARGES",
+        "amount": 276.75,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-22",
+        "description": "IGST ON FEES @18%",
+        "amount": 95.1,
+        "direction": "debit"
+      },
+      {
+        "date": "2026-10-22",
+        "description": "MARKUP FEE ON INTL TXN",
+        "amount": 28.35,
+        "direction": "debit"
+      }
+    ]
+  }
+}
