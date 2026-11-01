@@ -37,7 +37,13 @@
         }
       ],
       "expo-secure-store",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "PERQ reads a product screenshot you pick to get the price and offers. The image isn't stored."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

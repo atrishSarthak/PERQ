@@ -108,15 +108,18 @@ export async function extractStructuredJson(
   apiKey: string,
   prompt: string,
   schema: ResponseSchema,
-  modelName?: string
+  modelName?: string,
+  /** An inline image to read alongside the prompt (Step 3 screenshots). Sent, never stored. */
+  image?: { data: string; mimeType: string }
 ): Promise<unknown> {
   const client = new GoogleGenAI({ apiKey });
   const models = resolveModelChain(modelName);
+  const parts = image ? [{ inlineData: { data: image.data, mimeType: image.mimeType } }, { text: prompt }] : [{ text: prompt }];
 
   const response = await withModelFallback(models, (model) =>
     client.models.generateContent({
       model,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      contents: [{ role: "user", parts }],
       config: {
         responseMimeType: "application/json",
         responseSchema: toGenAiResponseSchema(schema),

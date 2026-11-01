@@ -539,3 +539,28 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      before anything runs, and it saves a model call per plan. Need-by is chosen from chips (this
      week / 2 weeks / this month / a month) relative to the server's day, so demo time travel
      applies. The confirmed input reaches the planning screen in memory only.
+131. **Extraction is a draft, never a plan.** `/api/plans/extract` (screenshot or chat text) only
+     returns a `PartialPlanInput`, and the phone always shows the "Check these before Ember plans"
+     card. Nothing runs until the user taps confirm. Gemini fills a fixed JSON schema; the result is
+     normalised and re-validated with zod, and anything that fails is dropped rather than guessed.
+     With Gemini off or timed out (25 s), a rules fallback reads the price and item from the text.
+132. **A chat price only counts if the user wrote it.** For text extraction, a price that doesn't
+     appear in the user's own words is dropped and `price` goes into `missing`, so the model can't
+     invent one from what it thinks the product costs.
+133. **Screenshots: cropped on the phone, processed in memory.** The picker uses `allowsEditing` so
+     the user can crop to the product, and sends JPEG at quality 0.6 as base64. The server passes
+     it inline to Gemini and keeps nothing: no disk, DB, storage or logs. `agent_runs` records only
+     the task name (`plan_extract_image` / `plan_extract_text`) for the daily limit. A test checks
+     the route and lib for file writes and for logging the image or text.
+134. **Links are parsed on the phone, never fetched.** `parseProductLink` reads the shop from the
+     hostname and a rough item name from the URL slug. There's no server-side fetch of shop pages;
+     the price is always typed or read from a screenshot.
+135. **Clipboard is read only on tap.** On iOS the app checks `hasUrlAsync` (which doesn't trigger
+     the paste prompt) and offers "Use the link you copied"; the clipboard contents are read only
+     when the user taps it.
+136. **Offer banks and merchant.** The prompt asks for the shop's own name as merchant (not the
+     third-party seller) and for the bank/wallet/pay-later name on every restricted offer, so
+     `applyOffer` can match it. The user can still edit both on the confirm card.
+137. **Fixtures are fictional.** `fixtures/plans/` holds five made-up product pages (fictional shops,
+     brands and people) rendered to PNG by `make.py`, with `expected.json` for the extraction eval.
+     No real shop screenshots are committed.

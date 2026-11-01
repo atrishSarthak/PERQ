@@ -1,0 +1,32 @@
+{
+  "phone": {
+    "price": 59900,
+    "item": "Nova X15 5G (Midnight, 128 GB)",
+    "offers": 2,
+    "emi": true
+  },
+  "laptop": {
+    "price": 24999,
+    "item": "AeroBook 14 Laptop (16 GB, 512 GB SSD)",
+    "offers": 1,
+    "emi": true
+  },
+  "headphones": {
+    "price": 8499,
+    "item": "SoundPeak ANC 700 Wireless Headphones",
+    "offers": 2,
+    "emi": false
+  },
+  "fridge": {
+    "price": 38490,
+    "item": "FrostPro 340 L Double Door Refrigerator",
+    "offers": 1,
+    "emi": true
+  },
+  "watch": {
+    "price": 3299,
+    "item": "Pulse Fit 3 Smartwatch (Graphite)",
+    "offers": 0,
+    "emi": false
+  }
+}
