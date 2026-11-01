@@ -8,6 +8,13 @@ import { PLANNER_CONFIG } from "./config";
 // validatePlanExplanation passes (numbers, verdict, tone, length).
 
 const pct = (n: number) => `${Math.round(n * 10) / 10}%`;
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** "this month", or "in December" when the purchase comes out of a later month's budget. */
+export function monthPhrase(r: Pick<PlanResult, "affordability" | "asOf">): string {
+  const m = r.affordability.forMonth;
+  return m && m > r.asOf.slice(0, 7) ? `in ${MONTHS[Number(m.slice(5, 7)) - 1]}` : "this month";
+}
 
 function creditSentence(r: PlanResult): string | null {
   const c = r.credit;
@@ -36,7 +43,7 @@ export function planTemplateExplanation(r: PlanResult): string {
       break;
     }
     case "go":
-      s.push(o.kind === "upi" ? "Go ahead." : `Go ahead with your ${o.label}${o.purchaseDate !== r.asOf ? ` on ${formatDay(o.purchaseDate)}` : ""}.`);
+      s.push(o.kind === "upi" ? `Go ahead${o.purchaseDate !== r.asOf ? ` on ${formatDay(o.purchaseDate)}` : ""}.` : `Go ahead with your ${o.label}${o.purchaseDate !== r.asOf ? ` on ${formatDay(o.purchaseDate)}` : ""}.`);
       s.push(o.kind === "upi" ? costSentence(r) : `After offers and rewards it costs ${formatInr(o.netCost)}${o.savingVsUpi > 0 ? `, ${formatInr(o.savingVsUpi)} less than paying by UPI` : ""}.`);
       break;
     case "wait": {
@@ -44,7 +51,7 @@ export function planTemplateExplanation(r: PlanResult): string {
       const a = r.affordability;
       const slip = [...a.goalImpacts].sort((x, y) => y.monthsSlip - x.monthsSlip)[0];
       if (r.verdictReason === "goal_slip" && slip) s.push(`Buying it now would push your ${slip.name} goal back by about ${slip.monthsSlip} months.`);
-      else if (a.leftThisMonth !== null) s.push(`It costs ${formatInr(o.effectivePrice)} and you have ${formatInr(Math.max(0, a.leftThisMonth))} left to spend this month.`);
+      else if (a.leftThisMonth !== null) s.push(`It costs ${formatInr(o.effectivePrice)} and you have ${formatInr(Math.max(0, a.leftThisMonth))} left to spend ${monthPhrase(r)}.`);
       s.push("A savings goal for it would let you buy it without stretching your month.");
       break;
     }

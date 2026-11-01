@@ -627,3 +627,27 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      the verdict. The prompt now gets `why`, the user's pick and the goal proposal.
 150. **"Ask Ember" on the result screen arrives with plan threads (checkpoint 10)**, so it opens a
      chat that already knows the plan.
+151. **No `planPurchase` tool in chat.** §7.1 lists one, but a model that plans from numbers it read
+     in a message would break "never plan on unconfirmed numbers". In chat, Ember calls
+     `extractPlanFromMessage`. That shows the confirmation card (`planConfirm` event, one per turn),
+     and the plan runs through `/api/plans/run` only when the user taps "Plan it", or after "Edit" on
+     the full form. The engine's `planPurchase` is still what runs. Ember's other plan tools are
+     `listPlans`, `getPlan` and `whatIfPlan`, all level 1 and read-only. What-ifs start from a plan
+     the user already confirmed and are never saved from chat.
+152. **The chat answer joins the thread.** A plan confirmed from the main-thread card runs with
+     `postToChat`. Ember's validated answer is then stored in the main thread with a `[plan:<id>]`
+     marker, which the app renders as the result card linking to the full plan. The confirmation
+     card isn't stored. A one-line note about it is kept with Ember's reply so later turns know what
+     was asked, and the app hides that line.
+153. **The planner in chat works for every signed-in user.** The chat used to need the quiz or a
+     statement. A purchase question needs neither, and the plan says what it couldn't check.
+154. **Plan threads.** A `plan:<id>` thread opens with the plan's headline. Its data is in the prompt
+     and counts as grounded, like a nudge's. The chips are the §8 three, made specific: the EMI chip
+     only when the plan has an EMI; "What if I use my <card>?" naming the next healthy card (or
+     UPI). A live test showed that "Use my other card" is ambiguous with three cards. Ember leads
+     with the what-if's new verdict and says it isn't saved.
+155. **"Wait a month" is modelled.** A purchase dated in a later IST month is checked against that
+     month's allowance: the budget total, or 30% of income, with nothing spent yet. It's reported as
+     `affordability.forMonth`, and the wording says "left to spend in December". The card balance is
+     left as it is today, which is conservative. The what-if tool takes `waitDays`, so the model never
+     does date arithmetic. With no cards, the later day applies to UPI.

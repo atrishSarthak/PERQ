@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { and, asc, count, eq, isNull } from "drizzle-orm";
-import { chatMessages, db, nudges } from "@perq/db";
+import { chatMessages, db, nudges, type PurchasePlanRow } from "@perq/db";
 import { isAuthed, requireAuth } from "@/lib/auth";
 import { logAgentRun } from "@/lib/ember/agentRunLog";
 import { moneyContext } from "@/lib/ember/money/context";
 import { NUDGE_CHIPS, nudgeOpening } from "@/lib/ember/money/nudgeThread";
+import { planChips, planOpening } from "@/lib/ember/plans/prompts";
+import { createPlanTools } from "@/lib/ember/plans/tools";
+import { loadPlanContext } from "@/lib/plans/context";
+import { getPlanRow } from "@/lib/plans/service";
+import type { PartialPlanInput, PlanResult } from "@perq/shared";
 import { chatTurn } from "@/lib/ember/money/run";
 import type { MoneyProposal } from "@/lib/ember/money/tools";
 import { formatInr } from "@perq/finance-engine";
@@ -37,6 +42,13 @@ async function nudgeFor(userId: string, threadRef: string | null) {
   return row ?? null;
 }
 
+async function planFor(userId: string, threadRef: string | null): Promise<PurchasePlanRow | null> {
+  if (!threadRef?.startsWith("plan:")) return null;
+  return getPlanRow(userId, threadRef.slice(5)).catch(() => null);
+}
+
+const geminiKey = () => (process.env.GEMINI_DISABLED === "1" ? null : (process.env.GEMINI_API_KEY ?? null));
+
 /** GET /api/ember/chat?threadRef=: a thread's messages. A nudge thread starts with Ember restating the nudge. */
 export async function GET(req: Request) {
   const auth = await requireAuth(req);
@@ -45,15 +57,14 @@ export async function GET(req: Request) {
   const ref = raw ? threadRefSchema.safeParse(raw) : null;
   if (ref && !ref.success) return NextResponse.json({ error: "Invalid thread" }, { status: 400 });
   const threadRef = ref?.data ?? null;
-  const nudge = await nudgeFor(auth.id, threadRef);
+  const [nudge, plan] = await Promise.all([nudgeFor(auth.id, threadRef), planFor(auth.id, threadRef)]);
   if (threadRef?.startsWith("nudge:") && !nudge) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (threadRef?.startsWith("plan:") && !plan) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   let rows = await db.select().from(chatMessages).where(threadWhere(auth.id, threadRef)).orderBy(asc(chatMessages.createdAt));
-  if (nudge && rows.length === 0) {
-    rows = await db
-      .insert(chatMessages)
-      .values({ userId: auth.id, thread: REF_THREAD, threadRef, role: "assistant", content: nudgeOpening(nudge) })
-      .returning();
+  const opening = nudge ? nudgeOpening(nudge) : plan ? planOpening(plan) : null;
+  if (opening && rows.length === 0) {
+    rows = await db.insert(chatMessages).values({ userId: auth.id, thread: REF_THREAD, threadRef, role: "assistant", content: opening }).returning();
   }
   return NextResponse.json({
     messages: rows.map((m) => ({
@@ -67,6 +78,9 @@ export async function GET(req: Request) {
           chips: NUDGE_CHIPS[nudge.ruleId] ?? [],
           nudge: { id: nudge.id, ruleId: nudge.ruleId, title: nudge.title, cardAccountId: nudge.cardAccountId, status: nudge.status },
         }
+      : {}),
+    ...(plan
+      ? { chips: planChips(plan), plan: { id: plan.id, itemName: plan.itemName, headline: (plan.result as PlanResult | null)?.headline ?? null } }
       : {}),
   });
 }
@@ -90,9 +104,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "This conversation is at its length limit." }, { status: 429 });
   }
   const now = await nowFor(auth.id);
-  const [rec, money, nudgeRow] = await Promise.all([recommenderContext(auth.id), moneyContext(auth.id, now), nudgeFor(auth.id, threadRef)]);
-  if (!rec && !money) return NextResponse.json({ error: "Take the quiz or upload a statement first." }, { status: 404 });
+  const [rec, money, nudgeRow, plan] = await Promise.all([recommenderContext(auth.id), moneyContext(auth.id, now), nudgeFor(auth.id, threadRef), planFor(auth.id, threadRef)]);
   if (threadRef?.startsWith("nudge:") && !nudgeRow) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (threadRef?.startsWith("plan:") && !plan) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const nudge = nudgeRow ? money?.nudges.find((n) => n.id === nudgeRow.id) ?? null : null;
   const cardState = threadRef?.startsWith("card:") ? money?.state.cards.find((c) => c.cardAccountId === threadRef.slice(5)) : undefined;
   if (threadRef?.startsWith("card:") && !cardState) return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -104,6 +118,7 @@ export async function POST(req: Request) {
 
   return sseResponse(async (emit) => {
     let proposal: MoneyProposal | null = null;
+    let confirmCard: { draft: PartialPlanInput; missing: ("price" | "item")[] } | null = null;
     const answer = await chatTurn({
       userId: auth.id,
       message: body.data.message,
@@ -112,6 +127,17 @@ export async function POST(req: Request) {
       money,
       nudge,
       card,
+      plan,
+      // The planner works for every signed-in user, quiz or not (§6.4).
+      planTools: createPlanTools({
+        userId: auth.id,
+        extract: { apiKey: geminiKey(), logRun: logAgentRun, userId: auth.id },
+        loadCtx: async () => (await loadPlanContext(auth.id, now)).ctx,
+        onPlanConfirm: (draft, missing) => {
+          confirmCard = { draft, missing };
+          emit({ type: "planConfirm", draft, missing });
+        },
+      }),
       callModel: geminiCaller(),
       onLabel: (label) => emit({ type: "step", label }),
       onProposal: (p) => {
@@ -124,7 +150,13 @@ export async function POST(req: Request) {
     await db.insert(chatMessages).values([
       { userId: auth.id, thread, threadRef, role: "user", content: body.data.message },
       // The proposal is stored with the reply so later turns (and history) know exactly what was offered.
-      { userId: auth.id, thread, threadRef, role: "assistant", content: proposal ? `${answer.text}\n\n${proposalLine(proposal)}` : answer.text },
+      {
+        userId: auth.id,
+        thread,
+        threadRef,
+        role: "assistant",
+        content: [answer.text, proposal ? proposalLine(proposal) : null, confirmCard ? confirmLine(confirmCard) : null].filter(Boolean).join("\n\n"),
+      },
     ]);
     // Replying in a nudge thread counts as acting on it (§7.4).
     if (nudgeRow && nudgeRow.status !== "acted") {
@@ -140,6 +172,12 @@ export async function POST(req: Request) {
     }
     emit({ type: "done" });
   });
+}
+
+/** Kept with the reply so later turns know what the user was asked to confirm. */
+function confirmLine(c: { draft: PartialPlanInput; missing: string[] }): string {
+  const d = c.draft;
+  return `(Showed a card to confirm: ${d.item?.name ?? "item?"}, ${d.price ? formatInr(d.price) : "price?"}${d.merchant ? ` at ${d.merchant}` : ""}. Not planned until the user taps Plan it.)`;
 }
 
 function proposalLine(p: MoneyProposal): string {

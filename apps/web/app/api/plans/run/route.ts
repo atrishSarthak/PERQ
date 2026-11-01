@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { chatMessages, db } from "@perq/db";
+import { planMarker } from "@/lib/ember/plans/prompts";
 import { planRunRequestSchema } from "@perq/shared";
 import { isAuthed, requireAuth } from "@/lib/auth";
 import { nowFor } from "@/lib/money/clock";
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
   if ((await plansRunToday(auth.id, now)) >= PLAN_DAILY_LIMIT) {
     return NextResponse.json({ error: `You've planned ${PLAN_DAILY_LIMIT} purchases today. Try again tomorrow.` }, { status: 429 });
   }
-  const { input, source } = body.data;
+  const { input, source, postToChat } = body.data;
 
   return sseResponse(async (emit) => {
     const computed = await computePlan(auth.id, input, now);
@@ -36,6 +38,10 @@ export async function POST(req: Request) {
     emit({ type: "step", label: steps.at(-1)! });
     const explanation = await explaining;
     const row = await savePlan(auth.id, input, source, computed, explanation);
+    // Confirmed from the chat card: Ember's answer joins the main thread, with a marker the app shows as the result card.
+    if (postToChat) {
+      await db.insert(chatMessages).values({ userId: auth.id, thread: "recommender", threadRef: null, role: "assistant", content: `${explanation.text}\n\n${planMarker(row.id)}` });
+    }
     emit({ type: "plan", planId: row.id, result: computed.result, explanation: explanation.text, explanationSource: explanation.source });
     emit({ type: "done" });
   });

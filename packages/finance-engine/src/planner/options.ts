@@ -247,7 +247,12 @@ export function chooseOption(input: PlanInput, cards: PlanCard[], today: string,
   if (!card) {
     const top = ranked.find((o) => o.kind === "card_full");
     card = top && cardOfOption(top, cards);
-    if (!card) return null;
+    if (!card) {
+      // No card to put it on: UPI on that day (a "wait a month" with no cards).
+      const upi = ranked.find((o) => o.kind === "upi");
+      if (!upi || !choice.purchaseDate || choice.purchaseDate <= today) return upi ?? null;
+      return { ...upi, id: "upi:picked", purchaseDate: choice.purchaseDate, rank: ranked.length + 1 };
+    }
   }
   if (!choice.purchaseDate) {
     // A card with no day picked: its best ranked way in full (which may be its best day).

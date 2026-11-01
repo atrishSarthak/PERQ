@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Alert, Pressable, View } from "react-native";
+import { router } from "expo-router";
 import { addDays, formatDay, formatInr } from "@perq/finance-engine";
 import type { PlanDetailResponse, PlanResult } from "@perq/shared";
 import { Button } from "@/components/Button";
@@ -154,6 +155,7 @@ export function PlanActions({ plan }: { plan: PlanDetailResponse }) {
         </Text>
       ) : null}
 
+      <Button label="Ask Ember about this" kind="secondary" onPress={() => router.push(`/chat/${encodeURIComponent(`plan:${p.id}`)}`)} />
       <View style={{ flexDirection: "row", gap: t.spacing[2] }}>
         {p.status === "draft" ? <Button label="Save plan" kind="secondary" onPress={() => patch.mutate({ status: "planned" })} style={{ flex: 1 }} /> : null}
         <Button label="I bought it" kind="secondary" onPress={() => update({ status: "bought" })} style={{ flex: 1 }} />

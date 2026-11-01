@@ -50,6 +50,8 @@ export interface PlanContext {
   cards: PlanCard[];
   /** This month's left-to-spend from the budget, null when there's no budget. */
   leftToSpend: number | null;
+  /** The monthly budget total, for a purchase dated in a later month (a what-if "wait a month"). */
+  monthBudget?: number | null;
   monthSpend: number; // this month's spend so far (statements only)
   goals: { id: string; name: string; monthlyNeeded: number | null }[];
   /** Quiz income band midpoint, ₹/month. */

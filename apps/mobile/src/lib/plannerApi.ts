@@ -24,8 +24,8 @@ export const plannerApi = {
   whatIf: (id: string, body: PlanWhatIfRequest) =>
     http.request(`/api/plans/${encodeURIComponent(id)}/what-if`, { method: "POST", body, schema: planWhatIfResponseSchema }),
   extract: (body: PlanExtractRequest) => http.request("/api/plans/extract", { method: "POST", body, schema: planExtractResponseSchema }),
-  run: (input: PlanInput, source: PlanSource, onEvent: (e: EmberEvent) => void, signal?: AbortSignal) =>
-    streamEmber("/api/plans/run", { input, source }, onEvent, signal),
+  run: (input: PlanInput, source: PlanSource, onEvent: (e: EmberEvent) => void, signal?: AbortSignal, opts: { postToChat?: boolean } = {}) =>
+    streamEmber("/api/plans/run", { input, source, ...opts }, onEvent, signal),
 };
 
 export const usePlans = () => useQuery({ queryKey: ["plans"], queryFn: plannerApi.list });

@@ -149,3 +149,29 @@ describe("planPurchase with a what-if pick", () => {
     expect(() => planPurchase(phone, ctx({ cards }), { emiTenure: 9 })).toThrow(PlanChoiceError);
   });
 });
+
+describe("what if I wait a month", () => {
+  it("a purchase dated next month comes out of next month's budget", () => {
+    const c = ctx({ cards: [card("hdfc", HDFC, { creditLimit: 500000 })], leftToSpend: 5000, monthBudget: 50000, goals: [] });
+    const now = planPurchase(input({ price: 40000 }), c);
+    expect(now.verdict).toBe("wait");
+    const later = planPurchase(input({ price: 40000 }), c, { purchaseDate: "2026-12-22" });
+    expect(later.affordability).toMatchObject({ forMonth: "2026-12", leftThisMonth: 50000, basis: "budget" });
+    expect(later.verdict).not.toBe("wait");
+    ok(later);
+  });
+
+  it("with no cards, it's UPI on that day", () => {
+    const r = planPurchase(input({ price: 40000 }), ctx({ cards: [], leftToSpend: 5000, monthBudget: 50000 }), { purchaseDate: "2026-12-22" });
+    expect(r.recommended).toMatchObject({ kind: "upi", purchaseDate: "2026-12-22" });
+    expect(r.verdict).toBe("go");
+    ok(r);
+  });
+
+  it("the template says which month's budget", () => {
+    const r = planPurchase(input({ price: 90000 }), ctx({ cards: [card("hdfc", HDFC, { creditLimit: 500000 })], leftToSpend: 5000, monthBudget: 50000 }), { purchaseDate: "2026-12-22" });
+    expect(r.verdict).toBe("wait");
+    expect(planTemplateExplanation(r)).toContain("left to spend in December");
+    ok(r);
+  });
+});

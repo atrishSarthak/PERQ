@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { addDays, formatDay, formatInr } from "@perq/finance-engine";
+import { addDays, formatDay, formatInr, monthPhrase } from "@perq/finance-engine";
 import type { OptionResult, PlanChoice, PlanResult } from "@perq/shared";
 import { Text } from "@/components/Text";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -65,13 +65,13 @@ function BudgetSection({ r }: { r: PlanResult }) {
   const a = r.affordability;
   const spent = a.leftThisMonth !== null && a.afterPurchase !== null ? a.leftThisMonth - a.afterPurchase : null;
   const summary =
-    a.leftThisMonth === null ? "No budget or income to check against" : `${formatInr(a.leftThisMonth)} left → ${formatInr(a.afterPurchase ?? 0)} after`;
+    a.leftThisMonth === null ? "No budget or income to check against" : `${formatInr(a.leftThisMonth)} left ${monthPhrase(r)} → ${formatInr(a.afterPurchase ?? 0)} after`;
   const basis = a.basis === "budget" ? "From your monthly budget, minus what you've spent so far" : "No budget set: 30% of your income, minus what you've spent this month";
   return (
     <Section title="Budget" summary={summary} defaultOpen={r.verdict === "wait"}>
       {a.leftThisMonth !== null ? (
         <>
-          <Row label="Left to spend this month">
+          <Row label={`Left to spend ${monthPhrase(r)}`}>
             <Figure value={a.leftThisMonth} {...(a.basis === "budget" ? { href: "/budgets" } : { how: basis })} />
           </Row>
           <Row label="After this purchase">

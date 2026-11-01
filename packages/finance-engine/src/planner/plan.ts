@@ -57,6 +57,7 @@ export function planContextFromState(
     today: state.asOf,
     cards: planCardsFromState(state, opts.termsById, opts.heldCatalogueIds),
     leftToSpend: state.month.leftToSpend,
+    monthBudget: state.month.budget?.totalLimit ?? null,
     monthSpend: state.month.totalSpend,
     goals: state.goals.map((g) => ({ id: g.id, name: g.name, monthlyNeeded: g.monthlyNeeded })),
     monthlyIncome: opts.monthlyIncome,
@@ -69,12 +70,15 @@ export function planContextFromState(
 export function affordability(input: PlanInput, rec: OptionResult, ctx: PlanContext): Affordability & { savingRate: number | null; savingRateFrom: "income" | "goals" | null } {
   let basis: Affordability["basis"] = "none";
   let left: number | null = null;
+  // Bought in a later month, it comes out of that month's allowance, with nothing spent yet.
+  const forMonth = rec.purchaseDate.slice(0, 7);
+  const later = forMonth > ctx.today.slice(0, 7);
   if (ctx.leftToSpend !== null) {
     basis = "budget";
-    left = ctx.leftToSpend;
+    left = later && ctx.monthBudget != null ? ctx.monthBudget : ctx.leftToSpend;
   } else if (ctx.monthlyIncome) {
     basis = "income_estimate";
-    left = Math.round(ctx.monthlyIncome * C.incomeDiscretionaryShare) - ctx.monthSpend;
+    left = Math.round(ctx.monthlyIncome * C.incomeDiscretionaryShare) - (later ? 0 : ctx.monthSpend);
   }
   const amount = rec.effectivePrice;
 
@@ -111,6 +115,7 @@ export function affordability(input: PlanInput, rec: OptionResult, ctx: PlanCont
     sizeLabel: share === null ? "unknown" : share < C.sizeSmallPct ? "small" : share <= C.sizeLargePct ? "medium" : "large",
     goalImpacts,
     basis,
+    forMonth,
     monthlyIncome: ctx.monthlyIncome,
     savingRate,
     savingRateFrom,

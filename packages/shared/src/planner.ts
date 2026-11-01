@@ -181,6 +181,8 @@ export const affordabilitySchema = z.object({
   sizeLabel: z.enum(["small", "medium", "large", "unknown"]),
   goalImpacts: z.array(z.object({ goalId: z.string(), name: z.string(), monthsSlip: z.number() })),
   basis: z.enum(["budget", "income_estimate", "none"]),
+  /** The month (YYYY-MM) the purchase comes out of: later than today's for a purchase dated next month. */
+  forMonth: z.string().regex(/^\d{4}-\d{2}$/).optional(),
   /** The monthly income band midpoint used for the size label and fallback, when known. */
   monthlyIncome: rupees.nullable(),
 });
@@ -276,7 +278,12 @@ export const planExtractResponseSchema = z.object({
 });
 export type PlanExtractResponse = z.infer<typeof planExtractResponseSchema>;
 
-export const planRunRequestSchema = z.object({ input: planInputSchema, source: planSourceSchema });
+export const planRunRequestSchema = z.object({
+  input: planInputSchema,
+  source: planSourceSchema,
+  /** Confirmed from the chat card: the answer is also posted to the main Ember thread (§10.7). */
+  postToChat: z.boolean().optional(),
+});
 export type PlanRunRequest = z.infer<typeof planRunRequestSchema>;
 
 /** A way to pay the user picks in a what-if: a card (or "upi"), a day to buy, or an EMI tenure. */

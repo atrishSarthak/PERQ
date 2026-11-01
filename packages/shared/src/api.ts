@@ -77,4 +77,5 @@ export const chatHistoryResponseSchema = z.object({
   messages: z.array(z.object({ id: z.string(), role: z.enum(["user", "assistant"]), content: z.string(), createdAt: z.string() })),
   chips: z.array(nudgeChipSchema).optional(),
   nudge: z.object({ id: z.string(), ruleId: z.string(), title: z.string(), cardAccountId: z.string().nullable(), status: z.string() }).optional(),
+  plan: z.object({ id: z.string(), itemName: z.string(), headline: z.string().nullable() }).optional(),
 });

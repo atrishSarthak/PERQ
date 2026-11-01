@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "react-native";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { EmberEvent, NudgeChip } from "@perq/shared";
+import type { EmberEvent, NudgeChip, PartialPlanInput, PlanInput } from "@perq/shared";
 import { Button } from "@/components/Button";
 import { Text } from "@/components/Text";
 import { api, streamEmber } from "@/lib/api";
 import { formatInr } from "@perq/finance-engine";
 import { useTheme } from "@/theme/ThemeProvider";
+import { PlanConfirmCard, PlanResultCard } from "@/features/planner/ChatCards";
+import { splitPlanMarker } from "@/features/planner/chatMessage";
+import { plannerApi } from "@/lib/plannerApi";
 
 // One Ember conversation (handoff §7.4, §8): the main thread, or a
 // `nudge:<id>` / `card:<id>` thread. Chips with an `action` are app buttons
@@ -21,7 +24,16 @@ interface Msg {
   content: string;
   pending?: boolean;
   proposal?: Proposal;
+  /** Details Ember read from a purchase question, for the user to confirm (Step 3 §6.4). */
+  planConfirm?: { draft: PartialPlanInput; missing: ("price" | "item")[] };
+  /** A finished plan shown as a result card. */
+  planId?: string | null;
 }
+
+const fromHistory = (m: Msg): Msg => {
+  const { text, planId } = splitPlanMarker(m.content);
+  return { ...m, content: text, planId };
+};
 
 export function ChatThread({
   threadRef,
@@ -51,9 +63,10 @@ export function ChatThread({
   const [step, setStep] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<Set<string>>(new Set());
   const listRef = useRef<FlatList<Msg>>(null);
+  const scrollToEnd = useCallback(() => setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50), []);
 
   useEffect(() => {
-    if (history.data && messages.length === 0) setMessages(history.data.messages);
+    if (history.data && messages.length === 0) setMessages(history.data.messages.map(fromHistory));
   }, [history.data, messages.length]);
 
   const chips = history.data?.chips ?? fixedChips ?? [];
@@ -70,6 +83,7 @@ export function ChatThread({
       await streamEmber("/api/ember/chat", { message, ...(threadRef ? { threadRef } : {}) }, (e) => {
         if (e.type === "step") setStep(e.label);
         if (e.type === "proposal") update((x) => ({ ...x, proposal: e.proposal }));
+        if (e.type === "planConfirm") update((x) => ({ ...x, planConfirm: { draft: e.draft, missing: e.missing } }));
         if (e.type === "chunk") {
           setStep(null);
           update((x) => ({ ...x, content: x.content + e.text }));
@@ -83,6 +97,37 @@ export function ChatThread({
       setStep(null);
       setBusy(false);
       qc.invalidateQueries({ queryKey: ["nudges"] });
+    }
+  }
+
+  // "Plan it" on a confirmation card: the user's tap is the confirmation; the plan
+  // runs with narration in the thread, and the answer is saved to the thread too.
+  async function planIt(cardId: string, input: PlanInput) {
+    if (busy) return;
+    setBusy(true);
+    setConfirmed((s) => new Set(s).add(cardId));
+    const replyId = `p-${Date.now()}`;
+    setMessages((m) => [...m, { id: replyId, role: "assistant", content: "", pending: true }]);
+    const update = (fn: (x: Msg) => Msg) => setMessages((m) => m.map((x) => (x.id === replyId ? fn(x) : x)));
+    try {
+      await plannerApi.run(
+        input,
+        "chat",
+        (e) => {
+          if (e.type === "step") setStep(e.label);
+          if (e.type === "plan") update((x) => ({ ...x, content: e.explanation, planId: e.planId }));
+          if (e.type === "error") update((x) => ({ ...x, content: e.message }));
+        },
+        undefined,
+        { postToChat: !threadRef }
+      );
+    } catch (err) {
+      update((x) => ({ ...x, content: (err as Error).message }));
+    } finally {
+      update((x) => ({ ...x, pending: false }));
+      setStep(null);
+      setBusy(false);
+      qc.invalidateQueries({ queryKey: ["plans"] });
     }
   }
 
@@ -112,6 +157,10 @@ export function ChatThread({
                 {item.content || (item.pending ? (step ?? "Thinking…") : "")}
               </Text>
             </View>
+            {item.planConfirm ? (
+              <PlanConfirmCard draft={item.planConfirm.draft} missing={item.planConfirm.missing} used={confirmed.has(item.id)} onPlan={(input) => planIt(item.id, input)} />
+            ) : null}
+            {item.planId ? <PlanResultCard planId={item.planId} onReady={item.id === messages.at(-1)?.id ? scrollToEnd : undefined} /> : null}
             {item.proposal && onConfirmProposal ? (
               <View style={{ padding: t.spacing[3], borderRadius: t.radii.md, borderWidth: 1, borderColor: t.colors.ember, gap: t.spacing[2] }}>
                 <Text variant="bodyStrong">{item.proposal.kind === "budget" ? "Proposed budget" : "Proposed goal"}</Text>
