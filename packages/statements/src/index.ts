@@ -13,3 +13,4 @@ export {
   type ParsedStatement,
   type ParseOptions,
 } from "./extract";
+export { categoriseTransactions, categoriseMerchantsWithAi, aiCategoryPrompt, type CategoriseIo } from "./categorise";

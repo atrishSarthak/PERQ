@@ -231,3 +231,14 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 67. **Reconcile tolerance** is computed on the printed (paise) figures, before rupee rounding. Unprinted
     fee and finance-charge figures count as 0. Missing total/previous/payments/purchases means not
     reconciled.
+68. **Categorisation precedence:** kind (payments, refunds, cashback, fees/GST, interest, EMI) → the
+    user's own override → keyword rules → UPI tag → shared cache → Gemini batch → "other". Refunds take
+    their merchant's category, so they net against that category's spend. The handoff lists the cache
+    before AI and the override as "wins", which this order satisfies. Merchant normalisation strips
+    gateway prefixes (PAYU*, RAZ*, BBPS*, …), UPI handles, references and phone numbers, cities,
+    company words and trailing branch numbers. It deliberately keeps "INDIA" so "AIR INDIA" still
+    matches travel. 49 real-looking descriptors are in the test table.
+69. **The AI batch sees merchant names only** (no amounts, dates or user data), validates every answer
+    against the 17 categories, and only its answers go to `merchant_categories`. User overrides live in
+    `user_merchant_overrides` and a test asserts they never reach the shared cache. If the AI fails or is
+    off, unknown merchants become "other".
