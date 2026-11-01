@@ -27,4 +27,7 @@ export const PLANNER_CONFIG = {
   /** Size label: price as a share of monthly income. */
   sizeSmallPct: 10,
   sizeLargePct: 40,
+  /** Plans not acted on expire this many days after need-by, or after creation without one (§8). */
+  expireAfterNeedByDays: 30,
+  expireAfterCreatedDays: 45,
 } as const;

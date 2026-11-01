@@ -3,6 +3,7 @@ import { cardAccounts, db, nudges } from "@perq/db";
 import {
   buildFinancialState,
   evaluateRules,
+  planBuyWindowCandidates,
   planNudges,
   simulateUpcoming,
   type NudgeCandidate,
@@ -13,6 +14,7 @@ import { logActivity } from "./activity";
 import { writeNudgeCopy } from "./nudgeCopy";
 import { pushNudges } from "./push";
 import { loadStateInput } from "./state";
+import { expireStalePlans, planReminders, reminderUserIds } from "@/lib/plans/reminders";
 
 // Server side of the nudge engine (handoff §7.1). Rules and planning are pure
 // finance-engine code; this file only loads rows and saves the result.
@@ -46,10 +48,12 @@ async function loadHistory(userId: string, now: Date) {
 
 export async function runNudgeEngine(userId: string, now: Date = new Date()): Promise<NudgeRunResult> {
   // Built fresh (not the per-day cache) so a write earlier today is reflected.
-  const [input, { rows, history }] = await Promise.all([loadStateInput(userId, now), loadHistory(userId, now)]);
+  await expireStalePlans(userId, now);
+  const [input, { rows, history }, reminders] = await Promise.all([loadStateInput(userId, now), loadHistory(userId, now), planReminders(userId, now)]);
   const state = buildFinancialState(input);
   const due = rows.filter((r) => r.status === "queued" && (!r.scheduledFor || r.scheduledFor <= now));
-  const candidates = evaluateRules(state, now, history);
+  // Plan reminders (Step 3 §8) re-run on today's state and compete with the other rules.
+  const candidates = [...evaluateRules(state, now, history), ...planBuyWindowCandidates(reminders, now)];
   const plan = planNudges({
     candidates,
     queued: due.map((r) => ({ id: r.id, ruleId: r.ruleId, dedupeKey: r.dedupeKey, priority: r.priority, expiresAt: r.expiresAt?.toISOString() ?? null })),
@@ -111,15 +115,15 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
 
 /** The Expo Go local-notification fallback: what the next 7 daily runs will send. */
 export async function upcomingNudges(userId: string, now: Date): Promise<UpcomingNudge[]> {
-  const [input, { rows, history }] = await Promise.all([loadStateInput(userId, now), loadHistory(userId, now)]);
+  const [input, { rows, history }, reminders] = await Promise.all([loadStateInput(userId, now), loadHistory(userId, now), planReminders(userId, now, 7)]);
   const queued = rows
     .filter((r) => r.status === "queued")
     .map((r) => ({ id: r.id, ruleId: r.ruleId, dedupeKey: r.dedupeKey, priority: r.priority, expiresAt: r.expiresAt?.toISOString() ?? null, scheduledFor: r.scheduledFor?.toISOString() ?? null, title: r.title, body: r.body }));
-  return simulateUpcoming(input, history, queued);
+  return simulateUpcoming(input, history, queued, (at) => planBuyWindowCandidates(reminders, at));
 }
 
-/** Users with any card account: the daily cron's work list. */
-export async function nudgeUserIds(): Promise<string[]> {
+/** Users with any card account, or a plan reminder due: the daily cron's work list. */
+export async function nudgeUserIds(now: Date = new Date()): Promise<string[]> {
   const rows = await db.selectDistinct({ userId: cardAccounts.userId }).from(cardAccounts).where(eq(cardAccounts.isActive, true));
-  return rows.map((r) => r.userId);
+  return [...new Set([...rows.map((r) => r.userId), ...(await reminderUserIds(now))])];
 }

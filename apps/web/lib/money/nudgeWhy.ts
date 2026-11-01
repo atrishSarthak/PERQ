@@ -40,12 +40,22 @@ const LABELS: Record<string, string> = {
   target: "Target",
   behindBy: "Behind plan by",
   monthlyNeeded: "Needed each month",
+  itemName: "Item",
+  headline: "Ember's answer today",
+  previousHeadline: "Ember's answer when you planned",
+  purchaseDate: "Day to buy",
+  netCost: "Cost after offers and rewards",
+  savingVsUpi: "Saving vs UPI",
+  leftThisMonth: "Left to spend this month",
+  utilisationAfterPct: "Limit used after buying",
+  interestFreeDays: "Interest-free days",
 };
 const RUPEE_KEYS = new Set([
   "totalDue", "minimumDue", "interest", "total", "leadAmount", "balance", "creditLimit", "payToReach30",
   "remaining", "annualFee", "topExtra", "valueRupees", "spent", "limit", "saved", "target", "behindBy", "monthlyNeeded",
+  "netCost", "savingVsUpi", "leftThisMonth",
 ]);
-const HIDDEN = new Set(["cardLabel", "statementDate", "month", "dataThrough", "level", "lineCount"]);
+const HIDDEN = new Set(["cardLabel", "statementDate", "month", "dataThrough", "level", "lineCount", "planId", "verdict"]);
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 const shortDate = (iso: string) =>

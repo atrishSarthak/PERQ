@@ -2,6 +2,7 @@ import { Platform } from "react-native";
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Notifications from "expo-notifications";
 import * as SecureStore from "expo-secure-store";
+import { planIdFromDedupeKey } from "@perq/finance-engine";
 import { moneyApi } from "./moneyApi";
 
 // Nudge delivery on the device (handoff §7.3).
@@ -70,6 +71,11 @@ export async function declineNotifications(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync().catch(() => {});
 }
 
+function planUrl(dedupeKey: string): string | null {
+  const id = planIdFromDedupeKey(dedupeKey);
+  return id ? `/plan/${id}` : null;
+}
+
 /** Run on sign-in and whenever the app comes to the foreground. */
 export async function syncNotifications(): Promise<void> {
   const mode = deliveryMode();
@@ -86,7 +92,8 @@ export async function syncNotifications(): Promise<void> {
     const at = new Date(n.at);
     if (at.getTime() <= now) continue;
     await Notifications.scheduleNotificationAsync({
-      content: { title: n.title, body: n.body, data: { url: `/nudge/${encodeURIComponent(`key:${n.dedupeKey}`)}` } },
+      // A plan reminder opens the plan itself: in Expo Go the daily job may not have stored the nudge yet.
+      content: { title: n.title, body: n.body, data: { url: planUrl(n.dedupeKey) ?? `/nudge/${encodeURIComponent(`key:${n.dedupeKey}`)}` } },
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: at },
     });
   }

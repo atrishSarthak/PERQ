@@ -236,6 +236,16 @@ export const planResultSchema = z.object({
     })
     .optional(),
   emi: emiTrueCostSchema.optional(),
+  /** On a wait: the savings goal Ember proposes (§8). Saved only when the user confirms. */
+  goalProposal: z
+    .object({
+      name: z.string(),
+      target: rupees,
+      /** At what the user can put aside after their other goals; null when that's unknown or nothing. */
+      targetDate: isoDate.nullable(),
+      monthlySaving: rupees.nullable(),
+    })
+    .optional(),
   /** What-if only: the way to pay the user picked, and what it costs over the recommendation. */
   chosen: z.object({ option: optionResultSchema, extraCost: z.number().int() }).optional(),
   /** Named out loud (§2): what the plan couldn't check, each with a code the app links to a fix. */

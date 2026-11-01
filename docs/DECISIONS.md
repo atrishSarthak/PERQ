@@ -589,3 +589,41 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 142. **No "wait a month" what-if on the result screen.** The engine only knows this month's budget, so
      a purchase moved a month out would be judged against the wrong month. Waiting is handled by the
      reminder (re-planned on fresh numbers when it fires) and the savings goal, in checkpoint 9.
+143. **plan_buy_window sits next to the rules, not inside them.** Nudge rules only see `FinancialState`,
+     but a plan reminder needs the plan and a fresh re-plan. `planBuyWindowCandidates` is pure and
+     takes reminders that the server re-plans on today's state (keeping a kept what-if pick if it
+     still exists). Its candidates are merged with the rule candidates, so it competes for the daily
+     cap at priority 80 and respects quiet hours. Dedupe key is `plan_buy_window:<planId>:<day>`, so
+     moving the reminder makes a new nudge. It stays live 3 days in case the cap or quiet hours hold
+     it back. "Changed" means the verdict changed, as §8 says. A new card or day under the same
+     verdict is simply stated in the body. Users with a reminder due get a nudge run even without
+     card accounts.
+144. **Expo Go fallback for plan reminders.** The week-ahead simulation behind `/api/nudges/upcoming`
+     takes extra candidates per send time, so plan reminders are scheduled on the phone with the
+     other local notifications, worded from today's re-plan. A plan reminder's notification opens
+     the plan itself, not the nudge chat: in Expo Go the daily job may not have stored the nudge
+     yet. Any plan status change re-syncs the phone's schedule.
+145. **A run is a draft until the user keeps it.** `/api/plans/run` stores `status = draft`. Save,
+     Remind, I bought it and Not buying move it on. Without this, "Save plan" (§8) would do
+     nothing. History shows open plans, then "Recent checks" (drafts), then bought, dropped and
+     expired. Home's "Your plans" row only counts saved and reminded plans.
+146. **Suggested reminder day.** It's the day the plan says to buy when that's later than today; the
+     1st of next month on a wait (a fresh budget month); otherwise tomorrow. "Another day" offers
+     tomorrow, a week out and the 1st of next month. Days are relative to the server's day, so time
+     travel works.
+147. **Savings goal on a wait.** The engine adds `goalProposal`. The target is the price, since
+     offers can lapse while saving. The date comes from what's left of the income-based saving
+     rate after the user's other goals' monthly needs. It has no date when that's unknown, or when
+     the rate was taken from the goals themselves (already spoken for). The user confirms it (level
+     3) through the same `createGoal` path as Ember's chat proposals.
+148. **Expiry** runs at the start of each daily nudge run. A plan, or an unsaved check, expires 30
+     days after its need-by date, or 45 days after creation if there isn't one. Bought and dropped
+     plans never expire.
+149. **Explanations must give the reason.** The validator now rejects an answer that doesn't name
+     why the verdict fired: the budget or left-to-spend for over_budget; the goal for goal_slip;
+     interest-free days or the statement for timing; the limit for utilisation; the extra cost for
+     costly_payment. It also rejects "wait until <date>" on a budget or goal wait. A live run had
+     tied a budget wait to the card's statement day ("Better to wait until 5 Dec…"), which misread
+     the verdict. The prompt now gets `why`, the user's pick and the goal proposal.
+150. **"Ask Ember" on the result screen arrives with plan threads (checkpoint 10)**, so it opens a
+     chat that already knows the plan.

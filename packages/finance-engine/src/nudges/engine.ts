@@ -11,6 +11,7 @@ import { highUtilisation } from "./highUtilisation";
 import { minDueTrap } from "./minDueTrap";
 import { missedRewards } from "./missedRewards";
 import { pointsValue } from "./pointsValue";
+import { PLAN_BUY_WINDOW_DESCRIPTION } from "./planBuyWindow";
 import { statementUpload } from "./statementUpload";
 import type { NudgeCandidate, NudgeHistoryEntry, NudgeRule } from "./types";
 
@@ -28,7 +29,10 @@ export const NUDGE_RULES: NudgeRule[] = [
   goalProgress,
 ];
 
-export const RULE_DESCRIPTIONS: Record<string, string> = Object.fromEntries(NUDGE_RULES.map((r) => [r.id, r.description]));
+export const RULE_DESCRIPTIONS: Record<string, string> = {
+  ...Object.fromEntries(NUDGE_RULES.map((r) => [r.id, r.description])),
+  plan_buy_window: PLAN_BUY_WINDOW_DESCRIPTION,
+};
 
 /** Every rule's candidates for this state (step 2 of §7.1). */
 export function evaluateRules(state: FinancialState, now: Date, history: NudgeHistoryEntry[], config: NudgeConfig = NUDGE_CONFIG): NudgeCandidate[] {

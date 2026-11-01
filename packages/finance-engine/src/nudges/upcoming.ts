@@ -1,7 +1,7 @@
 import { buildFinancialState, istDate, type StateInput } from "../state";
 import { NUDGE_CONFIG, type NudgeConfig } from "./config";
 import { evaluateRules, nextSendTime, planNudges, type QueuedNudge } from "./engine";
-import type { NudgeHistoryEntry } from "./types";
+import type { NudgeCandidate, NudgeHistoryEntry } from "./types";
 
 // The Expo Go fallback (handoff §7.3): remote push isn't available, so the
 // app schedules local notifications. This runs the same rules and planner
@@ -27,6 +27,8 @@ export function simulateUpcoming(
   input: StateInput,
   history: NudgeHistoryEntry[],
   queued: StoredQueuedNudge[] = [],
+  /** Candidates from outside the state rules on a given send time (plan reminders). */
+  extra: (at: Date) => NudgeCandidate[] = () => [],
   days = 7,
   config: NudgeConfig = NUDGE_CONFIG
 ): UpcomingNudge[] {
@@ -37,7 +39,7 @@ export function simulateUpcoming(
   for (let d = 0; d < days; d++) {
     const state = buildFinancialState({ ...input, now: at });
     const due = waiting.filter((q) => !q.scheduledFor || Date.parse(q.scheduledFor) <= at.getTime());
-    const plan = planNudges({ candidates: evaluateRules(state, at, seen, config), queued: due, history: seen, now: at, config });
+    const plan = planNudges({ candidates: [...evaluateRules(state, at, seen, config), ...extra(at)], queued: due, history: seen, now: at, config });
     for (const q of plan.sendQueued) {
       out.push({ ruleId: q.ruleId, dedupeKey: q.dedupeKey, at: at.toISOString(), title: q.current.templateTitle, body: q.current.templateBody });
       seen.push({ ruleId: q.ruleId, dedupeKey: q.dedupeKey, status: "sent", sentAt: at.toISOString(), dismissedAt: null, actedAt: null, createdAt: at.toISOString() });

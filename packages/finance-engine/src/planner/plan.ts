@@ -1,7 +1,7 @@
 import type { Affordability, OptionResult, PlanChoice, PlanInput, PlanResult, Verdict, VerdictReason } from "@perq/shared";
 import { formatDay, formatInr } from "../format";
 import type { CardState, FinancialState } from "../state";
-import { daysBetween } from "../state";
+import { addMonths, daysBetween } from "../state";
 import { PLANNER_CONFIG } from "./config";
 import { bestPurchaseDate, floatDays } from "./dates";
 import { buyingWindow, chooseOption, rankPaymentOptions, utilizationImpact } from "./options";
@@ -250,6 +250,22 @@ export function planPurchase(input: PlanInput, ctx: PlanContext, choice?: PlanCh
   if (savingRateFrom === "income" && savingRate) assumptions.push(`You save about ${formatInr(savingRate)} a month (income minus average card spend).`);
   if (savingRateFrom === "goals" && savingRate) assumptions.push(`You save about ${formatInr(savingRate)} a month (what your goals need).`);
 
+  // A savings goal for a wait (§8): the price, at what's left of the saving rate after other goals.
+  let goalProposal: PlanResult["goalProposal"];
+  if (verdict === "wait") {
+    const committed = ctx.goals.reduce((s, g) => s + Math.max(0, g.monthlyNeeded ?? 0), 0);
+    // A saving rate taken from the goals themselves is already spoken for.
+    const spare = savingRate !== null && savingRateFrom === "income" ? Math.round(savingRate - committed) : null;
+    const months = spare && spare > 0 ? Math.ceil(input.price / spare) : null;
+    goalProposal = {
+      name: input.item.name.slice(0, 60),
+      target: input.price,
+      targetDate: months ? addMonths(ctx.today, months) : null,
+      monthlySaving: months ? Math.ceil(input.price / months) : null,
+    };
+    if (months) assumptions.push(`The goal date assumes you put aside ${formatInr(Math.ceil(input.price / months))} a month for it.`);
+  }
+
   return {
     verdict,
     verdictReason: reason,
@@ -260,6 +276,7 @@ export function planPurchase(input: PlanInput, ctx: PlanContext, choice?: PlanCh
     timing,
     credit,
     emi,
+    ...(goalProposal ? { goalProposal } : {}),
     ...(picked ? { chosen: { option: picked, extraCost: picked.netCost - recommended.netCost } } : {}),
     missingData: missing,
     assumptions,
@@ -271,4 +288,10 @@ export function planPurchase(input: PlanInput, ctx: PlanContext, choice?: PlanCh
 /** Interest-free days on buying with a card today, for quick answers (Ember's bestCardFor-style tools). */
 export function floatToday(card: Pick<PlanCard, "statementDay" | "dueDay">, today: string): number | null {
   return floatDays(card, today)?.days ?? null;
+}
+
+/** Plans (and unsaved checks) not acted on expire 30 days after need-by, or 45 days after creation without one (§8). */
+export function isPlanExpired(plan: { status: string; needByDate: string | null; createdDay: string }, today: string): boolean {
+  if (plan.status !== "draft" && plan.status !== "planned" && plan.status !== "reminder_set") return false;
+  return plan.needByDate ? daysBetween(plan.needByDate, today) > C.expireAfterNeedByDays : daysBetween(plan.createdDay, today) > C.expireAfterCreatedDays;
 }

@@ -68,11 +68,11 @@ export async function savePlan(
       verdict: computed.result.verdict,
       explanation: explanation.text,
       explanationSource: explanation.source,
-      status: "planned",
+      status: "draft", // kept as a check until the user saves it, sets a reminder or buys (§8)
       agentRunId: explanation.runId,
     })
     .returning();
-  await logActivity(userId, "plan_created", `Planned a purchase: ${input.item.name} (${verdictWords(computed.result)})`, { table: "purchase_plans", id: row!.id });
+  await logActivity(userId, "plan_created", `Checked a purchase: ${input.item.name} (${verdictWords(computed.result)})`, { table: "purchase_plans", id: row!.id });
   return row!;
 }
 

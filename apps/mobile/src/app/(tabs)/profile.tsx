@@ -65,6 +65,7 @@ export default function Profile() {
         <Text variant="heading">Money</Text>
         {[
           { label: "Budgets & goals", href: "/budgets" as const },
+          { label: "Your plans", href: "/plans" as const },
           { label: "What Ember did", href: "/activity" as const },
           { label: "Privacy & data", href: "/privacy" as const },
         ].map((l) => (

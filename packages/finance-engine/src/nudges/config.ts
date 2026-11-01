@@ -33,6 +33,7 @@ export const NUDGE_CONFIG = {
     points_value_expiring: 65,
     high_utilisation_info: 40,
     goal_progress: 35,
+    plan_buy_window: 80,
   },
 } as const;
 export type NudgeConfig = typeof NUDGE_CONFIG;

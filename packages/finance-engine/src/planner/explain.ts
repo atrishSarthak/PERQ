@@ -109,6 +109,33 @@ export function planAllowedNumbers(r: PlanResult): Set<number> {
   return out;
 }
 
+/** The answer must say why (the rule that fired), not just what. */
+function reasonMissing(text: string, r: PlanResult): string | null {
+  const lower = text.toLowerCase();
+  switch (r.verdictReason) {
+    case "over_budget":
+      if (!/budget|left to spend|left this month|this month/.test(lower)) return "reason missing: budget";
+      // A wait is about the money, not the card's statement day.
+      if (/wait (until|till) /.test(lower)) return "wait tied to a date";
+      return null;
+    case "goal_slip": {
+      const names = r.affordability.goalImpacts.map((g) => g.name.toLowerCase());
+      if (!names.some((n) => lower.includes(n)) && !/\bgoal/.test(lower)) return "reason missing: goal";
+      if (/wait (until|till) /.test(lower)) return "wait tied to a date";
+      return null;
+    }
+    case "all_cards_high_util":
+    case "chosen_high_util":
+      return /limit|utili[sz]ation/.test(lower) ? null : "reason missing: limit";
+    case "timing_gain":
+      return /interest-free|statement/.test(lower) ? null : "reason missing: timing";
+    case "costly_payment":
+      return /emi|fee|interest|gst|more|cost/.test(lower) ? null : "reason missing: cost";
+    default:
+      return null;
+  }
+}
+
 export type ExplanationCheck = { ok: true } | { ok: false; reason: string };
 
 export function validatePlanExplanation(text: string, r: PlanResult): ExplanationCheck {
@@ -127,6 +154,8 @@ export function validatePlanExplanation(text: string, r: PlanResult): Explanatio
   if (!VERDICT_PHRASE[r.verdict].test(sentences[0]!)) return { ok: false, reason: "verdict not first" };
   const contra = CONTRADICTS[r.verdict];
   if (contra && contra.test(t)) return { ok: false, reason: "contradicts verdict" };
+  const missingReason = reasonMissing(t, r);
+  if (missingReason) return { ok: false, reason: missingReason };
   const allowed = planAllowedNumbers(r);
   const stray = numbersIn(t).find((n) => !allowed.has(n));
   if (stray !== undefined) return { ok: false, reason: `number not in result: ${stray}` };
