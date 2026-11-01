@@ -231,7 +231,7 @@ export async function renderSyntheticPdf(s: SyntheticStatement): Promise<Uint8Ar
 
 type Doc = InstanceType<typeof PDFDocument>;
 
-function line(doc: Doc, cols: [string, number, "left" | "right"?][], y?: number) {
+function line(doc: Doc, cols: [string, number, ("left" | "right")?][], y?: number) {
   const top = y ?? doc.y;
   for (const [text, x, align] of cols) {
     if (align === "right") doc.text(text, x - 120, top, { width: 120, align: "right", lineBreak: false });

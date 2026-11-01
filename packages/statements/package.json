@@ -12,7 +12,7 @@
   "dependencies": {
     "@perq/finance-engine": "workspace:*",
     "@perq/shared": "workspace:*",
-    "unpdf": "^2.1.0"
+    "pdfjs-dist": "4.10.38"
   },
   "devDependencies": {
     "@perq/config": "workspace:*",

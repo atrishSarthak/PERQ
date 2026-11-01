@@ -214,3 +214,20 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     fictional, and each file says "SYNTHETIC TEST STATEMENT" on it. One line deliberately carries a full
     16-digit test card number (Visa's public test number), so §12 stripping is exercised. Real
     statements belong in `fixtures/private/`, which is gitignored.
+65. **PDF library: `pdfjs-dist@4.10.38` legacy build**, not `unpdf`. unpdf 1.x and 2.x (and pdf.js v5)
+    need Node 22's global `Iterator`; this repo runs Node 20. The legacy build runs on Node 20 and on
+    Vercel without a worker thread. The PDF bytes and password only live in local variables of
+    `extractPdfLines`. They're never written, cached or logged, and pdf.js gets a copy so a retry with
+    another password still works.
+66. **Deterministic read first, Gemini second.** `parseStatementPdf` runs a heuristic parser (labelled
+    summary block, date-led rows, `Cr`/`Dr` suffixes or Debit/Credit columns by x position). If that
+    reading **reconciles**, it's accepted (`model = "heuristic"`) and **no statement text goes to
+    Gemini**. Only a reading that doesn't reconcile goes to Gemini structured extraction
+    (`STATEMENT_RESPONSE_SCHEMA`, chunked by whole pages over ~18k chars, header once, adjacent-chunk
+    duplicate drop). On a failed reconcile there's one retry naming the figures, then the better of the
+    two. This keeps the free-tier quota for the cases that need it, sends less personal data to a
+    third party, and never lowers the bar, because acceptance is still the §5.4 reconcile. The
+    heuristic reads all three synthetic layouts exactly; real statements will lean on Gemini more.
+67. **Reconcile tolerance** is computed on the printed (paise) figures, before rupee rounding. Unprinted
+    fee and finance-charge figures count as 0. Missing total/previous/payments/purchases means not
+    reconciled.

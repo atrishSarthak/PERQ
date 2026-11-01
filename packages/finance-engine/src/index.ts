@@ -4,3 +4,4 @@
 export * from "./types";
 export * from "./finance";
 export { formatInr } from "./format";
+export { reconcile, reconcileTolerance, type ReconcileInput, type ReconcileResult } from "./reconcile";
