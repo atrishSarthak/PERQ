@@ -432,3 +432,21 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     confirmed.)") so the next turn and the history know what was offered. Without that, a follow-up
     quoted the old ₹40,000 budget. Budget proposals are told to use a full statement cycle, not a partial
     month. A first live proposal of ₹6,080 had been just 4 days of November.
+
+---
+
+# Step 3 (Purchase Planner) decisions
+
+112. **Spec location.** The Step 3 handoff arrived at the repo root and was moved to `docs/specs/`.
+     The extension integration guide it cites doesn't exist yet (AUDIT Step 3 #1), so the shared
+     functions are designed from §3 alone.
+113. **Schema (migration 0012).** `purchase_plans` follows §4. Three details: `remind_at` is a
+     **date** (an IST day; the nudge fires at 09:00 IST on it), not a timestamp. Status defaults to
+     `planned`, because a plan row is only written once the confirmed input has run. And
+     `matched_transaction_id` is `ON DELETE SET NULL`: re-uploading a statement replaces its
+     transactions, so a match can drop and be found again by the next matching pass.
+114. **`cards.emi_rewards` is `false` on all 40 cards** (conservative: an EMI never looks cheaper than
+     it is). Axis ACE, Cashback SBI and IDFC FIRST Millennia were checked against the bank's terms and
+     are genuinely `false`. HDFC Millennia earns a reduced 1% on merchant EMI, which a boolean can't
+     express, so it stays `false`. The rest aren't checked yet (CARDS_README "EMI rewards"; TODOS).
+     The field is in `catalogCardSchema` with `.default(false)`, so older JSON still validates.

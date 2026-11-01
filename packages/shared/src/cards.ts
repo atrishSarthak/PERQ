@@ -79,6 +79,8 @@ export const catalogCardSchema = z.object({
   sourceUrl: z.string().url(),
   sourceUpdatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   verified: z.boolean(),
+  // Step 3: rewards still earned on spend converted to EMI. Default false.
+  emiRewards: z.boolean().default(false),
 });
 export type CatalogCard = z.infer<typeof catalogCardSchema>;
 

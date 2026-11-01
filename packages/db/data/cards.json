@@ -61,7 +61,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/cashback-sbi-card.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-ace",
@@ -115,7 +116,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/axis-bank-ace-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-airtel",
@@ -162,7 +164,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/airtel-axis-bank-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-flipkart",
@@ -209,7 +212,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/flipkart-axisbank-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hdfc-millennia",
@@ -280,7 +284,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfcbank.com/content/api/contentstream-id/723fb80a-2dde-42a3-9793-7ae1be57c87f/ef2bb403-39aa-46ae-aa45-bcd1ac8a538b",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hdfc-swiggy",
@@ -340,7 +345,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/swiggy-hdfc-bank-credit-card/pdf/terms-and-conditions-swiggy-hdfc-bank-credit-card-26052026.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hdfc-tata-neu-plus",
@@ -390,7 +396,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/tata-neu-plus-hdfc-bank-credit-card/pdfs/tata_neu_plus_card_tnc.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-simplyclick",
@@ -445,7 +452,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/sbi-card-en/assets/docs/pdf/SimplyClick-TnC.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-indianoil",
@@ -501,7 +509,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/indianoil-axis-bank-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hsbc-live-plus",
@@ -557,7 +566,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hsbc.co.in/credit-cards/products/live-plus/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-simplysave",
@@ -602,7 +612,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/simplysave-sbi-card.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "icici-amazon-pay",
@@ -648,7 +659,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.icicibank.com/personal-banking/cards/credit-card/amazon-pay-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "idfc-first-millennia",
@@ -694,7 +706,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.idfcfirstbank.com/credit-card/millennia",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "idfc-first-classic",
@@ -741,7 +754,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.idfcfirstbank.com/credit-card/classic",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "idfc-first-select",
@@ -788,7 +802,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.idfcfirstbank.com/credit-card/select",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-neo",
@@ -834,7 +849,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/axis-bank-neo-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "icici-platinum-chip",
@@ -880,7 +896,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.icicibank.com/personal-banking/cards/credit-card/platinum-chip-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "federal-scapia",
@@ -927,7 +944,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.federal.bank.in/scapia",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "hsbc-visa-platinum",
@@ -973,7 +991,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hsbc.co.in/credit-cards/products/visa-platinum/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "au-lit",
@@ -1019,7 +1038,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.au.bank.in/personal-banking/credit-cards/lit-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "hdfc-upi-rupay",
@@ -1086,7 +1106,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/hdfc-bank-upi-rupay-credit-card/Terms-and-Conditions-HDFC-Bank-UPI-RuPay-Credit-Card-27032025.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "kiwi-yes-rupay",
@@ -1132,7 +1153,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://gokiwi.in/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hsbc-rupay-cashback",
@@ -1187,7 +1209,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hsbc.bank.in/credit-cards/products/rupay-cashback-credit-card/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "icici-coral-rupay",
@@ -1232,7 +1255,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.icicibank.com/personal-banking/cards/credit-card/coral-rupay-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "hsbc-rupay-platinum",
@@ -1278,7 +1302,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hsbc.bank.in/credit-cards/products/rupay-platinum-credit-card/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "jupiter-edge-csb",
@@ -1324,7 +1349,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://jupiter.money/edge-csb-bank-rupay-credit-card/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "idfc-first-wow",
@@ -1370,7 +1396,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.idfcfirstbank.com/credit-card/wow",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "idfc-first-earn",
@@ -1416,7 +1443,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.idfcfirstbank.com/credit-card/secured-rupay-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-insta-easy",
@@ -1462,7 +1490,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/credit-card-against-fixed-deposit",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-simplysave-advantage",
@@ -1508,7 +1537,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/simplysave-sbi-card.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "kotak-811-dream-different",
@@ -1554,7 +1584,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.kotak.com/en/personal-banking/cards/credit-cards/811-dream-different-credit-card.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "federal-onecard",
@@ -1600,7 +1631,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.getonecard.app/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "hdfc-regalia-gold",
@@ -1646,7 +1678,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/pdf/common/Credit-Cards/Regalia-Gold-Product-feature-change.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hdfc-tata-neu-infinity",
@@ -1696,7 +1729,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/tata-neu-infinity-credit-card/pdf/tata_neu_infinity_card_tnc.pdf",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-bpcl-octane",
@@ -1752,7 +1786,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/bpcl-sbi-card-octane.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-prime",
@@ -1806,7 +1841,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/sbi-card-prime.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "axis-atlas",
@@ -1864,7 +1900,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.axis.bank.in/cards/credit-card/axis-bank-atlas-credit-card",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "sbi-elite",
@@ -1926,7 +1963,8 @@
     "minMonthlyIncome": null,
     "sourceUrl": "https://www.sbicard.com/en/personal/credit-cards/sbi-card-elite.html",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": true
+    "verified": true,
+    "emiRewards": false
   },
   {
     "id": "hsbc-travelone",
@@ -1971,7 +2009,8 @@
     "minMonthlyIncome": 50000,
     "sourceUrl": "https://www.hsbc.co.in/credit-cards/products/travelone/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   },
   {
     "id": "amex-membership-rewards",
@@ -2016,6 +2055,7 @@
     "minMonthlyIncome": 37500,
     "sourceUrl": "https://www.americanexpress.com/in/credit-cards/membership-rewards-card/",
     "sourceUpdatedAt": "2026-10-31",
-    "verified": false
+    "verified": false,
+    "emiRewards": false
   }
 ]

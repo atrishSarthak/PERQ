@@ -172,6 +172,9 @@ export const cards = pgTable(
     welcomeBenefitValue: integer("welcome_benefit_value").notNull().default(0),
     sourceUrl: text("source_url"), // the bank's own product / MITC page
     verified: boolean("verified").notNull().default(false), // false = excluded from ranking
+    // Step 3: does spend converted to EMI still earn rewards? Default false
+    // (most Indian cards exclude EMI conversions); see CARDS_README.
+    emiRewards: boolean("emi_rewards").notNull().default(false),
   },
   (t) => ({
     // D15 bucket-cache lookup: WHERE origin = ? AND search_bucket_key = ? AND status = ?
@@ -670,3 +673,40 @@ export const financialStateCache = pgTable("financial_state_cache", {
   computedAt: timestamp("computed_at", { mode: "date" }).notNull().defaultNow(),
   state: jsonb("state").notNull(),
 });
+
+// ===========================================================================
+// Step 3: Purchase Planner (docs/specs/PERQ_Handoff_Step3_Purchase_Planner.md §4).
+// price, offers and emi_options are what the user CONFIRMED; result is the
+// finance-engine PlanResult. Screenshots are never stored.
+// ===========================================================================
+
+export const purchasePlans = pgTable(
+  "purchase_plans",
+  {
+    id: id(),
+    userId: userRef(),
+    itemName: text("item_name").notNull(),
+    category: text("category").notNull(), // Step 2 transaction category
+    price: integer("price").notNull(), // ₹, confirmed by the user
+    merchant: text("merchant"),
+    source: text("source").notNull(), // typed | chat | screenshot | link
+    needByDate: date("need_by_date"),
+    offers: jsonb("offers").notNull().default([]), // OfferSpec[]
+    emiOptions: jsonb("emi_options").notNull().default([]), // EmiSpec[]
+    inputsSnapshot: jsonb("inputs_snapshot"), // state values the plan used
+    result: jsonb("result"), // PlanResult
+    verdict: text("verdict"), // go | go_with_timing | wait | rethink_payment
+    explanation: text("explanation"),
+    explanationSource: text("explanation_source"), // ai | template
+    status: text("status").notNull().default("planned"), // draft|planned|reminder_set|bought|dropped|expired
+    remindAt: date("remind_at"), // IST calendar day; the nudge fires at 09:00 IST
+    matchedTransactionId: text("matched_transaction_id").references(() => transactions.id, { onDelete: "set null" }),
+    agentRunId: text("agent_run_id"),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+  },
+  (t) => ({
+    userIdx: index("purchase_plans_user_idx").on(t.userId, t.createdAt),
+    statusIdx: index("purchase_plans_user_status_idx").on(t.userId, t.status),
+  })
+);

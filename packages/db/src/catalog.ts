@@ -38,6 +38,7 @@ export function catalogCardToRow(card: CatalogCard, sourceUpdatedAt: Date): NewC
     sourceUrl: card.sourceUrl,
     sourceUrls: [card.sourceUrl],
     verified: card.verified,
+    emiRewards: card.emiRewards,
     origin: "seeded",
     searchBucketKey: null,
     status: "active",
@@ -75,5 +76,6 @@ export function rowToCatalogCard(row: CardRow): CatalogCard {
     sourceUrl: row.sourceUrl ?? "",
     sourceUpdatedAt: row.sourceUpdatedAt.toISOString().slice(0, 10),
     verified: row.verified,
+    emiRewards: row.emiRewards,
   };
 }

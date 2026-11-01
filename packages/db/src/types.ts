@@ -1,6 +1,7 @@
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type {
   activityEvents,
+  purchasePlans,
   agentRuns,
   budgets,
   cardAccounts,
@@ -55,3 +56,6 @@ export type PushTokenRow = InferSelectModel<typeof pushTokens>;
 export type ConsentRow = InferSelectModel<typeof consents>;
 export type ActivityEventRow = InferSelectModel<typeof activityEvents>;
 export type FinancialStateCacheRow = InferSelectModel<typeof financialStateCache>;
+
+export type PurchasePlanRow = InferSelectModel<typeof purchasePlans>;
+export type NewPurchasePlanRow = InferInsertModel<typeof purchasePlans>;

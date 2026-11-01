@@ -122,3 +122,16 @@ How the numbers are modelled:
 - **SBI Card ELITE** (`sbi-elite`): 5X (10 points per ₹100) on dining, departmental stores and groceries; 2 per ₹100 elsewhere except fuel; 4 points = ₹1. Bonus points worth ₹2,500 at ₹3 lakh and ₹4 lakh, ₹3,750 at ₹5 lakh and ₹8 lakh. Welcome ₹5,000 voucher. Fee waived at ₹10 lakh.
 - **HSBC TravelOne Credit Card** (`hsbc-travelone`): UNVERIFIED: 4 points per ₹100 on flights, travel and foreign currency, 2 elsewhere, but points convert to airline/hotel partners with no stated rupee value. Needs ₹6 lakh a year (salaried) or ₹12 lakh (self-employed).
 - **American Express Membership Rewards Credit Card** (`amex-membership-rewards`): UNVERIFIED: Amex doesn't publish a rupee value for Membership Rewards points. 1,000 bonus points for ₹20,000 a month; none on fuel, insurance or utilities. Needs ₹4.5 lakh a year salaried or ₹6 lakh self-employed.
+
+## EMI rewards (`emiRewards`, Step 3)
+
+Whether spend converted to EMI still earns the card's rewards. **Every card is `false`.** That's the
+conservative default: assuming rewards are lost makes an EMI look slightly more expensive, never cheaper.
+
+Checked 2026-11-01:
+- **Axis ACE**: no cashback on EMI or post-facto EMI conversions (Axis ACE T&C PDF). `false`, verified.
+- **Cashback SBI**: no cashback on Merchant EMI or Flexipay (SBI card brochure). `false`, verified.
+- **HDFC Millennia**: HDFC's terms give 1% (not 5%) on merchant, aggregator and brand EMI, and
+  exclude SmartEMI and Dial-an-EMI. A boolean can't express a reduced rate, so it stays `false` (conservative).
+- IDFC FIRST Millennia's own page says "nothing on EMI" (see its note above). `false`, verified.
+- All other cards: not checked against the bank's terms yet. `false` by default.
