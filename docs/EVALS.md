@@ -49,6 +49,35 @@ Run on 1 Nov 2026: **10/10 pass.** Earlier runs found and fixed:
 - `bestCardFor` not echoing the amount it priced, so a correct answer counted as ungrounded;
 - the model writing "22,000" without ₹ (prompt rule added).
 
+## Purchase Planner (Step 3): `pnpm eval:plans`
+
+10 fixtures, synthetic, no DB (`apps/web/eval/planFixtures.ts`). The offline half,
+`test/eval/planFixtures.test.ts` in `pnpm test`, checks that each plan opens the verdict it's meant to test.
+
+- **Explanations (4), one per verdict:** headphones → Go ahead; a phone with an HDFC offer, three days before the
+  statement closes → Go ahead, on 26 Nov; a trip over what's left → Better to wait; a laptop on no-cost EMI with a
+  ₹199 fee → Pay a different way. A fixture passes when:
+  - Gemini's text passed `validatePlanExplanation`, so the template wasn't used. That check covers verdict words
+    in the first sentence, nothing contradicting it, the reason that decided it, every number from the
+    PlanResult, no urgency words, no item judgement and no abbreviated amounts.
+  - `ungroundedRupees` finds nothing.
+  - There are no banned phrases.
+- **Chat (1):** "Should I buy the new Sony WH-1000XM6 headphones from Croma?" Ember must call
+  `extractPlanFromMessage`, so a confirmation card is shown with the price marked missing. It must ask for the
+  price and give no ₹ figure.
+- **Screenshots (5):** `fixtures/plans/{phone,laptop,headphones,fridge,watch}.png`, synthetic product pages made
+  by `fixtures/plans/make.py`. The price must equal `expected.json` exactly. A slow response gets one retry.
+
+Run on 2 Nov 2026: **10/10 pass.** The screenshots read ₹59,900, ₹24,999, ₹8,499, ₹38,490 and ₹3,299, with the
+right offer counts. Earlier runs found and fixed:
+- a "go" over what's left this month whose text didn't mention the budget (validator rule and prompt rule added,
+  DECISIONS #169);
+- a screenshot timeout that crashed the whole run (now recorded per fixture).
+
+Caveat: these are clean synthetic screenshots. Real Amazon and Flipkart pages are busier (strike-through MRPs,
+bank-offer carousels), so accuracy on them is unmeasured until tested with real screenshots. The
+confirmation form exists for exactly this: no extracted price is planned until the user confirms it.
+
 ## Ember recommender (Step 1): `pnpm eval`
 
 Unchanged from Step 1: Top Pick explanation and "why not X?" fixtures. Every ₹ is grounded, there are no banned
@@ -64,3 +93,17 @@ phrases, and the right card is named.
 - web: nudge copy + why, money tools + chat fallback, agent_runs redaction, statement privacy (no file writes in
   the ingestion path, no password in logs or the review token, a real parse with console captured).
 - scoring-engine: real-spend override.
+
+## Tests touching Step 3
+
+- finance-engine (`pnpm test`):
+  - `floatDays` and `bestPurchaseDate`: month ends, February, statement day 31, need-by windows, the 10-day gain
+    threshold;
+  - `applyOffer`, `rewardFor` with caps, `emiTrueCost` (regular, no-cost with and without a fee, rewards lost);
+  - `rankPaymentOptions`, including the Locked case where the cheapest sticker price isn't the best option and
+    UPI winning when both cards are near their limits;
+  - every verdict rule and their order, what-if picks, the goal proposal, expiry;
+  - the `plan_buy_window` and `plan_purchase_match` nudges, purchase matching and outcome;
+  - explanation validation and the template fallback.
+- web: extraction normalising, chat plan tools (a confirmation card only, unsaved what-ifs, plan-thread chips),
+  and `test:db`: run → save → what-if → remind → statement match through the real routes and database.

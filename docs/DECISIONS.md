@@ -718,3 +718,8 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 170. **Demo users plan with their demo cards only.** Held cards from the quiz with no account are
      left out of a demo plan, as with the fixed demo income in #162. Otherwise a held Millennia, for
      example, could change a demo verdict and stop the demo from loading.
+171. **Step 3 acceptance pass (2 Nov 2026).** All §12 criteria were checked: the unit tests, `pnpm test:db`,
+     `pnpm eval:plans` (10/10), and the three demo plans plus the 26 Nov reminder, through the API and the Expo web
+     preview. Two things were not verified by me: the walkthrough on a physical iPhone in Expo Go (the founder runs
+     it, using RUNNING.md → Purchase Planner), and screenshot accuracy on real shop pages (only synthetic ones;
+     the confirmation form guards the price). Share-sheet entry is in TODOS.md.

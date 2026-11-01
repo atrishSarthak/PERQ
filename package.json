@@ -19,7 +19,9 @@
     "statements:fake": "pnpm --filter @perq/statements fake",
     "nudges:run": "pnpm --filter @perq/web nudges:run",
     "eval:statements": "pnpm --filter @perq/statements eval",
-    "eval:money": "pnpm --filter @perq/web eval:money"
+    "eval:money": "pnpm --filter @perq/web eval:money",
+    "eval:plans": "pnpm --filter @perq/web eval:plans",
+    "test:db": "pnpm --filter @perq/web test:db"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

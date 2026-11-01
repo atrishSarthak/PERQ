@@ -125,3 +125,23 @@ Deferred work captured with context, per `/plan-eng-review`. Not blockers for Fe
 **Cons:** Firecrawl credit cost is only half the real constraint — each search also spends Gemini API calls (classification + up to 2 extractions + narration), against Gemini's own separate free-tier quota, which this credit math says nothing about. Raising the cap without checking that quota too could just move the bottleneck rather than remove it.
 
 **Depends on:** nothing to revisit the number itself; a real answer depends on checking Gemini's free-tier RPD/RPM quota against realistic concurrent-user assumptions, not done in this pass.
+
+---
+
+## Share-sheet entry for the Purchase Planner (Step 3)
+
+**What:** "Share → PERQ" from the Amazon or Flipkart app (iOS share extension, Android intent filter). It opens
+the planner with the shared link or screenshot already in the confirmation form.
+
+**Why:** Today the user has to take a screenshot, open PERQ, tap Should I buy this?, then Add screenshot. A share
+sheet makes that one step from the shop.
+
+**Cons:** It needs a native extension, so a development build (`eas build --profile development`), not Expo Go.
+That's out of scope for Step 3 (§2, §6.1).
+
+**Context:** Use the existing input contract. A shared URL goes through `parseProductLink` (the server never
+fetches it). A shared image goes to `POST /api/plans/extract`. Both land in the same confirmation form, so the
+"never plan unconfirmed numbers" rule holds. `expo-share-intent` or a config plugin is the likely route; check it
+against the SDK in use at the time.
+
+**Depends on:** EAS project set up (the same blocker as remote push, DECISIONS #83).
