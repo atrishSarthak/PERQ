@@ -7,3 +7,4 @@ export { rewardFor, type RewardOutcome } from "./rewards";
 export { emiTrueCost, emiInstalment } from "./emi";
 export { rankPaymentOptions, utilizationImpact, buyingWindow, type UtilisationImpact } from "./options";
 export { planPurchase, affordability, decideVerdict, planCardsFromState, planContextFromState, floatToday } from "./plan";
+export { planTemplateExplanation, validatePlanExplanation, planAllowedNumbers, planNarration, BANNED_PLAN_PHRASES, type ExplanationCheck } from "./explain";

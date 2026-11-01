@@ -511,3 +511,31 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
        month's spend so far.
 125. **Missing data is coded** (`MISSING_DATA_CODES`, each with a fix link in `MISSING_DATA_FIX`), not
      free text, so the result screen can link "Upload a statement" or "Set a budget".
+126. **Ranking refinement (found in the first live plan).** Pure net-cost ranking put SimplyCLICK first
+     for a ₹4,999 purchase: it was ₹50 cheaper but took the card to 84% utilisation. Now an option
+     that takes a card above 70% stays first only if it saves at least ₹500 (`rethinkExtraCost`)
+     over the best option that doesn't. Otherwise that option moves to the top. A plain "over-70%
+     always ranks last" tier was tried and dropped: it hid an Axis offer that saved ₹2,276.
+127. **The pay-down date** for "pay ₹X early" is the statement the purchase lands on, not today's
+     next statement. Bought on 27 Nov with a 26th statement day, it's 26 Dec.
+128. **`/api/plans/run`.** The engine runs first, then Gemini words the result (`runEmber`,
+     `task: "plan"`, no tools, `maxPermission` 1, logged to `agent_runs`). The narration steps are
+     `planNarration(result)`: the checks the engine actually ran (budget, cards and offers, statement
+     dates, credit limit, EMI cost), streamed while the explanation is written, then a `plan` SSE
+     event. The model doesn't sequence tools here: the result can't depend on its choices (§7.2), so
+     its only job is wording. The rate limit is 20 plans per user per rolling 24 hours, counted from
+     `purchase_plans`; extractions are counted from `agent_runs`.
+129. **Explanation validation** (`validatePlanExplanation`, finance-engine):
+     - 2–4 sentences, at most 600 characters.
+     - The first sentence carries the verdict words, and nothing contradicts them.
+     - Every number must exist in the PlanResult, including dates' day numbers. The 30/70/90
+       thresholds and the option count are also allowed. No "58k"-style shorthand.
+     - Banned: the nudge urgency list, plus item judgement ("not worth", "luxury", "splurge"…) and
+       investment or loan advice.
+     - On any miss, the template (`planTemplateExplanation`) is used. The template passes the same
+       validator in tests for every verdict.
+130. **Typed input on the phone.** The category is guessed by rules (`inferPlanCategory`) and is editable
+     with chips. Gemini isn't used for the category of typed items: the user sees and fixes it
+     before anything runs, and it saves a model call per plan. Need-by is chosen from chips (this
+     week / 2 weeks / this month / a month) relative to the server's day, so demo time travel
+     applies. The confirmed input reaches the planning screen in memory only.

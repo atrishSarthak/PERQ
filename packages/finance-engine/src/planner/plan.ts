@@ -193,7 +193,7 @@ export function planPurchase(input: PlanInput, ctx: PlanContext): PlanResult {
 
   let credit: PlanResult["credit"];
   if (card && card.cardAccountId) {
-    const u = utilizationImpact(card, recommended.emi?.blockedLimit ?? recommended.effectivePrice, ctx.today);
+    const u = utilizationImpact(card, recommended.emi?.blockedLimit ?? recommended.effectivePrice, recommended.purchaseDate);
     credit = { cardAccountId: card.cardAccountId, before: u.before, after: u.after, payToStayUnder30: u.after !== null && u.after > C.utilisationTargetPct ? u.payToStayUnder30 : null, nextStatementDate: u.nextStatementDate };
   }
 

@@ -14,6 +14,7 @@ import { SpendSyncPrompt } from "@/features/results/SpendSync";
 import { useAuth } from "@/lib/auth";
 import { useMarkPaid, useMoneyState, useNudges } from "@/lib/moneyQueries";
 import { hasAskedForNotifications } from "@/lib/notifications";
+import { usePlans } from "@/lib/plannerApi";
 import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -32,6 +33,7 @@ export default function Home() {
   const state = useMoneyState();
   const nudges = useNudges();
   const markPaid = useMarkPaid();
+  const plans = usePlans();
 
   // First visit to Home after sign-in: explain notifications before any OS prompt.
   useEffect(() => {
@@ -46,6 +48,7 @@ export default function Home() {
   const hasStatements = s.cards.some((c) => c.latestStatement);
   const unread = nudges.data?.nudges.find((n) => n.status === "sent") ?? nudges.data?.nudges.find((n) => n.status === "opened");
   const unreadCount = nudges.data?.unread ?? 0;
+  const openPlans = (plans.data?.plans ?? []).filter((p) => p.status === "planned" || p.status === "reminder_set");
   const dues = s.cards
     .filter((c) => c.latestStatement?.dueDate && c.latestStatement.totalDue !== null && (c.daysToDue ?? -1) >= 0)
     .sort((a, b) => (a.daysToDue ?? 99) - (b.daysToDue ?? 99));
@@ -63,6 +66,7 @@ export default function Home() {
       </View>
 
       {!hasStatements ? (
+        <>
         <Card>
           <Text variant="heading">See your real money picture</Text>
           <Text tone="muted">Upload a credit card statement and Ember will track dues, fees, rewards and spending for you.</Text>
@@ -71,6 +75,8 @@ export default function Home() {
             We read it once and delete the file. The password is never stored on our side.
           </Text>
         </Card>
+        <Button label="Should I buy this?" kind="secondary" onPress={() => router.push("/plan/new")} accessibilityHint="Ember checks your cards and budget" />
+        </>
       ) : (
         <>
           <Pressable onPress={() => router.push("/budgets")} accessibilityRole="button">
@@ -116,6 +122,26 @@ export default function Home() {
                 <Text tone="muted" variant="small">
                   {unread.body}
                 </Text>
+              </Card>
+            </Pressable>
+          ) : null}
+
+          <Button label="Should I buy this?" onPress={() => router.push("/plan/new")} accessibilityHint="Ember checks your budget, cards and statement dates" />
+          {openPlans.length ? (
+            <Pressable onPress={() => router.push("/plans")} accessibilityRole="button">
+              <Card>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                  <Text variant="bodyStrong">Your plans</Text>
+                  <Text tone="link" variant="small">
+                    {openPlans.length} open ›
+                  </Text>
+                </View>
+                {openPlans.slice(0, 2).map((p) => (
+                  <Text key={p.id} variant="small" tone="muted" numberOfLines={1}>
+                    {p.itemName} · {formatInr(p.price)}
+                    {p.remindAt ? ` · reminder ${shortDate(p.remindAt)}` : ""}
+                  </Text>
+                ))}
               </Card>
             </Pressable>
           ) : null}

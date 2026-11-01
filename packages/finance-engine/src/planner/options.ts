@@ -23,9 +23,12 @@ export interface UtilisationImpact {
   overLimit: boolean;
 }
 
-/** Utilisation before/after putting `amount` on a card (§5.6). */
-export function utilizationImpact(card: Pick<PlanCard, "balance" | "creditLimit" | "statementDay">, amount: number, today: string): UtilisationImpact {
-  const nextStatementDate = card.statementDay ? statementOn(card.statementDay, today) : null;
+/**
+ * Utilisation before/after putting `amount` on a card (§5.6). `purchaseDate`
+ * picks the statement the spend is reported on: that's the date to pay down by.
+ */
+export function utilizationImpact(card: Pick<PlanCard, "balance" | "creditLimit" | "statementDay">, amount: number, purchaseDate: string): UtilisationImpact {
+  const nextStatementDate = card.statementDay ? statementOn(card.statementDay, purchaseDate) : null;
   if (!card.creditLimit) return { before: null, after: null, payToStayUnder30: null, nextStatementDate, level: "ok", overLimit: false };
   const balance = Math.max(0, card.balance ?? 0);
   const before = pct1((balance / card.creditLimit) * 100);
@@ -73,12 +76,12 @@ function cardBase(c: PlanCard): { flags: OptionFlag[] } {
   return { flags };
 }
 
-function fullOption(input: PlanInput, c: PlanCard, date: string, idSuffix: "today" | "best", today: string): Draft {
+function fullOption(input: PlanInput, c: PlanCard, date: string, idSuffix: "today" | "best"): Draft {
   const offers = applyOffers(input.offers, offerCard(c), input.price);
   const effectivePrice = input.price - offers.discount;
   const reward = c.terms ? rewardFor(c.terms, input.item.category, effectivePrice, { monthSpendByCategory: c.monthSpendByCategory }).reward : 0;
   const f = floatDays(c, date);
-  const u = utilizationImpact(c, effectivePrice, today);
+  const u = utilizationImpact(c, effectivePrice, date);
   return {
     id: `card:${cardKey(c)}:${idSuffix}`,
     kind: "card_full",
@@ -180,18 +183,21 @@ function emiAppliesTo(bankName: string | undefined, c: PlanCard): boolean {
 }
 
 /**
- * Every way the user could pay (§5.7), ranked: net cost, then fewer
+ * Every way the user could pay (§5.7), ranked by net cost, then fewer
  * warnings, then more interest-free days. Blocked options (> 90% or over the
- * limit) are listed but never ranked ahead of an unblocked one.
+ * limit) are listed but never ranked ahead of an unblocked one. And an option
+ * that takes a card above 70% only stays first if it saves at least ₹500
+ * (rethinkExtraCost) over the best option that doesn't: small savings aren't
+ * worth a high utilisation.
  */
 export function rankPaymentOptions(input: PlanInput, cards: PlanCard[], today: string): OptionResult[] {
   const drafts: Draft[] = [];
   const { from, to } = buyingWindow(input, today);
   for (const c of cards) {
-    drafts.push(fullOption(input, c, today, "today", today));
+    drafts.push(fullOption(input, c, today, "today"));
     const best = bestPurchaseDate(c, from, to);
     if (best && best.bestDate !== today && best.extraDays >= PLANNER_CONFIG.timingMinGainDays) {
-      drafts.push(fullOption(input, c, best.bestDate, "best", today));
+      drafts.push(fullOption(input, c, best.bestDate, "best"));
     }
     input.emiOptions.forEach((e, i) => {
       if (emiAppliesTo(e.bankName, c)) drafts.push(emiOption(input, c, i, today));
@@ -211,5 +217,9 @@ export function rankPaymentOptions(input: PlanInput, cards: PlanCard[], today: s
         (b.d.interestFreeDays ?? -1) - (a.d.interestFreeDays ?? -1) ||
         a.i - b.i
     );
+  const healthy = sorted.findIndex(({ d }) => !d.blocked && !d.flags.includes("util_over_70"));
+  if (healthy > 0 && sorted[healthy]!.d.netCost - sorted[0]!.d.netCost < PLANNER_CONFIG.rethinkExtraCost) {
+    sorted.unshift(...sorted.splice(healthy, 1));
+  }
   return sorted.map(({ d }, idx) => ({ ...d, savingVsUpi: upi.netCost - d.netCost, rank: idx + 1 }));
 }

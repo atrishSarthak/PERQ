@@ -278,3 +278,29 @@ describe("every plan validates against the shared schema", () => {
     expect(decideVerdict(input({ price: 100 }), r.options, affordability(input({ price: 100 }), r.options[0]!, ctx()), TODAY).verdict).toBeDefined();
   });
 });
+
+describe("ranking tiers and utilisation dates", () => {
+  it("doesn't rank a slightly cheaper card first when it pushes utilisation over 70%", () => {
+    const opts = rankPaymentOptions(
+      input({ price: 5000 }),
+      [card("hot", SBI, { creditLimit: 50000, balance: 37000, statementDay: null, dueDay: null }), card("cool", ACE, { creditLimit: 100000, balance: 22000, statementDay: null, dueDay: null })],
+      TODAY
+    );
+    expect(opts.find((o) => o.cardAccountId === "hot")!.netCost).toBeLessThan(opts.find((o) => o.cardAccountId === "cool")!.netCost);
+    expect(opts[0]!.cardAccountId).toBe("cool");
+  });
+  it("keeps the over-70% card first when it saves ₹500 or more", () => {
+    const opts = rankPaymentOptions(
+      input({ price: 59900, offers: [{ type: "instant_discount", bank: "Axis", flat: 1500, rawText: "₹1,500 off on Axis" }] }),
+      [card("ace", ACE, { creditLimit: 100000, balance: 22120, statementDay: null, dueDay: null }), card("hdfc", HDFC, { creditLimit: null, balance: null, statementDay: null, dueDay: null })],
+      TODAY
+    );
+    expect(opts[0]!.cardAccountId).toBe("ace");
+    expect(opts[0]!.flags).toContain("util_over_70");
+  });
+  it("tells you to pay down before the statement the purchase lands on", () => {
+    const r = planPurchase(input({ price: 59900 }), ctx({ cards: [card("h", HDFC, { creditLimit: 100000 })] }));
+    expect(r.recommended.purchaseDate).toBe("2026-11-26");
+    expect(r.credit!.nextStatementDate).toBe("2026-12-25");
+  });
+});

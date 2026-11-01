@@ -197,6 +197,40 @@ function RootNavigator() {
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
           />
+          <Stack.Screen
+            name="plan/new"
+            options={{
+              title: "Should I buy this?",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen name="plan/running" options={{ gestureEnabled: false }} />
+          <Stack.Screen
+            name="plan/[id]"
+            options={{
+              title: "Your plan",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
+            name="plans"
+            options={{
+              title: "Your plans",
+              headerShown: true,
+              headerBackTitle: "Back",
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
         </Stack.Protected>
         <Stack.Screen
           name="diagnostics"

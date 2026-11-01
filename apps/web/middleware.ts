@@ -38,6 +38,8 @@ export const config = {
     "/api/nudges/:path*",
     "/api/push/:path*",
     "/api/activity",
+    "/api/plans",
+    "/api/plans/:path*",
     "/api/me/:path*",
     "/api/demo/:path*",
   ],
