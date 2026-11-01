@@ -173,3 +173,53 @@ and what differs from what that handoff assumes:
     SDK 53; local notifications still work. iOS Expo Go can receive remote push, but an Expo push token
     needs an EAS `projectId` (linking an Expo account). Decided at checkpoint 9.
 11. **Tests at start of Step 2:** `pnpm test` green across 10 packages; `pnpm eval` 10/10 (2026-10-31).
+
+---
+
+# Step 3 audit addendum (2026-11-01)
+
+Read against `docs/specs/PERQ_Handoff_Step3_Purchase_Planner.md`, at commit `50ac108`. What exists
+that the Purchase Planner builds on, and what differs from what the handoff assumes:
+
+1. **Paths.** The handoff refers to `docs/PERQ_Handoff_*.md`; all three handoffs are in `docs/specs/`.
+   **`docs/PERQ_Chrome_Extension_Integration_Guide.md` does not exist** in the repo (or anywhere
+   on disk). So `rankPaymentOptions` and `emiTrueCost` are designed from §3 alone: pure functions
+   in finance-engine taking plain data (no DB rows, no `FinancialState` required for EMI), with
+   zod input/output schemas in `packages/shared` so an `/api/extension/analyze` route can validate
+   and call them unchanged.
+2. **Statement and due days.** `card_accounts.statement_day` / `due_day` already exist (migration
+   0009), and the demo loader fills them, but `StateCardAccount`/`CardState` don't carry them: the
+   state derives `nextStatementDate` as the latest statement date + 1 month. The planner needs the
+   days themselves (§5.5), so they are added to the state input and `CardState`, falling back to
+   the latest statement's day-of-month for the statement day and its due date for the due day.
+3. **Utilisation helpers exist.** finance-engine already has `utilisationAfter`,
+   `amountToReachUtilisation` and `bestCardFor`; the money tool `utilizationImpact` lives in
+   `apps/web/lib/ember/money/tools.ts`. §5.6's `utilizationImpact(card, amount, state)` moves into
+   finance-engine (planner) and the Step 2 tool calls it. Thresholds 30/70 come from `NUDGE_CONFIG`;
+   the 90% "block" threshold is new and goes in the same config.
+4. **Card terms.** Catalogue `rewardRates` are % value back over the **9** reward categories, with
+   per-category `rewardCaps` and shared `capGroups` (monthly ₹ of reward). Plans use the **17**
+   Step 2 transaction categories and map through `rewardCategoryOf`. The state has no per-card,
+   per-category spend for the current month, which `rewardFor`'s "remaining cap" needs; it's added.
+   Note this month's spend is usually partial (statements arrive after the cycle).
+5. **Offer matching.** The catalogue's `issuer` strings are bank names ("HDFC Bank", "SBI Card",
+   "IDFC FIRST Bank", "Federal Bank / partner banks"). Offers name banks loosely ("HDFC", "SBI
+   Cards"), so matching normalises both to a bank key. `networks` is an array per card.
+6. **`cards.emi_rewards` is new.** Nothing in `research-notes.md` records EMI reward treatment.
+7. **Savings goals** are the `savings_goals` table (Step 2); `goals` is the retired Feature 3 table.
+   The planner's goal action reuses Step 2's `proposeGoal` and the chat proposal/confirm flow.
+8. **Name clash to avoid.** `packages/scoring-engine/src/scorePaymentOptions.ts` is retired Feature 3
+   code (AUDIT §4). The new `rankPaymentOptions` lives in finance-engine and doesn't reuse it.
+9. **Income band.** Quiz v2 `monthlyIncome` is a bucket with `INCOME_BUCKET_RUPEES[b].mid`
+   (`packages/shared/src/quiz.ts`), used for the affordability fallback and size label.
+10. **Nudge engine.** Rules are pure functions over `NudgeRuleInput`, with dedupe, a daily cap of 2
+    and quiet hours in `planNudges`. §8 needs two things it doesn't have: a rule fed by plans
+    (`plan_buy_window`), and an in-app-only nudge that is neither pushed nor counted against the cap
+    (the purchase match). Both are added to the engine rather than written around it.
+11. **Ember chat.** `/api/ember/chat` already supports `thread_ref` threads (`nudge:`, `card:`), a
+    `proposal` SSE event with Confirm in the app, and one proposal per turn. Plan threads add
+    `plan:<id>`. The main thread's tool set gains the planner tools.
+12. **Mobile.** `expo-image-picker` and `expo-clipboard` are not installed yet; both are in Expo Go.
+13. **Gemini quota** (AUDIT Step 2 #9) still applies: plans must work with Gemini off (template
+    explanation, rule-based category, typed input), and tests mock the model.
+14. **Tests at start of Step 3:** `pnpm test` green; web and mobile typecheck clean (commit `50ac108`).
