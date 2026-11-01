@@ -158,6 +158,7 @@ export interface MissedReward {
   merchant: string;
   category: string;
   amount: number;
+  usedCardAccountId: string;
   usedCard: string;
   betterCard: string;
   betterCardId: string;
@@ -387,6 +388,7 @@ export function buildFinancialState(input: StateInput): FinancialState {
           merchant: t.merchant,
           category: t.category,
           amount: t.amount,
+          usedCardAccountId: a.id,
           usedCard: a.label,
           betterCard: best.name,
           betterCardId: best.cardId,

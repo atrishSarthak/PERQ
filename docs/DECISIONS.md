@@ -280,3 +280,18 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     track `expectedSaved` on a straight line from creation to target date.
 78. **State cache** is keyed by `STATE_VERSION` + the IST day, because the state depends on today. It's
     deleted on every money write via `invalidateState`.
+79. **Nudge engine layout.** Rules, thresholds (`NUDGE_CONFIG`), learned suppression and the cap/quiet-hours
+    planner are pure functions in `packages/finance-engine/src/nudges`, and every number a rule's copy may
+    use sits in its payload. `apps/web/lib/money/nudgeEngine.ts` only loads rows and saves the plan. It
+    rebuilds the state fresh instead of reading the per-day cache, so a save made earlier today is reflected.
+80. **When the engine runs.** It runs after every money write (`afterMoneyWrite`), and again from the daily
+    cron (checkpoint 9). Errors there are logged and swallowed so a nudge bug can't fail a statement save.
+    The daily cap of 2 is counted on `sent_at` per IST day. A nudge held by the cap or by quiet hours is
+    stored as `queued` with `scheduled_for` at the next 09:00 IST, and it competes on priority with that
+    day's fresh candidates.
+81. **Dedupe across all statuses.** A dedupe key that was ever stored (sent, dismissed, expired, queued)
+    is never created again. The keys include the statement date or month, so the next cycle gets a fresh
+    key. History looks back 120 days, plus any rows still queued.
+82. **High-utilisation levels.** Spec §7.2 gives one rule. It's split into `warn` (≥ 70% and the statement
+    closes within 5 days, priority 75, with "pay ₹X to get under 30%") and `info` (≥ 30%, priority 40), so
+    it is urgent only when acting on it still changes the reported figure.
