@@ -61,7 +61,7 @@ export const api = {
  * event as it arrives (expo/fetch streams response bodies in Expo Go).
  */
 export async function streamEmber(
-  path: "/api/recommender/explain" | "/api/ember/chat",
+  path: string,
   body: unknown,
   onEvent: (e: EmberEvent) => void,
   signal?: AbortSignal

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { recommendationResultSchema } from "./recommendation";
+import { statementDraftSchema } from "./statementApi";
 
 // Request/response bodies for the recommender API (handoff §1.5) that
 // aren't covered by the domain schemas.
@@ -34,7 +35,9 @@ export const emberEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("chunk"), text: z.string() }),
   z.object({ type: z.literal("explanation"), text: z.string(), source: z.string(), topCardId: z.string() }),
   z.object({ type: z.literal("done") }),
-  z.object({ type: z.literal("error"), message: z.string() }),
+  z.object({ type: z.literal("error"), message: z.string(), code: z.string().optional() }),
+  // Statement parse (§5.1): the review draft once narration finishes.
+  z.object({ type: z.literal("draft"), draft: z.lazy(() => statementDraftSchema) }),
 ]);
 export type EmberEvent = z.infer<typeof emberEventSchema>;
 

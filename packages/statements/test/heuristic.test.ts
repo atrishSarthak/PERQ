@@ -27,7 +27,7 @@ describe("heuristic extraction on the synthetic layouts", () => {
       const { password, expected } = JSON.parse(readFileSync(`${dir}/${name}.json`, "utf-8"));
       const got = heuristicExtract(await extractPdfLines(new Uint8Array(readFileSync(`${dir}/${name}.pdf`)), password));
       expect(reconcile(got).reconciled).toBe(true);
-      for (const k of ["statementDate", "periodStart", "periodEnd", "dueDate", "totalDue", "minimumDue", "previousBalance", "paymentsCredits", "purchasesDebits", "feesCharges", "financeCharges", "creditLimit", "availableLimit", "last4"]) {
+      for (const k of ["statementDate", "periodStart", "periodEnd", "dueDate", "totalDue", "minimumDue", "previousBalance", "paymentsCredits", "purchasesDebits", "feesCharges", "financeCharges", "creditLimit", "availableLimit", "last4", "cardName"]) {
         expect([k, got[k as keyof typeof got]]).toEqual([k, expected[k]]);
       }
       expect(got.transactions).toHaveLength(expected.transactions.length);

@@ -118,9 +118,11 @@ export function heuristicExtract(lines: PdfLine[]): ExtractedStatement {
   const issuerLine = texts[0] ?? "";
   const last4 = first((t) => t.match(/(?:x{4}|\*{4})[\sx*]*(\d{4})\b/i)?.[1] ?? null);
   const cardName = first((t) => {
-    const m = t.match(/^(.*?)\s+credit card statement/i) ?? t.match(/^card:\s*(.+?)(?:\s{2,}|$)/i);
+    // "Millennia Credit Card Statement", or a "Card: NAME" field, which in
+    // two-column layouts shares a line with the left column.
+    const m = t.match(/^(.*?)\s+credit card statement/i) ?? t.match(/(?:^|\s{2})card:\s*(.+?)(?:\s{2,}|$)/i);
     return m ? m[1]!.trim() : null;
-  });
+  }) ?? texts.slice(0, 6).find((t) => /^[A-Za-z0-9 &+.]+\bcredit card$/i.test(t.trim()))?.trim() ?? null;
 
   const pointsLine = texts.find((t) => /opening balance:\s*\d/i.test(t) && /earned/i.test(t));
   const expLine = texts.find((t) => /points expiring/i.test(t));

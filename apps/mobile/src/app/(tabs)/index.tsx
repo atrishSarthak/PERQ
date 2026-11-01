@@ -1,6 +1,7 @@
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { formatInr } from "@perq/finance-engine";
+import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { EmberAvatar } from "@/components/EmberAvatar";
 import { Screen } from "@/components/Screen";
@@ -57,11 +58,9 @@ export default function Home() {
         </Pressable>
       ) : null}
       <Card>
-        <Text variant="caption" tone="muted">
-          NEXT
-        </Text>
-        <Text variant="heading">Card Manager is coming next</Text>
-        <Text tone="muted">Track what each card actually earns you, from your real spends.</Text>
+        <Text variant="heading">Track your real spending</Text>
+        <Text tone="muted">Upload a credit card statement. Ember reads it once and deletes the file.</Text>
+        <Button label="Upload a statement" onPress={() => router.push("/upload")} />
       </Card>
     </Screen>
   );

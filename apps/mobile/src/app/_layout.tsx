@@ -76,6 +76,16 @@ function RootNavigator() {
             }}
           />
           <Stack.Screen
+            name="upload"
+            options={{
+              presentation: "modal",
+              headerShown: true,
+              headerStyle: { backgroundColor: t.colors.surface },
+              headerTintColor: t.colors.text,
+              headerTitleStyle: { fontFamily: t.fonts.bodySemi },
+            }}
+          />
+          <Stack.Screen
             name="edit/[key]"
             options={{
               presentation: "modal",

@@ -14,3 +14,4 @@ export {
   type ParseOptions,
 } from "./extract";
 export { categoriseTransactions, categoriseMerchantsWithAi, aiCategoryPrompt, type CategoriseIo } from "./categorise";
+export { matchCard, issuerKey, dayOf, feeAnniversaryMonth, MATCH_THRESHOLD, type CardMatch, type CatalogueEntry, type AccountEntry } from "./match";

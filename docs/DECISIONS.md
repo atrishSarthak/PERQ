@@ -242,3 +242,31 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     against the 17 categories, and only its answers go to `merchant_categories`. User overrides live in
     `user_merchant_overrides` and a test asserts they never reach the shared cache. If the AI fails or is
     off, unknown merchants become "other".
+70. **Upload transport: base64 PDF in a JSON body**, not multipart. It works the same from Expo Go,
+    the web preview and tests, and Vercel's ~4.5 MB body cap means a **3 MB PDF limit** (base64 adds
+    a third). Real statements are usually well under 1 MB. The server decodes into a `Uint8Array`,
+    parses, and zero-fills it in `finally`.
+71. **Parse token = signed draft (JWS, HS256, `PARSE_TOKEN_SECRET`, 15 min, bound to the user)**
+    instead of a server-side cache. Parse and confirm can land on different Vercel instances. The token
+    holds only the extracted figures and lines the user is reviewing (never the PDF or password), and a
+    tampered or expired token is rejected. Confirm re-runs reconciliation on whatever is saved,
+    including the user's corrected figures.
+72. **On the phone**, the document picker's temporary copy is read into memory as base64 and deleted
+    immediately (`File.delete()`). The password is only kept if "Remember on this phone" is on, in the
+    Keychain via expo-secure-store, keyed by issuer + last 4 with a small index for the "use remembered"
+    buttons.
+73. **Wrong passwords**: 5 per user per 10 minutes, in memory (per warm instance, like the public finder
+    limit). Logs carry only the error code; a manual check of the dev log after a parse found no
+    password, figure, merchant or card number.
+74. **Demo/dev sample statements:** `GET /api/demo/fixtures?layout=A|B|C` (only with
+    `DEMO_ENABLED=true`) generates a synthetic statement in memory. `/demo/statements` lists them with
+    passwords so one can be saved to Files in Safari, and the upload screen has "Try a synthetic
+    statement" buttons in dev or demo builds (`EXPO_PUBLIC_DEMO=true`). The headless browser can't drive
+    Expo's web file picker, so checkpoint 6 was verified with these buttons in the web preview:
+    SBI sample → narration → review (reconciled, matched to Cashback SBI Card) → saved. The on-iPhone
+    check is in RUNNING.md.
+75. **pdfkit and pdfjs-dist are `serverExternalPackages`** in Next; bundling them loses their font and
+    worker files.
+76. Confirm takes several seconds in dev because it's ~8 sequential Neon HTTP round trips (account
+    upsert, replace, insert, transactions, arsenal, cache, activity). That's fine for now; batch it if it
+    shows up in real use.
