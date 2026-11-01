@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     }
     emit({ type: "step", label: steps.at(-1)! });
     const explanation = await explaining;
-    const row = await savePlan(auth.id, input, source, computed, explanation);
+    const row = await savePlan(auth.id, input, source, computed, explanation, now);
     // Confirmed from the chat card: Ember's answer joins the main thread, with a marker the app shows as the result card.
     if (postToChat) {
       await db.insert(chatMessages).values({ userId: auth.id, thread: "recommender", threadRef: null, role: "assistant", content: `${explanation.text}\n\n${planMarker(row.id)}` });

@@ -8,3 +8,4 @@ export { emiTrueCost, emiInstalment } from "./emi";
 export { rankPaymentOptions, utilizationImpact, buyingWindow, chooseOption, cardOfOption, type UtilisationImpact } from "./options";
 export { planPurchase, PlanChoiceError, isPlanExpired, affordability, decideVerdict, planCardsFromState, planContextFromState, floatToday } from "./plan";
 export { planTemplateExplanation, monthPhrase, validatePlanExplanation, planAllowedNumbers, planNarration, BANNED_PLAN_PHRASES, type ExplanationCheck } from "./explain";
+export { matchPlanPurchase, planOutcome, sameMerchant, MATCH_CONFIG, type MatchablePlan, type MatchableTxn } from "./match";

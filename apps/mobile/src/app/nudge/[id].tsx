@@ -8,7 +8,8 @@ import { Screen } from "@/components/Screen";
 import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
 import { ChatThread } from "@/features/chat/ChatThread";
-import { planIdFromDedupeKey } from "@perq/finance-engine";
+import { matchFromDedupeKey, planIdFromDedupeKey } from "@perq/finance-engine";
+import { plannerApi } from "@/lib/plannerApi";
 import { moneyApi } from "@/lib/moneyApi";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -55,7 +56,16 @@ export default function NudgeScreen() {
       <ChatThread
         threadRef={`nudge:${nudge.id}`}
         onAction={async (action) => {
-          if (action === "open_plan") {
+          const match = matchFromDedupeKey(nudge.dedupeKey);
+          if (action === "match_yes" && match) {
+            await plannerApi.match(match.planId, match.transactionId);
+            qc.invalidateQueries({ queryKey: ["plans"] });
+            qc.invalidateQueries({ queryKey: ["plan", match.planId] });
+            router.replace(`/plan/${match.planId}`);
+          } else if (action === "match_no") {
+            await moneyApi.markNudge(nudge.id, "dismissed").catch(() => {});
+            done("Got it. The plan stays open.");
+          } else if (action === "open_plan") {
             const planId = planIdFromDedupeKey(nudge.dedupeKey);
             await moneyApi.markNudge(nudge.id, "acted").catch(() => {});
             if (planId) router.replace(`/plan/${planId}`);

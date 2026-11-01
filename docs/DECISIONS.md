@@ -651,3 +651,25 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      `affordability.forMonth`, and the wording says "left to spend in December". The card balance is
      left as it is today, which is conservative. The what-if tool takes `waitDays`, so the model never
      does date arithmetic. With no cards, the later day applies to UPI.
+156. **Purchase matching.** A match needs all of these:
+     - a debit with `kind = purchase`, no earlier than the plan's day and at most 30 days after it;
+     - an amount within ±5% of the planned price, or of the recommended way's effective price, since
+       a bank offer lowers the charge;
+     - and either the same shop (normalised names, one containing the other, at least 3 characters)
+       or the same category.
+
+     The closest amount wins. Each statement line can match only one plan (newest plan first).
+     Drafts are matched too: people buy after a quick check. It runs after a statement is
+     confirmed, before the nudge run. Only the user's "Yes, that's it" links the transaction, marks
+     the plan bought and acts the nudge. "No" dismisses it, and that line is never offered again
+     (dedupe `plan_purchase_match:<plan>:<txn>`).
+157. **In-app only, outside the cap.** The match nudge is stored as `sent`, so it appears in the
+     inbox, newest first. It's never pushed. Its rule is in `IN_APP_ONLY_RULES`, which the daily cap
+     doesn't count.
+158. **"Ember saved you ₹X" is only claimed when the plan was followed.** `planOutcome` credits the
+     recommended way's saving over UPI only if the matched line is on the recommended card. Extra
+     interest-free days count only if it was also bought on or after the suggested day. Otherwise
+     the activity log and the plan say which card was used instead.
+159. **Plans are stamped with the user's clock.** `created_at` comes from the user's clock, so in a
+     demo with time travel, matching (plan day to 30 days later) and expiry use the same day the
+     plan was made.

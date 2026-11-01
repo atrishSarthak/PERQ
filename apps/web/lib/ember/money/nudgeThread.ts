@@ -18,9 +18,12 @@ export const NUDGE_CHIPS: Record<string, NudgeChip[]> = {
   points_value: [ask("How do I use these points?"), ask("Which points expire first?")],
   budget_pace: [ask("Where did that money go?"), ask("Should I change this budget?")],
   goal_progress: [ask("How can I catch up?"), ask("Can I move the date?")],
+  plan_purchase_match: [{ label: "Yes, that's it", action: "match_yes" }, { label: "No, not this", action: "match_no" }],
   plan_buy_window: [{ label: "Open the plan", action: "open_plan" }, ask("What changed since I planned?"), ask("Is there a better way to pay?")],
 };
 
-export function nudgeOpening(n: { title: string; body: string }): string {
+export function nudgeOpening(n: { title: string; body: string; ruleId?: string }): string {
+  // A purchase match already ends with its own question.
+  if (n.ruleId === "plan_purchase_match") return n.body;
   return `${n.body} Want to go through it together?`;
 }

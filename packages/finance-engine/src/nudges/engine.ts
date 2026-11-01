@@ -12,6 +12,7 @@ import { minDueTrap } from "./minDueTrap";
 import { missedRewards } from "./missedRewards";
 import { pointsValue } from "./pointsValue";
 import { PLAN_BUY_WINDOW_DESCRIPTION } from "./planBuyWindow";
+import { PLAN_PURCHASE_MATCH_DESCRIPTION } from "./planPurchaseMatch";
 import { statementUpload } from "./statementUpload";
 import type { NudgeCandidate, NudgeHistoryEntry, NudgeRule } from "./types";
 
@@ -29,9 +30,13 @@ export const NUDGE_RULES: NudgeRule[] = [
   goalProgress,
 ];
 
+/** Rules shown only in the app's inbox: never pushed and not counted against the daily cap (Step 3 §8). */
+export const IN_APP_ONLY_RULES = new Set(["plan_purchase_match"]);
+
 export const RULE_DESCRIPTIONS: Record<string, string> = {
   ...Object.fromEntries(NUDGE_RULES.map((r) => [r.id, r.description])),
   plan_buy_window: PLAN_BUY_WINDOW_DESCRIPTION,
+  plan_purchase_match: PLAN_PURCHASE_MATCH_DESCRIPTION,
 };
 
 /** Every rule's candidates for this state (step 2 of §7.1). */
@@ -124,7 +129,8 @@ export function planNudges(input: {
     .map((q) => ({ ...q, current: current.get(q.dedupeKey)!, priority: adjust(q.ruleId, current.get(q.dedupeKey)!.priority) }));
 
   const today = istDate(now);
-  const sentToday = input.history.filter((h) => h.sentAt && istDate(new Date(h.sentAt)) === today).length;
+  // In-app-only nudges (never pushed) don't use up the daily cap.
+  const sentToday = input.history.filter((h) => h.sentAt && !IN_APP_ONLY_RULES.has(h.ruleId) && istDate(new Date(h.sentAt)) === today).length;
   const quietHours = isQuietHours(now, config);
   const capRemaining = quietHours ? 0 : Math.max(0, config.dailyCap - sentToday);
 

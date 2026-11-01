@@ -64,6 +64,16 @@ export function PlanActions({ plan }: { plan: PlanDetailResponse }) {
             {formatInr(m.amount)} at {m.merchant ?? "the shop"} on {formatDay(m.date)}, on your {m.cardLabel}.
           </Text>
         ) : null}
+        {plan.outcome?.usedRecommendedCard ? (
+          <Text variant="bodyStrong" tone="success">
+            {plan.outcome.savedVsUpi ? `Ember saved you ${formatInr(plan.outcome.savedVsUpi)}` : "Paid the way Ember suggested"}
+            {plan.outcome.extraInterestFreeDays ? `, plus ${plan.outcome.extraInterestFreeDays} more interest-free days` : ""}.
+          </Text>
+        ) : plan.outcome ? (
+          <Text variant="small" tone="muted">
+            You paid with a different card than planned ({r.recommended.label}).
+          </Text>
+        ) : null}
         {p.status !== "bought" ? (
           <Pressable onPress={() => patch.mutate({ status: "planned" })} accessibilityRole="button" hitSlop={6}>
             <Text tone="link" variant="small">

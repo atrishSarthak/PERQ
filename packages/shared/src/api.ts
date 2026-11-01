@@ -70,7 +70,7 @@ export const chatRequestSchema = z.object({ message: z.string().trim().min(1).ma
 export const nudgeChipSchema = z.object({
   label: z.string(),
   /** App-handled button; null sends the label as a message. */
-  action: z.enum(["mark_paid", "remind_tomorrow", "upload", "open_plan"]).nullable(),
+  action: z.enum(["mark_paid", "remind_tomorrow", "upload", "open_plan", "match_yes", "match_no"]).nullable(),
 });
 export type NudgeChip = z.infer<typeof nudgeChipSchema>;
 export const chatHistoryResponseSchema = z.object({

@@ -23,6 +23,8 @@ export const plannerApi = {
   remove: (id: string) => http.request(`/api/plans/${encodeURIComponent(id)}`, { method: "DELETE", schema: z.object({ ok: z.boolean() }) }),
   whatIf: (id: string, body: PlanWhatIfRequest) =>
     http.request(`/api/plans/${encodeURIComponent(id)}/what-if`, { method: "POST", body, schema: planWhatIfResponseSchema }),
+  match: (id: string, transactionId: string) =>
+    http.request(`/api/plans/${encodeURIComponent(id)}/match`, { method: "POST", body: { transactionId }, schema: planDetailResponseSchema }),
   extract: (body: PlanExtractRequest) => http.request("/api/plans/extract", { method: "POST", body, schema: planExtractResponseSchema }),
   run: (input: PlanInput, source: PlanSource, onEvent: (e: EmberEvent) => void, signal?: AbortSignal, opts: { postToChat?: boolean } = {}) =>
     streamEmber("/api/plans/run", { input, source, ...opts }, onEvent, signal),

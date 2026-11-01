@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray } from "drizzle-orm";
 import { agentRuns, cardAccounts, db, purchasePlans, transactions, type PurchasePlanRow } from "@perq/db";
-import { planPurchase } from "@perq/finance-engine";
+import { planOutcome, planPurchase } from "@perq/finance-engine";
 import type { PlanDetailResponse, PlanInput, PlanResult, PlanSource, PlanSummary } from "@perq/shared";
 import { logAgentRun } from "@/lib/ember/agentRunLog";
 import { geminiCaller } from "@/lib/ember/recommender/run";
@@ -49,7 +49,9 @@ export async function savePlan(
   input: PlanInput,
   source: PlanSource,
   computed: ComputedPlan,
-  explanation: PlanExplanation
+  explanation: PlanExplanation,
+  /** The user's clock (demo time travel), so matching and expiry see the plan's day. */
+  now: Date = new Date()
 ): Promise<PurchasePlanRow> {
   const [row] = await db
     .insert(purchasePlans)
@@ -70,6 +72,8 @@ export async function savePlan(
       explanationSource: explanation.source,
       status: "draft", // kept as a check until the user saves it, sets a reminder or buys (§8)
       agentRunId: explanation.runId,
+      createdAt: now,
+      updatedAt: now,
     })
     .returning();
   await logActivity(userId, "plan_created", `Checked a purchase: ${input.item.name} (${verdictWords(computed.result)})`, { table: "purchase_plans", id: row!.id });
@@ -117,14 +121,20 @@ export async function listPlans(userId: string): Promise<PurchasePlanRow[]> {
 
 export async function planDetail(row: PurchasePlanRow): Promise<PlanDetailResponse> {
   let matched: PlanDetailResponse["matchedTransaction"] = null;
+  let outcome: PlanDetailResponse["outcome"] = null;
   if (row.matchedTransactionId) {
     const [t] = await db
-      .select({ id: transactions.id, date: transactions.txnDate, merchant: transactions.merchantNormalized, amount: transactions.amount, cardLabel: cardAccounts.cardLabel })
+      .select({ id: transactions.id, date: transactions.txnDate, merchant: transactions.merchantNormalized, amount: transactions.amount, cardLabel: cardAccounts.cardLabel, cardAccountId: transactions.cardAccountId })
       .from(transactions)
       .innerJoin(cardAccounts, eq(cardAccounts.id, transactions.cardAccountId))
       .where(and(eq(transactions.id, row.matchedTransactionId), eq(transactions.userId, row.userId)))
       .limit(1);
-    matched = t ?? null;
+    if (t) {
+      const { cardAccountId, ...shown } = t;
+      matched = shown;
+      const r = row.result as PlanResult | null;
+      outcome = r ? planOutcome(r, { date: t.date, cardAccountId }) : null;
+    }
   }
   return {
     plan: {
@@ -136,5 +146,6 @@ export async function planDetail(row: PurchasePlanRow): Promise<PlanDetailRespon
       explanationSource: (row.explanationSource as "ai" | "template" | null) ?? null,
     },
     matchedTransaction: matched,
+    outcome,
   };
 }

@@ -332,6 +332,17 @@ export const planSummarySchema = z.object({
 export type PlanSummary = z.infer<typeof planSummarySchema>;
 export const planListResponseSchema = z.object({ plans: z.array(planSummarySchema) });
 
+/** How a bought plan went against the plan (§8: feeds "Ember saved you ₹X"). */
+export const planOutcomeSchema = z.object({
+  usedRecommendedCard: z.boolean(),
+  /** Bought on or after the suggested day (so it landed on the later statement). */
+  usedRecommendedDay: z.boolean(),
+  /** What the suggested card saved over UPI, when it was used. */
+  savedVsUpi: z.number().int().nullable(),
+  extraInterestFreeDays: z.number().int().nullable(),
+});
+export type PlanOutcome = z.infer<typeof planOutcomeSchema>;
+
 export const planDetailResponseSchema = z.object({
   plan: planSummarySchema.extend({
     source: planSourceSchema,
@@ -343,7 +354,11 @@ export const planDetailResponseSchema = z.object({
   matchedTransaction: z
     .object({ id: z.string(), date: isoDate, merchant: z.string(), amount: z.number(), cardLabel: z.string() })
     .nullable(),
+  /** For a bought plan matched to a statement line: did the user pay the way Ember suggested? */
+  outcome: planOutcomeSchema.nullable().optional(),
 });
+
+export const planMatchRequestSchema = z.object({ transactionId: z.string().uuid() });
 export type PlanDetailResponse = z.infer<typeof planDetailResponseSchema>;
 
 export const planWhatIfResponseSchema = z.object({ result: planResultSchema, explanation: z.string() });
