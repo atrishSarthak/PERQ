@@ -16,7 +16,8 @@ export const budgetPace: NudgeRule = {
   description: "Spending in a budget is past 80% of its limit with more than a week of the month left.",
   evaluate(state, { config }) {
     const m = state.month;
-    if (!m.budget || m.daysLeft <= config.budgetPaceMinDaysLeft) return [];
+    // Spend from a statement that didn't reconcile isn't trusted for a rupee nudge (§5.4).
+    if (!m.budget || !m.allReconciled || m.daysLeft <= config.budgetPaceMinDaysLeft) return [];
     const out: { key: string; label: string; spent: number; limit: number }[] = [];
     for (const [cat, limit] of Object.entries(m.budget.categoryLimits)) {
       const spent = m.spendByCategory[cat] ?? 0;

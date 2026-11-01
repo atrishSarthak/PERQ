@@ -17,7 +17,9 @@
     "db:migrate": "pnpm --filter @perq/db db:migrate",
     "db:seed-cards": "pnpm --filter @perq/db db:seed-cards",
     "statements:fake": "pnpm --filter @perq/statements fake",
-    "nudges:run": "pnpm --filter @perq/web nudges:run"
+    "nudges:run": "pnpm --filter @perq/web nudges:run",
+    "eval:statements": "pnpm --filter @perq/statements eval",
+    "eval:money": "pnpm --filter @perq/web eval:money"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

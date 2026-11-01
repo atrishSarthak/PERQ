@@ -8,7 +8,7 @@ export const feeWaiverPace: NudgeRule = {
   evaluate(state, { config }) {
     return state.cards.flatMap((c) => {
       const f = c.feeWaiver;
-      if (!f || f.remaining <= 0) return [];
+      if (!f || f.remaining <= 0 || c.hasUnreconciled) return [];
       const behind = !f.onPace && f.monthsLeft <= config.feeWaiverMonthsLeft;
       const near = f.remaining <= f.threshold * config.feeWaiverNearPct;
       if (!behind && !near) return [];

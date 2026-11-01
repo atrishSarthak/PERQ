@@ -150,6 +150,8 @@ export interface CardState {
     startAssumed: boolean;
   } | null;
   feesLastCycle: { total: number; lines: { description: string; amount: number }[] };
+  /** Any of this card's statements failed reconciliation (§5.4): rupee nudges from them are held back. */
+  hasUnreconciled: boolean;
 }
 
 export interface MissedReward {
@@ -178,6 +180,8 @@ export interface FinancialState {
     leftToSpend: number | null;
     daysLeft: number;
     coverage: "complete" | "partial";
+    /** Every statement behind this month's spend reconciled. */
+    allReconciled: boolean;
   };
   missedRewardsLastCycle: { total: number; items: MissedReward[] };
   goals: {
@@ -346,6 +350,7 @@ export function buildFinancialState(input: StateInput): FinancialState {
         total: Math.round(feeLines.reduce((s, t) => s + t.amount, 0)),
         lines: feeLines.map((t) => ({ description: t.description, amount: t.amount })),
       },
+      hasUnreconciled: (stmtsByCard.get(a.id) ?? []).some((x) => !x.reconciled),
     };
   });
 
@@ -433,6 +438,10 @@ export function buildFinancialState(input: StateInput): FinancialState {
       leftToSpend: input.budget?.totalLimit !== null && input.budget?.totalLimit !== undefined ? input.budget.totalLimit - totalSpend : null,
       daysLeft: daysBetween(today, end) + 1,
       coverage: dataThrough && dataThrough >= end ? "complete" : "partial",
+      allReconciled: (() => {
+        const unreconciled = new Set(input.statements.filter((x) => !x.reconciled).map((x) => x.id));
+        return !input.transactions.some((t) => t.txnDate.startsWith(key) && unreconciled.has(t.statementId));
+      })(),
     },
     missedRewardsLastCycle: { total: Math.round(items.reduce((s, i) => s + i.extra, 0)), items },
     goals,

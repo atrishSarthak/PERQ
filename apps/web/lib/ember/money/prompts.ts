@@ -14,7 +14,8 @@ Money Manager rules you must follow:
 
 export const MONEY_TOOLS_GUIDE = `
 Money tools: getFinancialState (cards, dues, utilisation, this month's spend by category, missed rewards, goals), getTransactions (filter by card, category, dates), listStatements/getStatement, bestCardFor, utilizationImpact, amountToReachUtilisation, feeWaiverStatus, getCardRules, explainNudge, proposeBudget, proposeGoal.
-For "where did my money go?" call getFinancialState (thisMonth or missedRewards) and, if useful, getTransactions for the biggest category. For "why is my utilisation high?" use getFinancialState, then amountToReachUtilisation with targetPct 30.`;
+For "where did my money go?" call getFinancialState (thisMonth or missedRewards) and, if useful, getTransactions for the biggest category. For "why is my utilisation high?" use getFinancialState, then amountToReachUtilisation with targetPct 30.
+For a budget proposal, base each limit on a full month: when thisMonth.coverage is "partial", use getTransactions for the last complete statement cycle (about 30 days up to dataThrough) and its debitTotal per category, not this month's partial spend. Use round numbers that come from tool results, and make one proposal.`;
 
 export function nudgeThreadPrompt(n: MoneyNudge): string {
   return `

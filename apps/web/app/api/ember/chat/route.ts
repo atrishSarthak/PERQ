@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { and, asc, count, eq, isNull } from "drizzle-orm";
 import { chatMessages, db, nudges } from "@perq/db";
-import { chatRequestSchema, threadRefSchema } from "@perq/shared";
 import { isAuthed, requireAuth } from "@/lib/auth";
 import { logAgentRun } from "@/lib/ember/agentRunLog";
 import { moneyContext } from "@/lib/ember/money/context";
 import { NUDGE_CHIPS, nudgeOpening } from "@/lib/ember/money/nudgeThread";
 import { chatTurn } from "@/lib/ember/money/run";
+import type { MoneyProposal } from "@/lib/ember/money/tools";
+import { formatInr } from "@perq/finance-engine";
+import { chatRequestSchema, threadRefSchema, TXN_CATEGORY_LABELS, type TxnCategory } from "@perq/shared";
 import { geminiCaller } from "@/lib/ember/recommender/run";
 import { nowFor } from "@/lib/money/clock";
 import { recommenderContext } from "@/lib/recommender/context";
@@ -101,6 +103,7 @@ export async function POST(req: Request) {
     .map((m) => ({ role: m.role === "assistant" ? ("assistant" as const) : ("user" as const), content: m.content }));
 
   return sseResponse(async (emit) => {
+    let proposal: MoneyProposal | null = null;
     const answer = await chatTurn({
       userId: auth.id,
       message: body.data.message,
@@ -111,13 +114,17 @@ export async function POST(req: Request) {
       card,
       callModel: geminiCaller(),
       onLabel: (label) => emit({ type: "step", label }),
-      onProposal: (proposal) => emit({ type: "proposal", proposal }),
+      onProposal: (p) => {
+        proposal = p;
+        emit({ type: "proposal", proposal: p });
+      },
       logRun: logAgentRun,
     });
     const thread = threadRef ? REF_THREAD : MAIN_THREAD;
     await db.insert(chatMessages).values([
       { userId: auth.id, thread, threadRef, role: "user", content: body.data.message },
-      { userId: auth.id, thread, threadRef, role: "assistant", content: answer.text },
+      // The proposal is stored with the reply so later turns (and history) know exactly what was offered.
+      { userId: auth.id, thread, threadRef, role: "assistant", content: proposal ? `${answer.text}\n\n${proposalLine(proposal)}` : answer.text },
     ]);
     // Replying in a nudge thread counts as acting on it (§7.4).
     if (nudgeRow && nudgeRow.status !== "acted") {
@@ -133,4 +140,10 @@ export async function POST(req: Request) {
     }
     emit({ type: "done" });
   });
+}
+
+function proposalLine(p: MoneyProposal): string {
+  if (p.kind === "goal") return `(Proposed goal: ${p.name}, ${formatInr(p.target)}${p.date ? ` by ${p.date}` : ""}. Not saved until confirmed.)`;
+  const cats = Object.entries(p.categories).map(([c, v]) => `${TXN_CATEGORY_LABELS[c as TxnCategory] ?? c} ${formatInr(v)}`);
+  return `(Proposed budget: ${p.total ? `total ${formatInr(p.total)}; ` : ""}${cats.join(", ")}. Not saved until confirmed.)`;
 }

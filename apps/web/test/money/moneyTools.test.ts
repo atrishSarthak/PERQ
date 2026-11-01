@@ -51,6 +51,18 @@ describe("money tools (§8)", () => {
     expect(await run("proposeBudget", { categories: [{ category: "food_delivery", amount: 5000 }] }, seen)).toMatchObject({ proposed: true, needsYourConfirmation: true });
     expect(seen).toHaveBeenCalledWith({ kind: "budget", total: null, categories: { food_delivery: 5000 } });
   });
+
+  it("allows one proposal per turn", async () => {
+    const seen = vi.fn();
+    const tools = createMoneyTools(ctx, seen);
+    const budget = tools.find((t) => t.name === "proposeBudget")!;
+    const goal = tools.find((t) => t.name === "proposeGoal")!;
+    const c = { userId: "u", task: "t", runId: "r" };
+    await budget.handler({ categories: [{ category: "food_delivery", amount: 5000 }] } as never, c);
+    expect(await budget.handler({ categories: [{ category: "food_delivery", amount: 9000 }] } as never, c)).toMatchObject({ error: expect.stringMatching(/already made a proposal/) });
+    expect(await goal.handler({ name: "x", target: 100 } as never, c)).toMatchObject({ error: expect.any(String) });
+    expect(seen).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("money chat", () => {

@@ -7,7 +7,8 @@
   "types": "./src/index.ts",
   "scripts": {
     "test": "vitest run",
-    "fake": "tsx scripts/fake-statements.ts"
+    "fake": "tsx scripts/fake-statements.ts",
+    "eval": "tsx scripts/eval-statements.ts"
   },
   "dependencies": {
     "@perq/finance-engine": "workspace:*",
@@ -20,6 +21,8 @@
     "@types/pdfkit": "^0.17.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "@perq/ai": "workspace:*",
+    "dotenv": "^16.4.5"
   }
 }

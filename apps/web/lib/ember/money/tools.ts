@@ -67,6 +67,11 @@ const categoryEnum = z.enum(TXN_CATEGORIES);
 const label = (c: string) => TXN_CATEGORY_LABELS[c as keyof typeof TXN_CATEGORY_LABELS] ?? c;
 
 export function createMoneyTools(ctx: MoneyToolContext, onProposal?: (p: MoneyProposal) => void) {
+  // One proposal per turn: the app shows one Confirm card, and a model that
+  // re-proposes with different numbers would contradict itself.
+  let proposed: MoneyProposal | null = null;
+  const alreadyProposed = () =>
+    proposed ? { error: "You already made a proposal this turn. Describe that one to the user instead.", yourProposal: proposed } : null;
   const card = (id: string) => ctx.state.cards.find((c) => c.cardAccountId === id);
   const cardName = (id: string) => card(id)?.label ?? "card";
 
@@ -259,8 +264,11 @@ export function createMoneyTools(ctx: MoneyToolContext, onProposal?: (p: MoneyPr
     permission: PERMISSION.PREPARE,
     narration: "Ember drafted a budget for you to confirm",
     handler: async ({ total, categories: list }) => {
+      const again = alreadyProposed();
+      if (again) return again;
       const categories = Object.fromEntries(list.map((c) => [c.category, c.amount]));
       const p: MoneyProposal = { kind: "budget", total: total ?? null, categories };
+      proposed = p;
       onProposal?.(p);
       return { proposed: true, needsYourConfirmation: true, total: p.total, categories };
     },
@@ -273,7 +281,10 @@ export function createMoneyTools(ctx: MoneyToolContext, onProposal?: (p: MoneyPr
     permission: PERMISSION.PREPARE,
     narration: "Ember drafted a goal for you to confirm",
     handler: async ({ name, target, date }) => {
+      const again = alreadyProposed();
+      if (again) return again;
       const p: MoneyProposal = { kind: "goal", name, target, date: date ?? null };
+      proposed = p;
       onProposal?.(p);
       return { proposed: true, needsYourConfirmation: true, name, target, date: p.date };
     },

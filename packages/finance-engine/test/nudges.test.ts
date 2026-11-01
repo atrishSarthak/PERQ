@@ -290,3 +290,23 @@ describe("simulateUpcoming with stored queued nudges", () => {
     expect(Math.max(...perDay.values())).toBeLessThanOrEqual(2);
   });
 });
+
+describe("statements that don't reconcile never drive rupee nudges (§5.4, §16)", () => {
+  const unreconciled = input((i) => i.statements.forEach((s) => (s.reconciled = false)));
+  const out = run(unreconciled);
+
+  it("due reminders still go out, without any ₹ figure", () => {
+    const due = out.filter((c) => c.ruleId === "due_soon" || c.ruleId === "due_today");
+    expect(due.length).toBeGreaterThan(0);
+    for (const c of due) {
+      expect(`${c.templateTitle} ${c.templateBody} ${c.why}`).not.toMatch(/₹/);
+      expect(c.payload.totalDue).toBeNull();
+    }
+  });
+
+  it("no other rule fires with a rupee figure", () => {
+    for (const c of out.filter((x) => x.ruleId !== "due_soon" && x.ruleId !== "due_today" && x.ruleId !== "goal_progress")) {
+      expect([c.ruleId, /₹/.test(`${c.templateTitle} ${c.templateBody}`)]).toEqual([c.ruleId, false]);
+    }
+  });
+});

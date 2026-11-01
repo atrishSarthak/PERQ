@@ -413,3 +413,22 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     nudge's own figures go into the prompt and count as grounded. Ember answers from them and calls
     tools only for anything else. Before this, "How much should I pay to get under 30%?" looped on
     `amountToReachUtilisation` until it hit the 6-round cap and fell back.
+108. **Unreconciled statements never drive rupee nudges (§16).** This tightens #64 (dues are printed values).
+    Due reminders from an unreconciled statement still go out, but without an amount ("Check the amount on the
+    statement itself"). Points value, fee-waiver pace, budget pace, fees, interest, missed rewards and
+    statement-balance utilisation all need reconciled data. Two state flags support this:
+    `CardState.hasUnreconciled` and `month.allReconciled`. Tested.
+109. **Privacy test** (`apps/web/test/money/statementPrivacy.test.ts`) covers four things. (1) A static scan
+    of the ingestion path for any file, temp-dir or storage write. (2) No log line there mentions the
+    password or file. (3) The review JWT holds only the extracted draft. (4) A real parse, with the right
+    and a wrong password and console captured, never prints the password. Alongside it are the earlier
+    live check (no leak in server logs or /tmp) and the code notes in #67–#71.
+110. **`pnpm eval:statements`** forces the Gemini path on every fixture, so both parsers are measured
+    (docs/EVALS.md). Real-statement accuracy is still unmeasured. Testing on your own statements is your
+    call (fixtures/private/, gitignored).
+111. **One proposal per chat turn.** In a live test Ember called `proposeBudget` four times with different
+    totals in one turn. Later calls in the same turn now return an error that includes the first proposal.
+    The proposal is also saved with the assistant message ("(Proposed budget: … Not saved until
+    confirmed.)") so the next turn and the history know what was offered. Without that, a follow-up
+    quoted the old ₹40,000 budget. Budget proposals are told to use a full statement cycle, not a partial
+    month. A first live proposal of ₹6,080 had been just 4 days of November.

@@ -1,7 +1,7 @@
 import type { NudgeRule } from "./types";
 import { daysBetween, endOfIstDay, inr, plusDays, shortDate } from "./util";
 
-/** Points worth ≥ ₹500, or points expiring (printed). Printed values, so unreconciled is fine. */
+/** Points worth ≥ ₹500, or points expiring. Only from a reconciled statement, since it quotes a ₹ value (§5.4). */
 export const pointsValue: NudgeRule = {
   id: "points_value",
   description: "You have reward points worth spending, or some are about to expire.",
@@ -9,7 +9,7 @@ export const pointsValue: NudgeRule = {
     return state.cards.flatMap((c) => {
       const p = c.points;
       const s = c.latestStatement;
-      if (!p || !s) return [];
+      if (!p || !s || !s.reconciled) return [];
       const valuable = p.valueRupees !== null && p.valueRupees >= config.pointsValueMin;
       const expiring = !!p.expiring && p.expiring > 0;
       if (!valuable && !expiring) return [];
