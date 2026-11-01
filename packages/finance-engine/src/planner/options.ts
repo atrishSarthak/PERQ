@@ -1,4 +1,4 @@
-import type { OptionFlag, OptionResult, PlanInput } from "@perq/shared";
+import type { OptionFlag, OptionResult, PlanChoice, PlanInput } from "@perq/shared";
 import { amountToReachUtilisation } from "../state";
 import { PLANNER_CONFIG } from "./config";
 import { addDays, bestPurchaseDate, floatDays, statementOn } from "./dates";
@@ -76,7 +76,7 @@ function cardBase(c: PlanCard): { flags: OptionFlag[] } {
   return { flags };
 }
 
-function fullOption(input: PlanInput, c: PlanCard, date: string, idSuffix: "today" | "best"): Draft {
+function fullOption(input: PlanInput, c: PlanCard, date: string, idSuffix: "today" | "best" | "picked"): Draft {
   const offers = applyOffers(input.offers, offerCard(c), input.price);
   const effectivePrice = input.price - offers.discount;
   const reward = c.terms ? rewardFor(c.terms, input.item.category, effectivePrice, { monthSpendByCategory: c.monthSpendByCategory }).reward : 0;
@@ -222,4 +222,42 @@ export function rankPaymentOptions(input: PlanInput, cards: PlanCard[], today: s
     sorted.unshift(...sorted.splice(healthy, 1));
   }
   return sorted.map(({ d }, idx) => ({ ...d, savingVsUpi: upi.netCost - d.netCost, rank: idx + 1 }));
+}
+
+/** The card an option is on, if any. */
+export function cardOfOption(o: Pick<OptionResult, "id" | "kind">, cards: PlanCard[]): PlanCard | undefined {
+  if (o.kind === "upi") return undefined;
+  return cards.find((c) => o.id.startsWith(`card:${cardKey(c)}:`) || o.id.startsWith(`emi:${cardKey(c)}:`));
+}
+
+/**
+ * The option for a way to pay the user picked in a what-if (§9): a card
+ * ("upi" for UPI), a day to buy, or an EMI tenure. Uses a ranked option when
+ * one matches; a card on a day that wasn't ranked is built the same way and
+ * ranked after the others. Null when the pick doesn't exist (an unknown card,
+ * or no EMI of that tenure on it). Days before today count as today.
+ */
+export function chooseOption(input: PlanInput, cards: PlanCard[], today: string, ranked: OptionResult[], choice: PlanChoice): OptionResult | null {
+  if (choice.cardAccountId === "upi") return ranked.find((o) => o.kind === "upi") ?? null;
+  let card = choice.cardAccountId ? cards.find((c) => c.cardAccountId === choice.cardAccountId) : undefined;
+  if (choice.cardAccountId && !card) return null;
+  if (choice.emiTenure) {
+    return ranked.find((o) => o.kind === "card_emi" && o.emi?.tenureMonths === choice.emiTenure && (!card || cardOfOption(o, cards) === card)) ?? null;
+  }
+  if (!card) {
+    const top = ranked.find((o) => o.kind === "card_full");
+    card = top && cardOfOption(top, cards);
+    if (!card) return null;
+  }
+  if (!choice.purchaseDate) {
+    // A card with no day picked: its best ranked way in full (which may be its best day).
+    const first = ranked.find((o) => o.kind === "card_full" && cardOfOption(o, cards) === card);
+    if (first) return first;
+  }
+  const date = choice.purchaseDate && choice.purchaseDate > today ? choice.purchaseDate : today;
+  const hit = ranked.find((o) => o.kind === "card_full" && o.purchaseDate === date && cardOfOption(o, cards) === card);
+  if (hit) return hit;
+  const upi = ranked.find((o) => o.kind === "upi")!;
+  const d = fullOption(input, card, date, "picked");
+  return { ...d, savingVsUpi: upi.netCost - d.netCost, rank: ranked.length + 1 };
 }

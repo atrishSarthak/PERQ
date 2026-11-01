@@ -564,3 +564,28 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 137. **Fixtures are fictional.** `fixtures/plans/` holds five made-up product pages (fictional shops,
      brands and people) rendered to PNG by `make.py`, with `expected.json` for the extraction eval.
      No real shop screenshots are committed.
+138. **What-if picks are judged, not just priced.** `planPurchase(input, ctx, choice?)` takes a pick
+     (a card or `"upi"`, a day, an EMI tenure). The engine still ranks every option, then judges the
+     pick with the same Locked rules: it's a rethink if it costs ₹500+ more than the top option
+     (`costly_payment`), or if it takes a card over 70% while the top option doesn't (a new reason,
+     `chosen_high_util`). Otherwise the pick becomes the recommendation. The result carries
+     `chosen: { option, extraCost }`, so the screen and Ember can say what the pick costs. A card
+     with no day picked uses its best-ranked day; a day not in the ranking is built for that card;
+     past days count as today. A pick that doesn't exist is a 400, never a guess.
+139. **EMI what-ifs only use EMIs the user confirmed.** The tenure chips come from the plan's own EMI
+     options. Ember doesn't make up a rate or a no-cost offer at another tenure.
+140. **What-ifs are instant and unsaved; keeping one re-words it.** An unsaved what-if is worded by
+     the template, which means no Gemini call and an answer in under a second. "Keep this version"
+     re-runs the same changes with `save: true`. That updates the plan (price, need-by, result,
+     verdict), stores the pick in `inputs_snapshot.choice`, and has Ember word it through the
+     validated explanation path.
+141. **Result sections.** Each section is collapsed to a one-line summary. The one that explains the
+     verdict opens by default: Budget for wait, Best way to pay for a rethink, Timing for
+     go-with-timing, Credit limit above 70%, EMI for a costly EMI. Every ₹ in them can be tapped.
+     It opens the screen that holds the source (budget, card account), or shows the sum behind it
+     inline (`price − offers − rewards + EMI costs`, the EMI lines). The calendar strip is the 21
+     days from today. It marks today, the statement close, the best day and the due date, and dates
+     outside the strip appear in the legend.
+142. **No "wait a month" what-if on the result screen.** The engine only knows this month's budget, so
+     a purchase moved a month out would be judged against the wrong month. Waiting is handled by the
+     reminder (re-planned on fresh numbers when it fires) and the savings goal, in checkpoint 9.

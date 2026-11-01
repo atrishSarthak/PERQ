@@ -164,6 +164,7 @@ export const VERDICT_LABELS: Record<Verdict, string> = {
 export const VERDICT_REASONS = [
   "costly_payment", // rethink_payment: chosen/default pay has extra cost ≥ ₹500 and a cheaper option exists
   "all_cards_high_util", // rethink_payment: every card option > 70%
+  "chosen_high_util", // rethink_payment (what-if): the card the user picked goes > 70% and a healthier option exists
   "over_budget", // wait: price > left this month by 25%+, no need-by within 14 days
   "goal_slip", // wait: a goal slips by more than a month
   "timing_gain", // go_with_timing: ≥ 10 extra interest-free days
@@ -235,6 +236,8 @@ export const planResultSchema = z.object({
     })
     .optional(),
   emi: emiTrueCostSchema.optional(),
+  /** What-if only: the way to pay the user picked, and what it costs over the recommendation. */
+  chosen: z.object({ option: optionResultSchema, extraCost: z.number().int() }).optional(),
   /** Named out loud (§2): what the plan couldn't check, each with a code the app links to a fix. */
   missingData: z.array(z.object({ code: missingDataCodeSchema, text: z.string() })),
   assumptions: z.array(z.string()),
@@ -266,16 +269,24 @@ export type PlanExtractResponse = z.infer<typeof planExtractResponseSchema>;
 export const planRunRequestSchema = z.object({ input: planInputSchema, source: planSourceSchema });
 export type PlanRunRequest = z.infer<typeof planRunRequestSchema>;
 
+/** A way to pay the user picks in a what-if: a card (or "upi"), a day to buy, or an EMI tenure. */
+export const planChoiceSchema = z.object({
+  cardAccountId: z.string().optional(),
+  purchaseDate: isoDate.optional(),
+  emiTenure: z.number().int().min(1).max(60).optional(),
+});
+export type PlanChoice = z.infer<typeof planChoiceSchema>;
+
 export const planWhatIfRequestSchema = z.object({
   changes: z
     .object({
       price: z.number().int().min(1).max(10_000_000).optional(),
-      cardAccountId: z.string().optional(),
-      purchaseDate: isoDate.optional(),
-      emiTenure: z.number().int().min(1).max(60).optional(),
       needBy: isoDate.nullable().optional(),
     })
+    .merge(planChoiceSchema)
     .refine((c) => Object.keys(c).length > 0, "Change at least one thing"),
+  /** Save this version over the plan (§9: what-ifs aren't saved unless confirmed). */
+  save: z.boolean().optional(),
 });
 export type PlanWhatIfRequest = z.infer<typeof planWhatIfRequestSchema>;
 

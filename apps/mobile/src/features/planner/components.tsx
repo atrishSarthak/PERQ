@@ -1,3 +1,4 @@
+import { useState, type ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { formatDay, formatInr } from "@perq/finance-engine";
@@ -94,6 +95,84 @@ export function MissingData({ result }: { result: PlanResult }) {
         );
       })}
       <View style={{ height: t.spacing[1] }} />
+    </Card>
+  );
+}
+
+/**
+ * A ₹ figure you can tap to see where it comes from (§10): a screen that
+ * holds the source (budget, card account), or the sum behind it inline.
+ */
+export function Figure({
+  value,
+  how,
+  href,
+  variant = "bodyStrong",
+  tone,
+}: {
+  value: number;
+  how?: string;
+  href?: string;
+  variant?: "display" | "heading" | "bodyStrong" | "body" | "small";
+  tone?: "ember" | "muted" | "danger" | "success" | "default";
+}) {
+  const [open, setOpen] = useState(false);
+  const text = (
+    <Text variant={variant} tone={tone ?? (href || how ? "link" : "default")}>
+      {formatInr(value)}
+    </Text>
+  );
+  if (!href && !how) return text;
+  return (
+    <Pressable
+      onPress={() => (href ? router.push(href as never) : setOpen((o) => !o))}
+      accessibilityRole={href ? "link" : "button"}
+      accessibilityHint="Shows where this number comes from"
+      hitSlop={6}
+    >
+      {text}
+      {open && how ? (
+        <Text variant="caption" tone="muted">
+          {how}
+        </Text>
+      ) : null}
+    </Pressable>
+  );
+}
+
+/** The sum behind an option's net cost. */
+export function netCostHow(o: OptionResult): string {
+  let s = `${formatInr(o.stickerPrice)} price`;
+  if (o.offerDiscount) s += ` − ${formatInr(o.offerDiscount)} offers`;
+  if (o.rewards) s += ` − ${formatInr(o.rewards)} rewards`;
+  if (o.extraCosts) s += ` + ${formatInr(o.extraCosts)} EMI costs`;
+  return `${s} = ${formatInr(o.netCost)}`;
+}
+
+/** A result section that opens and closes (§10.5). */
+export function Section({ title, summary, defaultOpen = false, children }: { title: string; summary?: string; defaultOpen?: boolean; children: ReactNode }) {
+  const t = useTheme();
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Card>
+      <Pressable
+        onPress={() => setOpen((o) => !o)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: open }}
+        accessibilityLabel={summary ? `${title}, ${summary}` : title}
+        style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3] }}
+      >
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text variant="heading">{title}</Text>
+          {summary && !open ? (
+            <Text variant="small" tone="muted" numberOfLines={1}>
+              {summary}
+            </Text>
+          ) : null}
+        </View>
+        <Text tone="muted">{open ? "▴" : "▾"}</Text>
+      </Pressable>
+      {open ? <View style={{ gap: t.spacing[3] }}>{children}</View> : null}
     </Card>
   );
 }

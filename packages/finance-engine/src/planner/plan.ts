@@ -1,10 +1,10 @@
-import type { Affordability, OptionResult, PlanInput, PlanResult, Verdict, VerdictReason } from "@perq/shared";
+import type { Affordability, OptionResult, PlanChoice, PlanInput, PlanResult, Verdict, VerdictReason } from "@perq/shared";
 import { formatDay, formatInr } from "../format";
 import type { CardState, FinancialState } from "../state";
 import { daysBetween } from "../state";
 import { PLANNER_CONFIG } from "./config";
 import { bestPurchaseDate, floatDays } from "./dates";
-import { buyingWindow, rankPaymentOptions, utilizationImpact } from "./options";
+import { buyingWindow, chooseOption, rankPaymentOptions, utilizationImpact } from "./options";
 import type { PlanCard, PlanCardTerms, PlanContext } from "./types";
 
 // The whole plan (§5.7): options, affordability, timing, credit, EMI and the
@@ -117,35 +117,51 @@ export function affordability(input: PlanInput, rec: OptionResult, ctx: PlanCont
   };
 }
 
-/** The Locked verdict rules of §5.7, in order. */
+/**
+ * The Locked verdict rules of §5.7, in order. `picked` is a way to pay the
+ * user chose in a what-if: it's judged in place of the top option, and stays
+ * the recommendation unless a rethink rule fires.
+ */
 export function decideVerdict(
   input: PlanInput,
   options: OptionResult[],
   afford: Affordability,
-  today: string
+  today: string,
+  picked?: OptionResult
 ): { verdict: Verdict; reason: VerdictReason; recommended: OptionResult } {
   const top = options[0]!;
-  // 1. rethink_payment. The user's chosen way to pay is the EMI they confirmed (best of them);
-  //    without one, the default is the top option, which is never beaten.
+  // 1. rethink_payment. The user's chosen way to pay is the pick, else the EMI they confirmed
+  //    (best of them); without either, the default is the top option, which is never beaten.
   const emis = options.filter((o) => o.kind === "card_emi");
-  const chosen = input.emiOptions.length && emis.length ? emis[0]! : null;
-  if (chosen && (chosen.emi?.extraCostVsFullPayment ?? 0) >= C.rethinkExtraCost && options.some((o) => !o.blocked && o.netCost < chosen.netCost)) {
+  const chosenEmi = picked ? (picked.kind === "card_emi" ? picked : null) : input.emiOptions.length && emis.length ? emis[0]! : null;
+  if (chosenEmi && (chosenEmi.emi?.extraCostVsFullPayment ?? 0) >= C.rethinkExtraCost && options.some((o) => !o.blocked && o.netCost < chosenEmi.netCost)) {
     return { verdict: "rethink_payment", reason: "costly_payment", recommended: top };
   }
+  if (picked && picked !== top) {
+    if (picked.netCost - top.netCost >= C.rethinkExtraCost) return { verdict: "rethink_payment", reason: "costly_payment", recommended: top };
+    const pickedHigh = picked.blocked || (picked.utilisationAfterPct ?? 0) > C.utilisationWarnPct;
+    const topHigh = top.blocked || (top.utilisationAfterPct ?? 0) > C.utilisationWarnPct;
+    if (pickedHigh && !topHigh) return { verdict: "rethink_payment", reason: "chosen_high_util", recommended: top };
+  }
   const cardFull = options.filter((o) => o.kind === "card_full" && o.purchaseDate === today);
-  if (cardFull.length && cardFull.every((o) => o.utilisationAfterPct !== null && o.utilisationAfterPct > C.utilisationWarnPct)) {
+  if ((!picked || picked.kind !== "upi") && cardFull.length && cardFull.every((o) => o.utilisationAfterPct !== null && o.utilisationAfterPct > C.utilisationWarnPct)) {
     return { verdict: "rethink_payment", reason: "all_cards_high_util", recommended: options.find((o) => o.kind === "upi") ?? top };
   }
+  const base = picked ?? top;
   // 2. wait.
   const needSoon = !!input.needBy && daysBetween(today, input.needBy) <= C.waitNeedByDays;
   if (afford.leftThisMonth !== null && !needSoon) {
     const limit = Math.max(0, afford.leftThisMonth) * (1 + C.waitOverBudgetPct / 100);
-    if (top.effectivePrice > limit) return { verdict: "wait", reason: "over_budget", recommended: top };
+    if (base.effectivePrice > limit) return { verdict: "wait", reason: "over_budget", recommended: base };
   }
-  if (afford.goalImpacts.some((g) => g.monthsSlip > C.goalSlipMonths)) return { verdict: "wait", reason: "goal_slip", recommended: top };
-  // 3. go_with_timing: the top option is a card in full on a later best day (only built when it gains ≥ 10 days).
-  if (top.kind === "card_full" && top.purchaseDate !== today) return { verdict: "go_with_timing", reason: "timing_gain", recommended: top };
-  return { verdict: "go", reason: "default", recommended: top };
+  if (afford.goalImpacts.some((g) => g.monthsSlip > C.goalSlipMonths)) return { verdict: "wait", reason: "goal_slip", recommended: base };
+  // 3. go_with_timing: a card in full on a later day that gains ≥ 10 interest-free days over today.
+  if (base.kind === "card_full" && base.purchaseDate !== today) {
+    const sameCardToday = options.find((o) => o.kind === "card_full" && o.purchaseDate === today && o.cardAccountId === base.cardAccountId && o.catalogueCardId === base.catalogueCardId);
+    const gain = (base.interestFreeDays ?? 0) - (sameCardToday?.interestFreeDays ?? 0);
+    if (!picked || gain >= C.timingMinGainDays) return { verdict: "go_with_timing", reason: "timing_gain", recommended: base };
+  }
+  return { verdict: "go", reason: "default", recommended: base };
 }
 
 function headline(verdict: Verdict, rec: OptionResult): string {
@@ -161,12 +177,22 @@ function headline(verdict: Verdict, rec: OptionResult): string {
   }
 }
 
-/** Runs the whole planner. Every number in the result comes from here. */
-export function planPurchase(input: PlanInput, ctx: PlanContext): PlanResult {
-  const options = rankPaymentOptions(input, ctx.cards, ctx.today);
-  const prelim = affordability(input, options[0]!, ctx);
-  const { verdict, reason, recommended } = decideVerdict(input, options, prelim, ctx.today);
-  const afford = recommended === options[0] ? prelim : affordability(input, recommended, ctx);
+/** A what-if pick that doesn't exist: an unknown card, or no EMI of that tenure. */
+export class PlanChoiceError extends Error {}
+
+/**
+ * Runs the whole planner. Every number in the result comes from here.
+ * `choice` is a what-if pick (§9); without one, the engine picks.
+ */
+export function planPurchase(input: PlanInput, ctx: PlanContext, choice?: PlanChoice): PlanResult {
+  let options = rankPaymentOptions(input, ctx.cards, ctx.today);
+  const hasPick = !!choice && (choice.cardAccountId !== undefined || choice.purchaseDate !== undefined || choice.emiTenure !== undefined);
+  const picked = hasPick ? chooseOption(input, ctx.cards, ctx.today, options, choice!) : undefined;
+  if (hasPick && !picked) throw new PlanChoiceError(choice!.emiTenure ? "There's no EMI of that length on that card." : "That card isn't one of yours.");
+  if (picked && !options.includes(picked)) options = [...options, picked];
+  const prelim = affordability(input, picked ?? options[0]!, ctx);
+  const { verdict, reason, recommended } = decideVerdict(input, options, prelim, ctx.today, picked ?? undefined);
+  const afford = recommended === (picked ?? options[0]) ? prelim : affordability(input, recommended, ctx);
   const { savingRate, savingRateFrom, ...affordOut } = afford;
 
   const card =
@@ -197,7 +223,7 @@ export function planPurchase(input: PlanInput, ctx: PlanContext): PlanResult {
     credit = { cardAccountId: card.cardAccountId, before: u.before, after: u.after, payToStayUnder30: u.after !== null && u.after > C.utilisationTargetPct ? u.payToStayUnder30 : null, nextStatementDate: u.nextStatementDate };
   }
 
-  const emi = options.find((o) => o.kind === "card_emi")?.emi;
+  const emi = (picked?.kind === "card_emi" ? picked.emi : undefined) ?? options.find((o) => o.kind === "card_emi")?.emi;
 
   // Missing data, said out loud (§2).
   const missing: PlanResult["missingData"] = [];
@@ -234,6 +260,7 @@ export function planPurchase(input: PlanInput, ctx: PlanContext): PlanResult {
     timing,
     credit,
     emi,
+    ...(picked ? { chosen: { option: picked, extraCost: picked.netCost - recommended.netCost } } : {}),
     missingData: missing,
     assumptions,
     asOf: ctx.today,

@@ -65,3 +65,17 @@ export const takeDraftToConfirm = () => {
   draft = null;
   return d;
 };
+
+/** What-ifs (§9): unsaved unless `save` is set, which updates the plan in place. */
+export function useWhatIf(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: PlanWhatIfRequest) => plannerApi.whatIf(id, body),
+    // A kept version: wait for the saved plan so the screen never flashes the old one.
+    onSuccess: async (_data, body) => {
+      if (!body.save) return;
+      qc.invalidateQueries({ queryKey: ["plans"] });
+      await qc.refetchQueries({ queryKey: ["plan", id] });
+    },
+  });
+}

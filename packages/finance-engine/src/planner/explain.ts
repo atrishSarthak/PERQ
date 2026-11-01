@@ -36,7 +36,7 @@ export function planTemplateExplanation(r: PlanResult): string {
       break;
     }
     case "go":
-      s.push(o.kind === "upi" ? "Go ahead." : `Go ahead with your ${o.label}.`);
+      s.push(o.kind === "upi" ? "Go ahead." : `Go ahead with your ${o.label}${o.purchaseDate !== r.asOf ? ` on ${formatDay(o.purchaseDate)}` : ""}.`);
       s.push(o.kind === "upi" ? costSentence(r) : `After offers and rewards it costs ${formatInr(o.netCost)}${o.savingVsUpi > 0 ? `, ${formatInr(o.savingVsUpi)} less than paying by UPI` : ""}.`);
       break;
     case "wait": {
@@ -50,7 +50,14 @@ export function planTemplateExplanation(r: PlanResult): string {
     }
     case "rethink_payment": {
       s.push("Pay a different way.");
-      if (r.verdictReason === "costly_payment" && r.emi) {
+      const picked = r.chosen?.option;
+      if (r.verdictReason === "chosen_high_util" && picked) {
+        s.push(`Your ${picked.label} would go to ${pct(picked.utilisationAfterPct ?? 0)} of its limit, which can weigh on your credit score.`);
+        s.push(costSentence(r));
+      } else if (r.verdictReason === "costly_payment" && picked && picked.kind !== "card_emi" && r.chosen!.extraCost > 0) {
+        s.push(`${picked.kind === "upi" ? "Paying by UPI or debit" : `Your ${picked.label}`} would cost ${formatInr(r.chosen!.extraCost)} more.`);
+        s.push(costSentence(r));
+      } else if (r.verdictReason === "costly_payment" && r.emi) {
         s.push(`The EMI costs ${formatInr(r.emi.extraCostVsFullPayment)} more than paying in full, in GST, fees and lost rewards.`);
         s.push(costSentence(r));
       } else {
