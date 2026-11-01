@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { formatInr } from "@perq/finance-engine";
 import type { PartialPlanInput, PlanInput } from "@perq/shared";
 import { Button } from "@/components/Button";
+import { SurfaceFill } from "@/components/Card";
 import { Text } from "@/components/Text";
 import { setDraftToConfirm, usePlan } from "@/lib/plannerApi";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -74,7 +75,8 @@ export function PlanResultCard({ planId, onReady }: { planId: string; onReady?: 
   if (!r) return null;
   return (
     <Pressable onPress={() => router.push(`/plan/${planId}`)} accessibilityRole="button" accessibilityHint="Opens the full plan">
-      <View style={{ padding: t.spacing[3], borderRadius: t.radii.md, borderWidth: 1, borderColor: t.colors.border, backgroundColor: t.colors.surface, gap: t.spacing[2] }}>
+      <View style={{ padding: t.spacing[3], borderRadius: t.radii.md, borderWidth: 1, borderColor: t.colors.border, overflow: "hidden", gap: t.spacing[2] }}>
+        <SurfaceFill />
         <Text variant="caption" tone="muted">
           {plan.data!.plan.itemName.toUpperCase()}
         </Text>

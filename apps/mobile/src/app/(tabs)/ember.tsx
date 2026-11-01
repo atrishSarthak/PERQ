@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { EmberAvatar } from "@/components/EmberAvatar";
 import { Text } from "@/components/Text";
 import { ChatThread } from "@/features/chat/ChatThread";
@@ -22,22 +22,26 @@ export default function EmberTab() {
 
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: t.colors.bg }}>
-      <ChatThread
-        chips={chips}
-        onConfirmProposal={confirmProposal}
-        emptyText="Ask me why a card ranked where it did, where your money went, or which card to use. I only use the numbers PERQ computed for you."
-        header={
-          <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3], paddingHorizontal: t.spacing[5], paddingVertical: t.spacing[3] }}>
-            <EmberAvatar size={36} />
-            <View>
-              <Text variant="heading">Ember</Text>
-              <Text variant="caption" tone="muted">
-                Answers from your statements, your answers and verified card terms
-              </Text>
+      {/* Its own provider, so the bottom inset includes the glass tab bar. */}
+      <SafeAreaProvider>
+        <ChatThread
+          overTabBar
+          chips={chips}
+          onConfirmProposal={confirmProposal}
+          emptyText="Ask me why a card ranked where it did, where your money went, or which card to use. I only use the numbers PERQ computed for you."
+          header={
+            <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3], paddingHorizontal: t.spacing[5], paddingVertical: t.spacing[3] }}>
+              <EmberAvatar size={36} />
+              <View>
+                <Text variant="heading">Ember</Text>
+                <Text variant="caption" tone="muted">
+                  Answers from your statements, your answers and verified card terms
+                </Text>
+              </View>
             </View>
-          </View>
-        }
-      />
+          }
+        />
+      </SafeAreaProvider>
     </SafeAreaView>
   );
 }

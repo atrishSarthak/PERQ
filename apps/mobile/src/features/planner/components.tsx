@@ -19,7 +19,7 @@ export const VERDICT_TONE: Record<Verdict, "success" | "ember" | "danger" | "def
 
 export function VerdictChip({ result }: { result: PlanResult }) {
   const t = useTheme();
-  const color = { success: t.colors.success, ember: t.colors.ember, danger: t.colors.danger, default: t.colors.text }[VERDICT_TONE[result.verdict]];
+  const color = { success: t.colors.success, ember: t.colors.emberText, danger: t.colors.danger, default: t.colors.text }[VERDICT_TONE[result.verdict]];
   return (
     <View style={{ alignSelf: "flex-start", borderRadius: 999, borderWidth: 1, borderColor: color, paddingHorizontal: t.spacing[3], paddingVertical: 4 }} accessibilityRole="text" accessibilityLabel={`Verdict: ${result.headline}`}>
       <Text variant="bodyStrong" style={{ color }}>

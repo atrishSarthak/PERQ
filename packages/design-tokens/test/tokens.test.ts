@@ -22,10 +22,11 @@ describe("design tokens", () => {
         expect(contrastRatio(t.textMuted, bg)).toBeGreaterThanOrEqual(AA);
       }
     });
-    it(`${name}: links and ember accent pass AA on background`, () => {
+    it(`${name}: links and red text are readable on background and surface`, () => {
       expect(contrastRatio(t.link, t.bg)).toBeGreaterThanOrEqual(AA);
-      expect(contrastRatio(t.ember, t.bg)).toBeGreaterThanOrEqual(AA);
-      expect(contrastRatio(t.ember, t.surface)).toBeGreaterThanOrEqual(AA);
+      // Red text on charcoal is the founder's call (DECISIONS #175): AA large, not AA.
+      expect(contrastRatio(t.emberText, t.bg)).toBeGreaterThanOrEqual(AA);
+      expect(contrastRatio(t.emberText, t.surface)).toBeGreaterThanOrEqual(AA_LARGE);
     });
     it(`${name}: text on primary and ember fills passes AA`, () => {
       expect(contrastRatio(t.onPrimary, t.primary)).toBeGreaterThanOrEqual(AA);

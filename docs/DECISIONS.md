@@ -723,3 +723,30 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      preview. Two things were not verified by me: the walkthrough on a physical iPhone in Expo Go (the founder runs
      it, using RUNNING.md → Purchase Planner), and screenshot accuracy on real shop pages (only synthetic ones;
      the confirmation form guards the price). Share-sheet entry is in TODOS.md.
+172. **Black, charcoal and ember red replace navy and chartreuse (2 Nov 2026).** The dark theme is now
+     a black background, charcoal surfaces (`#1C1C1E` / `#262629`), deep-red primary fills (`#C42B23`,
+     white text) and a coral accent for Ember (`#FF5A4E`). Deep red is too dark to pass AA as text on
+     black, so accent text and icons use the coral. Headers and the tab bar sit on black. Light theme
+     follows with grey neutrals and deep-red accents. The old navy/ice/chartreuse palette keys stay for
+     the web dashboard's raw use. Ember's avatar is now the coral-flame artwork
+     (`apps/mobile/assets/images/ember-avatar.png`, 384px), not the drawn chartreuse flame.
+173. **Founder's colours: red `#971211`, charcoal `#252525`, cards as a gradient.** Primary fills are
+     `#971211` (white text, AA). Cards fade from `#252525` at the top to `#121212` at the bottom
+     (`surfaceDeep`, a new token) toward the black page, via `expo-linear-gradient`, which Expo Go
+     includes. `Card` draws it, and `SurfaceFill` does the same for the inbox rows and the in-chat plan
+     card. `#971211` is too dark to read as text on black (2.4:1), so accent text and icons use a coral,
+     `#F45D52`, which passes AA on both black and `#252525`.
+174. **The tab bar is the system's native tab bar** (`expo-router/native-tabs`): Liquid Glass on
+     iOS 26, with the system bar on older iOS. The selected tab's icon and label use the red accent (the coral
+     `ember` token, since `#971211` is too dark on the glass). The glass floats over the screen, and
+     every tab scrolls behind it, so the glass has something to blur: `Screen` and the Cards lists use
+     automatic content insets. On the Ember tab, `ChatThread overTabBar` floats the message box above
+     the bar and pads the list to match. It reads the bar's height from a `SafeAreaProvider` inside the
+     tab, since native tabs export no tab-bar-height hook. SF Symbols switch to their filled
+     versions when selected.
+175. **Every red shape is `#971211`, and red text is a brighter red of the same hue.** This is the
+     founder's call, replacing the coral in #173/#174. `ember` is now for shapes (fills, borders, the
+     selected tab icon) and is `#971211` with white text on it. The new `emberText` token (`#E8221F` on
+     dark; `#971211` on light) is for red text: Ember labels, ₹ highlights, links, the selected tab's
+     label and the verdict chip. `#E8221F` passes AA on black (4.7:1) but only AA-large on `#252525`
+     (3.4:1), and the token test now checks that. On the web, `text-ember` became `text-ember-text`.

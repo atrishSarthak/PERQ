@@ -30,18 +30,39 @@ export const palette = {
   warning: "#E59A3B", // kept from the old system's semantic set (DECISIONS.md)
   white: "#FFFFFF",
   black: "#000000",
+
+  // Black + charcoal + ember red (Nov 2026 restyle, DECISIONS #172). The app
+  // themes use these; the navy/ice/chartreuse set above stays for raw web use.
+  charcoal: "#252525", // cards / surfaces on black (gradient top)
+  charcoalDeep: "#121212", // card gradient bottom, fading toward the black page
+  charcoal750: "#2D2D2D", // nested surface
+  charcoal700: "#363636", // borders, dividers
+  grey300: "#A1A1A6", // muted text on dark
+  smoke: "#F5F5F7", // body text on dark
+  red: "#971211", // primary fill (buttons, tab highlight), white text on it
+  redPressed: "#7A0E0D",
+  brightRed: "#E8221F", // red text on dark: same hue as `red`, bright enough to read (DECISIONS #175)
+  lightGrey: "#F2F2F4", // light background
+  lightGrey100: "#E8E8EB", // nested surface on light
+  lightBorderGrey: "#D6D6DB",
+  ink: "#141416", // text on light
+  inkMuted: "#5E5E66", // muted text on light
 } as const;
 
 // --- Semantic roles per theme ---
-// `primary` = primary button fill (electric, white text) in both themes.
+// `primary` = primary button fill (deep red, white text) in both themes.
+// `surfaceDeep` = where a card's gradient ends (surface at the top, darker below).
 // `link` = links / focus rings / accent text.
-// `ember` = Ember's accent: chartreuse on dark, electric on light (chartreuse
-// text on light backgrounds fails contrast — never use it there).
-// `onEmber` = text placed ON an ember-coloured fill (navy on chartreuse).
+// `ember` = Ember's accent for shapes (fills, borders, the selected tab): the
+// founder's red #971211 in both themes. `emberText` = red text; on dark it's a
+// brighter red of the same hue, since #971211 text on black reads at ~2:1.
+// `onEmber` = text placed ON an ember-coloured fill (white).
 export interface ThemeColors {
   bg: string;
   surface: string;
   surface2: string;
+  /** Bottom stop of the surface gradient on cards (top is `surface`). */
+  surfaceDeep: string;
   border: string;
   text: string;
   textMuted: string;
@@ -51,6 +72,8 @@ export interface ThemeColors {
   link: string;
   ember: string;
   emberPressed: string;
+  /** Red text: Ember labels, ₹ highlights. `ember` itself is for shapes (fills, borders, the selected tab). */
+  emberText: string;
   onEmber: string;
   success: string;
   warning: string;
@@ -59,38 +82,42 @@ export interface ThemeColors {
 
 export const themes: Record<"dark" | "light", ThemeColors> = {
   dark: {
-    bg: palette.navy900,
-    surface: palette.navy800,
-    surface2: palette.navy750,
-    border: palette.navy700,
-    text: palette.ice,
-    textMuted: palette.ice300,
-    primary: palette.electric,
-    primaryPressed: "#223B72",
+    bg: palette.black,
+    surface: palette.charcoal,
+    surface2: palette.charcoal750,
+    surfaceDeep: palette.charcoalDeep,
+    border: palette.charcoal700,
+    text: palette.smoke,
+    textMuted: palette.grey300,
+    primary: palette.red,
+    primaryPressed: palette.redPressed,
     onPrimary: palette.white,
-    link: palette.electric400,
-    ember: palette.chartreuse,
-    emberPressed: palette.chartreuse600,
-    onEmber: palette.navy,
-    success: palette.success,
-    warning: palette.warning,
-    danger: palette.danger,
+    link: palette.brightRed,
+    ember: palette.red,
+    emberPressed: palette.redPressed,
+    emberText: palette.brightRed,
+    onEmber: palette.white,
+    success: "#34C77B",
+    warning: "#F0A23B",
+    danger: "#FF453A",
   },
   light: {
-    bg: palette.ice50,
+    bg: palette.lightGrey,
     surface: palette.white,
-    surface2: palette.ice100,
-    border: palette.lightBorder,
-    text: palette.navy,
-    textMuted: palette.slate500,
-    primary: palette.electric,
-    primaryPressed: "#223B72",
+    surface2: palette.lightGrey100,
+    surfaceDeep: palette.lightGrey100,
+    border: palette.lightBorderGrey,
+    text: palette.ink,
+    textMuted: palette.inkMuted,
+    primary: palette.red,
+    primaryPressed: palette.redPressed,
     onPrimary: palette.white,
-    link: palette.electric,
-    ember: palette.electric,
-    emberPressed: "#223B72",
+    link: palette.red,
+    ember: palette.red,
+    emberPressed: palette.redPressed,
+    emberText: palette.red,
     onEmber: palette.white,
-    success: "#2A8F6A", // darker green so ₹ positives pass AA on ice-50
+    success: "#2A8F6A", // darker green so ₹ positives pass AA on the light background
     warning: "#B8741F",
     danger: "#C9373C",
   },

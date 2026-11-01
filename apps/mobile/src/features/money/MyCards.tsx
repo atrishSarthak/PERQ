@@ -25,6 +25,7 @@ export function MyCards({ header }: { header?: ReactNode }) {
       keyExtractor={(c) => c.cardAccountId}
       onRefresh={() => state.refetch()}
       refreshing={state.isRefetching}
+      contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={{ padding: t.spacing[5], gap: t.spacing[4], paddingBottom: t.spacing[12] }}
       ListHeaderComponent={
         <View style={{ gap: t.spacing[4] }}>

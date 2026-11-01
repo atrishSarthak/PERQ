@@ -57,6 +57,7 @@ export function ExploreList({ header }: { header?: ReactNode }) {
       <FlatList
         data={rows}
         keyExtractor={(c) => c.cardId}
+        contentInsetAdjustmentBehavior="automatic"
         contentContainerStyle={{ padding: t.spacing[5], gap: t.spacing[4], paddingBottom: t.spacing[12] }}
         onRefresh={() => results.refetch()}
         refreshing={results.isRefetching}

@@ -75,7 +75,7 @@ function RootNavigator() {
               presentation: "modal",
               headerShown: true,
               title: "See the math",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -85,7 +85,7 @@ function RootNavigator() {
             options={{
               presentation: "modal",
               headerShown: true,
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -96,7 +96,7 @@ function RootNavigator() {
               presentation: "modal",
               headerShown: true,
               title: "Notifications",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -107,7 +107,7 @@ function RootNavigator() {
               presentation: "modal",
               headerShown: true,
               title: "Ember noticed",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -117,7 +117,7 @@ function RootNavigator() {
             options={{
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -128,7 +128,7 @@ function RootNavigator() {
               title: "Transactions",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -138,7 +138,7 @@ function RootNavigator() {
             options={{
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -149,7 +149,7 @@ function RootNavigator() {
               title: "Ember's nudges",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -160,7 +160,7 @@ function RootNavigator() {
               title: "Budgets & goals",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -171,7 +171,7 @@ function RootNavigator() {
               title: "What Ember did",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -182,7 +182,7 @@ function RootNavigator() {
               title: "Privacy & data",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -192,7 +192,7 @@ function RootNavigator() {
             options={{
               presentation: "modal",
               headerShown: true,
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -203,7 +203,7 @@ function RootNavigator() {
               title: "Should I buy this?",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -215,7 +215,7 @@ function RootNavigator() {
               title: "Your plan",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -226,7 +226,7 @@ function RootNavigator() {
               title: "Your plans",
               headerShown: true,
               headerBackTitle: "Back",
-              headerStyle: { backgroundColor: t.colors.surface },
+              headerStyle: { backgroundColor: t.colors.bg },
               headerTintColor: t.colors.text,
               headerTitleStyle: { fontFamily: t.fonts.bodySemi },
             }}
@@ -238,7 +238,7 @@ function RootNavigator() {
             presentation: "modal",
             headerShown: true,
             title: "Diagnostics",
-            headerStyle: { backgroundColor: t.colors.surface },
+            headerStyle: { backgroundColor: t.colors.bg },
             headerTintColor: t.colors.text,
           }}
         />

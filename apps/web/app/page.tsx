@@ -26,7 +26,7 @@ export default async function LandingPage() {
         <section className="flex flex-col gap-3">
           <h1 className="font-display text-h1 font-extrabold text-text-primary sm:text-display">Get more from the cards you use</h1>
           <p className="font-body text-body-lg text-text-secondary">
-            <span className="font-semibold text-ember">Ember</span> works out what each credit card is worth to you, in rupees a year, from
+            <span className="font-semibold text-ember-text">Ember</span> works out what each credit card is worth to you, in rupees a year, from
             terms checked on the banks&apos; own pages.
           </p>
         </section>

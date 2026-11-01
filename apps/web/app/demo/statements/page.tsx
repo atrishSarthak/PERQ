@@ -18,7 +18,7 @@ export default function DemoStatements() {
               {s.issuer} · {s.cardName}
             </p>
             <p className="text-body-sm text-text-secondary">
-              Statement {s.statementDate} · password <code className="text-ember">{s.password}</code>
+              Statement {s.statementDate} · password <code className="text-ember-text">{s.password}</code>
             </p>
             <a className="mt-2 inline-block rounded-md bg-primary px-3 py-2 text-on-primary" href={`/api/demo/fixtures?layout=${s.layout}`}>
               Download PDF

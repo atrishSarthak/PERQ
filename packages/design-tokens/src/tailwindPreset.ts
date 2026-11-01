@@ -18,6 +18,7 @@ export const perqTailwindPreset = {
         link: "var(--link)",
         ember: "var(--ember)",
         "ember-pressed": "var(--ember-pressed)",
+        "ember-text": "var(--ember-text)",
         "on-ember": "var(--on-ember)",
         success: "var(--success)",
         warning: "var(--warning)",

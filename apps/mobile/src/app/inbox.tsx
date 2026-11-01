@@ -3,6 +3,7 @@ import { Animated, PanResponder, Pressable, SectionList, View } from "react-nati
 import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { NudgeItem } from "@perq/shared";
+import { SurfaceFill } from "@/components/Card";
 import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
 import { moneyApi } from "@/lib/moneyApi";
@@ -39,7 +40,7 @@ function Row({ n, onDismiss }: { n: NudgeItem; onDismiss: () => void }) {
         style={{
           padding: t.spacing[4],
           borderRadius: t.radii.md,
-          backgroundColor: t.colors.surface,
+          overflow: "hidden",
           borderWidth: 1,
           borderColor: unread ? t.colors.ember : t.colors.border,
           borderLeftWidth: unread ? 4 : 1,
@@ -47,6 +48,7 @@ function Row({ n, onDismiss }: { n: NudgeItem; onDismiss: () => void }) {
           opacity: n.status === "dismissed" ? 0.6 : 1,
         }}
       >
+        <SurfaceFill />
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: t.spacing[3] }}>
           <Text variant="bodyStrong" style={{ flex: 1 }}>
             {n.title}

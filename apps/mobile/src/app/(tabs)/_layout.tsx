@@ -1,35 +1,37 @@
-import { Redirect, Tabs } from "expo-router";
-import { SymbolView, type SymbolViewProps } from "expo-symbols";
-import type { ColorValue } from "react-native";
+import { Redirect } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
 import { Loading } from "@/components/StateViews";
 import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
-function icon(name: SymbolViewProps["name"]) {
-  return ({ color }: { color: ColorValue }) => <SymbolView name={name} tintColor={color} size={24} />;
-}
-
+// The system tab bar (Liquid Glass on iOS 26), with the selected tab in red.
+// The glass floats over each screen, so screens keep their content clear of it
+// (Screen's scroll inset, a bottom safe-area edge on the chat and cards tabs).
 export default function TabsLayout() {
   const t = useTheme();
   const results = useResults();
   // No saved answers yet (or an unreadable old profile) → the quiz first.
   if (results.isLoading) return <Loading />;
   if (results.data === null) return <Redirect href="/quiz" />;
+  const content = { backgroundColor: t.colors.bg };
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: t.colors.ember,
-        tabBarInactiveTintColor: t.colors.textMuted,
-        tabBarStyle: { backgroundColor: t.colors.surface, borderTopColor: t.colors.border },
-        tabBarLabelStyle: { fontFamily: t.fonts.bodyMedium, fontSize: 11 },
-        sceneStyle: { backgroundColor: t.colors.bg },
-      }}
-    >
-      <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon({ ios: "house.fill", android: "home", web: "home" }) }} />
-      <Tabs.Screen name="ember" options={{ title: "Ember", tabBarIcon: icon({ ios: "flame.fill", android: "local_fire_department", web: "local_fire_department" }) }} />
-      <Tabs.Screen name="cards" options={{ title: "Cards", tabBarIcon: icon({ ios: "creditcard.fill", android: "credit_card", web: "credit_card" }) }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile", tabBarIcon: icon({ ios: "person.crop.circle", android: "person", web: "person" }) }} />
-    </Tabs>
+    <NativeTabs tintColor={t.colors.ember} labelStyle={{ selected: { color: t.colors.emberText } }}>
+      <NativeTabs.Trigger name="index" contentStyle={content}>
+        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md="home" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="ember" contentStyle={content}>
+        <NativeTabs.Trigger.Label>Ember</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "flame", selected: "flame.fill" }} md="local_fire_department" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="cards" contentStyle={content}>
+        <NativeTabs.Trigger.Label>Cards</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "creditcard", selected: "creditcard.fill" }} md="credit_card" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile" contentStyle={content}>
+        <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} md="person" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

@@ -14,7 +14,7 @@ export function Text({
   const color = {
     default: t.colors.text,
     muted: t.colors.textMuted,
-    ember: t.colors.ember,
+    ember: t.colors.emberText,
     link: t.colors.link,
     success: t.colors.success,
     danger: t.colors.danger,

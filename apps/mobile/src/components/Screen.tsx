@@ -24,6 +24,8 @@ export function Screen({
         {scroll ? (
           <ScrollView
             ref={scrollRef}
+            // Clears the floating tab bar on tab screens (and the home indicator elsewhere).
+            contentInsetAdjustmentBehavior="automatic"
             contentContainerStyle={[padding, { paddingBottom: t.spacing[12] }, contentStyle]}
             keyboardShouldPersistTaps="handled"
           >

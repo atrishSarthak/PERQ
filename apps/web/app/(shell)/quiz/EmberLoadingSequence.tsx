@@ -23,7 +23,7 @@ export function EmberLoadingSequence({ steps }: { steps: NarrationStep[] }) {
         />
       </div>
       <p className="font-display text-h2 text-text-primary">
-        <span className="text-ember">Ember</span> is on it
+        <span className="text-ember-text">Ember</span> is on it
       </p>
       <div className="w-full max-w-xs">
         <Narration steps={steps} />

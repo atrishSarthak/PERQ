@@ -135,13 +135,13 @@ export function ResultsV2({
             <span className="font-body text-caption text-text-secondary">{top.issuer}</span>
           </div>
           <h3 className="mt-3 font-display text-h2 font-bold text-text-primary">{top.name}</h3>
-          <p className="font-display text-display font-extrabold text-ember">
+          <p className="font-display text-display font-extrabold text-ember-text">
             {formatInr(top.ongoingValue)}
             <span className="font-body text-body font-normal text-text-secondary"> / yr</span>
           </p>
           <p className="font-body text-body-sm text-text-secondary">Year 1: {formatInr(top.year1Value)}</p>
           <p className="mt-3 whitespace-pre-line font-body text-body text-text-primary">{explanation ?? top.reason}</p>
-          {!explanation && emberStep ? <p className="mt-1 font-body text-body-sm text-ember">Ember: {emberStep}…</p> : null}
+          {!explanation && emberStep ? <p className="mt-1 font-body text-body-sm text-ember-text">Ember: {emberStep}…</p> : null}
           <div className="mt-2">
             <Flags card={top} />
           </div>

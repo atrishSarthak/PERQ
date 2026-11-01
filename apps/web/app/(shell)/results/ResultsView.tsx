@@ -291,7 +291,7 @@ export function ResultsView({
             {topPick && (
               <div>
                 <p
-                  className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-ember"
+                  className="mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-body text-body-sm font-bold uppercase tracking-wide text-ember-text"
                   style={{ backgroundColor: "color-mix(in srgb, var(--ember) 14%, transparent)" }}
                 >
                   <span aria-hidden="true">✦</span> Ember&apos;s Top Pick
