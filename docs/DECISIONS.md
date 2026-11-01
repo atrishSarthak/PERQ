@@ -183,3 +183,12 @@ Judgement calls made while working through `docs/specs/PERQ_Handoff_Step0_Step1.
     plans in `docs/plans/`, the mockup in `docs/design-reference/`, images in `docs/assets/`, and the
     session prompt in `docs/prompts/`. Your previously untracked drafts are now committed there, as
     you asked to include all docs.
+
+---
+
+# Step 2 (Money Manager) decisions
+
+Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
+
+59. **Spec location.** The Step 2 handoff arrived at the repo root and was moved to `docs/specs/`
+    beside the Step 0/1 handoff.

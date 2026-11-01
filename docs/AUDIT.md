@@ -134,3 +134,42 @@ tests passing) so this handoff doesn't turn into a deletion sweep:
   `runGeminiAgent` in `packages/ai`
 - Legacy scoring: `packages/scoring-engine/src/{scoreCards,buildProfileFromAnswers,
   estimateSpendFromBucket,getBestCardForCategory}.ts`
+
+---
+
+# Step 2 audit addendum (2026-11-01)
+
+Read against `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`. What exists now that Step 2 builds on,
+and what differs from what that handoff assumes:
+
+1. **Paths.** The Step 2 handoff refers to `docs/PERQ_Handoff_Step0_Step1.md`; it now lives in
+   `docs/specs/` (both handoffs are there). Root clutter moved to `docs/` in commit `2fa0ed1`.
+2. **Streaming.** Step 1 settled on **SSE over POST**, read with `expo/fetch` on the phone
+   (`apps/mobile/src/lib/api.ts` `streamEmber`) and `parseSSEStream` on the web. Statement-parse
+   narration reuses it. Events are `emberEventSchema` in `packages/shared/src/api.ts`.
+3. **Ember runner.** `runEmber` (`packages/ai/src/ember`) already has permission levels 1–5, zod tool
+   inputs, `agent_runs` logging via an injected `logRun`, a banned-phrase list, and `ungroundedRupees`
+   (every ₹ in model text must appear in tool output). Nudge copy validation reuses the grounding check.
+   `agent_runs.steps` stores `outputSummary` (first 400 chars of tool output JSON), which **would** leak
+   amounts and descriptions. Step 2 §12 requires a redaction change here.
+4. **Categories.** finance-engine and the recommender use 9 categories (`food_delivery, online_shopping,
+   groceries, dining, fuel, bills, upi, travel, other`). Step 2 transactions use 17. The extra ones map
+   onto the recommender as: entertainment/health/education → `other`; rent, emi, fees_interest, cash,
+   transfers → not reward-earning spend, so they're excluded from synced spend.
+5. **Chat threads.** `chat_messages.thread` already exists (default `recommender`). Step 2's
+   `thread_ref` (`nudge:<id>`, `card:<id>`) is added as a nullable column beside it rather than renamed.
+6. **Arsenal.** `user_card_arsenal` is the single source of held cards (Step 1 decision 44); linking a
+   card account to a catalogue card writes through the same `setHeld`.
+7. **Recommender profile.** Answers live in `user_profile.answers` (quiz v2 JSON). There is no
+   `spendSource` field yet. Step 2 §9 adds it to the profile row, not to the quiz answers.
+8. **Card terms for hindsight/points.** The 40-card catalogue has `rewardRates` (% value back per
+   category), `redemptionValue` (₹ per point, null for plain cashback), `feeWaiverSpend` and caps.
+   Points value uses `redemptionValue`; cards with a null value can't value printed points.
+9. **Gemini quota.** On the current free key `gemini-3.5-flash` allows ~20 requests/day and Flash-Lite
+   leads the chain (DECISIONS #48). Statement extraction adds 1–3 calls per upload, plus categorisation
+   batches. The demo must work with Gemini off (templates + rules), and the synthetic statements
+   must parse deterministically in tests (mocked).
+10. **Push in Expo Go.** Expo SDK 58 docs: remote push is unavailable in Expo Go **on Android** since
+    SDK 53; local notifications still work. iOS Expo Go can receive remote push, but an Expo push token
+    needs an EAS `projectId` (linking an Expo account). Decided at checkpoint 9.
+11. **Tests at start of Step 2:** `pnpm test` green across 10 packages; `pnpm eval` 10/10 (2026-10-31).
