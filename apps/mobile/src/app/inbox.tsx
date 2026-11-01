@@ -6,7 +6,7 @@ import type { NudgeItem } from "@perq/shared";
 import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
 import { moneyApi } from "@/lib/moneyApi";
-import { useNudges } from "@/lib/moneyQueries";
+import { useMoneyState, useNudges } from "@/lib/moneyQueries";
 import { useTheme } from "@/theme/ThemeProvider";
 
 // Nudge inbox (handoff §10.5): Today / Earlier, status, swipe left to dismiss.
@@ -67,10 +67,12 @@ export default function Inbox() {
   const t = useTheme();
   const qc = useQueryClient();
   const inbox = useNudges();
+  // The server's IST date, so "Today" follows a demo account's clock too.
+  const asOf = useMoneyState().data?.asOf;
   if (inbox.isLoading) return <Loading />;
   if (inbox.error) return <ErrorState message={inbox.error.message} onRetry={() => inbox.refetch()} />;
   const all = inbox.data!.nudges;
-  const today = istDay(new Date().toISOString());
+  const today = asOf ?? istDay(new Date().toISOString());
   const sections = [
     { title: "Today", data: all.filter((n) => n.sentAt && istDay(n.sentAt) === today) },
     { title: "Earlier", data: all.filter((n) => !n.sentAt || istDay(n.sentAt) !== today) },

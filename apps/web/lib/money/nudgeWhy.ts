@@ -19,6 +19,8 @@ const LABELS: Record<string, string> = {
   creditLimit: "Credit limit",
   payToReach30: "Payment to get under 30%",
   daysToStatement: "Days to statement",
+  statementCloses: "Statement closes",
+  targetPct: "Target utilisation",
   remaining: "Spend still needed",
   annualFee: "Annual fee",
   byMonth: "By",

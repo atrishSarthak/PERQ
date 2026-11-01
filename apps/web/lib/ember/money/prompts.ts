@@ -18,9 +18,16 @@ For "where did my money go?" call getFinancialState (thisMonth or missedRewards)
 
 export function nudgeThreadPrompt(n: MoneyNudge): string {
   return `
-This conversation is about a nudge Ember sent (nudgeId ${n.id}, rule ${n.ruleId}):
+This conversation is about a nudge Ember sent (rule ${n.ruleId}):
 "${n.title}: ${n.body}"
-Call explainNudge with that id before quoting its numbers. Buttons like "Mark as paid" and "Remind me tomorrow" are in the app; don't claim to do them yourself.`;
+NUDGE DATA (exact numbers, already checked; quote them as given): ${JSON.stringify(nudgeContext(n))}
+Answer from NUDGE DATA when it covers the question. Call a tool only for something it doesn't contain, and never repeat a tool call with the same input.
+Buttons like "Mark as paid" and "Remind me tomorrow" are in the app; don't claim to do them yourself.`;
+}
+
+/** The nudge facts Ember may quote in its thread; also counted as grounded tool output. */
+export function nudgeContext(n: MoneyNudge) {
+  return { numbers: n.payload, why: n.why.description, figures: n.why.figures, dataDate: n.why.dataDate };
 }
 
 export function cardThreadPrompt(c: { cardAccountId: string; label: string }): string {

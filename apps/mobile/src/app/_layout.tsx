@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import { router, Stack } from "expo-router";
 import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
@@ -216,7 +216,8 @@ function RootNavigator() {
 /** Keeps the push token or the local schedule current, and opens tapped notifications. */
 function useNotificationSync(signedIn: boolean) {
   useEffect(() => {
-    if (!signedIn) return;
+    // Notifications are native-only; the web preview keeps the in-app inbox.
+    if (!signedIn || Platform.OS === "web") return;
     const sync = () => syncNotifications().catch(() => {});
     sync();
     const open = (data: unknown) => {

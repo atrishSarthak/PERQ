@@ -21,8 +21,9 @@ export function monthName(key: string): string {
 
 /** A ₹ amount that opens where it came from. */
 export function Amount({ value, href, variant = "bodyStrong", tone }: { value: number; href?: string; variant?: "display" | "heading" | "bodyStrong" | "body" | "small"; tone?: "ember" | "muted" | "danger" | "default" }) {
+  // Tappable amounts use the link colour (an underline read like a strikethrough).
   const text = (
-    <Text variant={variant} tone={tone} style={href ? { textDecorationLine: "underline", textDecorationStyle: "dotted" } : undefined}>
+    <Text variant={variant} tone={href && !tone ? "link" : tone}>
       {formatInr(value)}
     </Text>
   );

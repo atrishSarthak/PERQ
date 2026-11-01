@@ -406,3 +406,10 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     is sent only if today's evaluation produces the same dedupe key again. It then goes out with
     today's payload, copy and "why". Otherwise it expires. Before this fix, "₹4,100 of ₹5,000 with
     9 days left" went out three days later, when only 5 days were left.
+107. **QA fixes from the Expo web pass with demo data.** (a) The notification hook skips web, where
+    `getLastNotificationResponse` doesn't exist and crashed the preview. (b) Tappable ₹ amounts use the
+    link colour instead of a dotted underline, which rendered like a strikethrough ("paid?"). (c) The
+    inbox's "Today" uses the server's `asOf`, so it follows a demo clock. (d) In nudge threads, the
+    nudge's own figures go into the prompt and count as grounded. Ember answers from them and calls
+    tools only for anything else. Before this, "How much should I pay to get under 30%?" looped on
+    `amountToReachUtilisation` until it hit the 6-round cap and fell back.

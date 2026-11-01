@@ -5,7 +5,7 @@ import { chatFallback, type EmberAnswer } from "../recommender/run";
 import { labelsForEvent, WRITING_LABEL } from "../recommender/narration";
 import { CHAT_SYSTEM_PROMPT } from "../recommender/prompts";
 import { createRecommenderTools } from "../recommender/tools";
-import { cardThreadPrompt, MONEY_RULES, MONEY_TOOLS_GUIDE, nudgeThreadPrompt } from "./prompts";
+import { cardThreadPrompt, MONEY_RULES, MONEY_TOOLS_GUIDE, nudgeContext, nudgeThreadPrompt } from "./prompts";
 import { createMoneyTools, type MoneyNudge, type MoneyProposal, type MoneyToolContext } from "./tools";
 
 // One Ember chat turn with whichever tool sets the user has data for:
@@ -60,7 +60,8 @@ export async function chatTurn(input: ChatTurnInput): Promise<EmberAnswer> {
     ...(input.recommender ? createRecommenderTools(input.recommender) : []),
     ...(input.money ? createMoneyTools(input.money, input.onProposal) : []),
   ];
-  const toolOutputs: unknown[] = [];
+  // The nudge's own figures are in the prompt, so they count as grounded.
+  const toolOutputs: unknown[] = input.nudge ? [nudgeContext(input.nudge)] : [];
   const run = await runEmber({
     userId: input.userId,
     task: input.nudge ? "nudge_chat" : "chat",
