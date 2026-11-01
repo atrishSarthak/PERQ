@@ -460,3 +460,22 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      (which Locked rule fired), `affordability.monthlyIncome`, `credit.nextStatementDate`, `asOf` and
      `engineVersion` to §5.7's shape. A pasted link is parsed on the device by a pure function, with
      no server call (§2), so `/api/plans/extract` takes only an image or text.
+117. **Timing maths (§5.5).** A statement or due day past the end of a month clamps to that month's
+     last day (31 → 28/29/30). The due date is the first due day strictly after the statement date,
+     so a due day before the statement day lands in the next month. Interest-free days = due date −
+     purchase date. `bestPurchaseDate` takes the earliest day on a tie.
+118. **Offers (§5.2).** Banks match on a normalised bank key (`bankKey`: "SBI Cards" = "SBI Card" =
+     "State Bank"). A network condition is confirmed only when the catalogue card has exactly one
+     network; a card sold as Visa *or* Mastercard can't be confirmed, so the offer isn't applied.
+     Card-name conditions match the catalogue name or the account label. Amounts round **down**.
+     Offers of the same type don't stack (one bank offer per order); the biggest wins, and a
+     coupon can add to a bank offer. Cashback counts as a discount in net cost, labelled "credited
+     later". `no_cost_emi` offers are never a discount: they're priced in the EMI cost.
+119. **Rewards (§5.3).** Remaining monthly caps use the IST calendar month's spend on that card, because
+     cycles aren't known per card. Rewards round down.
+120. **EMI (§5.4).** No-cost EMI is modelled as you paying the sticker price in equal instalments. The
+     bank's principal is the present value of those instalments at its rate; the gap is the
+     interest, which the shop's upfront discount cancels. 18% GST on that interest still applies.
+     When the offer doesn't print a rate, 15% p.a. is assumed (`noCostAssumedRatePa`) and
+     `assumedRatePa` says so on screen. `extraCostVsFullPayment` is the sum of the rounded lines, so
+     the breakdown always adds up. The blocked limit is the bank's principal.

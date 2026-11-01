@@ -96,6 +96,8 @@ export const emiTrueCostSchema = z.object({
   extraCostVsFullPayment: z.number().int(),
   /** Price blocked on the card limit at purchase, released as instalments are paid. */
   blockedLimit: rupees,
+  /** No-cost EMI without a printed rate: the rate the engine assumed (% p.a.), else null. */
+  assumedRatePa: z.number().nullable(),
   lines: z.array(line),
 });
 export type EmiTrueCost = z.infer<typeof emiTrueCostSchema>;
