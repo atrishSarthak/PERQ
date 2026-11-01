@@ -185,6 +185,30 @@ export const affordabilitySchema = z.object({
 });
 export type Affordability = z.infer<typeof affordabilitySchema>;
 
+/** What a plan couldn't check (§2, §10.5), with where the app sends the user to fix it. */
+export const MISSING_DATA_CODES = [
+  "no_cards",
+  "no_statements",
+  "no_budget",
+  "no_income",
+  "no_statement_dates",
+  "no_card_terms",
+  "no_credit_limit",
+  "unreconciled",
+] as const;
+export const missingDataCodeSchema = z.enum(MISSING_DATA_CODES);
+export type MissingDataCode = z.infer<typeof missingDataCodeSchema>;
+export const MISSING_DATA_FIX: Record<MissingDataCode, { label: string; href: string }> = {
+  no_cards: { label: "Add a card statement", href: "/upload" },
+  no_statements: { label: "Upload a statement", href: "/upload" },
+  no_budget: { label: "Set a budget", href: "/budgets" },
+  no_income: { label: "Add your income", href: "/edit/monthlyIncome" },
+  no_statement_dates: { label: "Upload a statement", href: "/upload" },
+  no_card_terms: { label: "Link the card", href: "/cards" },
+  no_credit_limit: { label: "Upload a statement", href: "/upload" },
+  unreconciled: { label: "Check the statement", href: "/cards" },
+};
+
 export const planResultSchema = z.object({
   verdict: verdictSchema,
   verdictReason: verdictReasonSchema,
@@ -211,8 +235,8 @@ export const planResultSchema = z.object({
     })
     .optional(),
   emi: emiTrueCostSchema.optional(),
-  /** Named out loud (§2): e.g. "no statements yet", "no budget set". */
-  missingData: z.array(z.string()),
+  /** Named out loud (§2): what the plan couldn't check, each with a code the app links to a fix. */
+  missingData: z.array(z.object({ code: missingDataCodeSchema, text: z.string() })),
   assumptions: z.array(z.string()),
   asOf: isoDate,
   engineVersion: z.number().int(),

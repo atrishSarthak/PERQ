@@ -28,7 +28,8 @@ export interface PlanCardTerms extends CardTerms {
 
 /** A held card account as the planner sees it. */
 export interface PlanCard {
-  cardAccountId: string;
+  /** null for a card the user holds (Step 1 quiz) but hasn't added a statement for. */
+  cardAccountId: string | null;
   label: string;
   issuer: string;
   /** null when the account isn't linked to a catalogue card. */
@@ -41,4 +42,19 @@ export interface PlanCard {
   hasUnreconciled: boolean;
   /** This IST month's purchase spend on this card, by reward category (for remaining caps). */
   monthSpendByCategory: Partial<Record<string, number>>;
+}
+
+/** Everything the planner reads about the user, assembled by the caller (web API, extension). */
+export interface PlanContext {
+  today: string; // IST day
+  cards: PlanCard[];
+  /** This month's left-to-spend from the budget, null when there's no budget. */
+  leftToSpend: number | null;
+  monthSpend: number; // this month's spend so far (statements only)
+  goals: { id: string; name: string; monthlyNeeded: number | null }[];
+  /** Quiz income band midpoint, ₹/month. */
+  monthlyIncome: number | null;
+  /** Average monthly card spend from statements, ₹. */
+  averageMonthlySpend: number | null;
+  hasStatements: boolean;
 }

@@ -4,6 +4,7 @@ import {
   amountToReachUtilisation,
   bestCardFor,
   utilisationAfter,
+  utilizationImpact as utilisationImpactOf,
   type CardTerms,
   type FinancialState,
   type NudgePayload,
@@ -215,7 +216,10 @@ export function createMoneyTools(ctx: MoneyToolContext, onProposal?: (p: MoneyPr
     handler: async ({ cardAccountId, amount }) => {
       const c = card(cardAccountId);
       if (!c?.creditLimit || c.balanceForUtilisation === null) return { error: "No limit or balance for that card yet." };
-      return { card: c.label, nowPct: c.utilisationPct, afterPct: utilisationAfter(c.balanceForUtilisation, c.creditLimit, amount), amount };
+      if (amount <= 0) return { card: c.label, nowPct: c.utilisationPct, afterPct: utilisationAfter(c.balanceForUtilisation, c.creditLimit, amount), amount };
+      // Spending: the planner's shared utilisation check (Step 3 §5.6), with its 30/70/90 levels.
+      const u = utilisationImpactOf({ balance: c.balanceForUtilisation, creditLimit: c.creditLimit, statementDay: c.statementDay }, amount, ctx.state.asOf);
+      return { card: c.label, nowPct: c.utilisationPct, afterPct: u.after, level: u.level, payToStayUnder30: u.payToStayUnder30, beforeStatement: u.nextStatementDate, amount };
     },
   };
 

@@ -479,3 +479,35 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      When the offer doesn't print a rate, 15% p.a. is assumed (`noCostAssumedRatePa`) and
      `assumedRatePa` says so on screen. `extraCostVsFullPayment` is the sum of the rounded lines, so
      the breakdown always adds up. The blocked limit is the bank's principal.
+121. **State gains `statementDay`, `dueDay` and `monthSpendByRewardCategory` per card**
+     (`STATE_VERSION` 2). Each day comes from the account, or else is read off the latest statement.
+     The Step 2 `utilizationImpact` tool now uses the planner's `utilizationImpact` for spending,
+     which adds the 30/70/90 level and "pay ₹X before the statement".
+122. **`rankPaymentOptions(input, cards, today)`** takes `PlanCard[]` and an IST day, not the whole
+     `FinancialState` (§5.7 sketches `(input, state, cards, now)`). That's everything ranking needs,
+     and the extension can build `PlanCard`s without a Money Manager state. `planContextFromState`
+     and `planCardsFromState` build them on the web side. Cards held in the Step 1 profile with no
+     statement yet are included as options (catalogue rewards, no dates or limit), so a user with no
+     statements still gets a card answer, and the plan names what's missing.
+123. **Options.** Each card gets a "today" option, and a "best day" option only when that day gains
+     10 or more interest-free days inside the window (need-by, else 14 days). Each confirmed EMI
+     option is applied to the cards of its named bank, or to every card. UPI/debit is the baseline.
+     For EMI, `extraCosts` is interest + GST + fee; rewards lost show as lower `rewards`, so they
+     aren't counted twice. Blocked options sort last; then options sort by net cost, then by fewer
+     warnings (30%/70%/unreconciled), then by more interest-free days.
+124. **Verdict rule readings (§5.7, Locked).**
+     - *Chosen or default way to pay.* With confirmed EMI options, the chosen way is the cheapest of
+       them. Otherwise it's the top option, which can't be beaten, so the costly-payment rule only
+       applies to EMIs.
+     - *Every card option over 70%.* This counts each card's buy-today option, and only when every
+       one of them has a known limit. In that case the recommendation becomes UPI/debit.
+     - *Over budget.* Compares the recommended option's price after offers with what's left this
+       month.
+     - *Goal slip.* The part of the price that doesn't fit what's left this month comes out of
+       savings, and each goal slips that amount ÷ the monthly saving rate. The rate is quiz income
+       minus average card spend, or the goals' combined monthly need when income is unknown (the
+       result says which).
+     - *Budget fallback.* With no budget, the income-based limit is 30% of income minus this
+       month's spend so far.
+125. **Missing data is coded** (`MISSING_DATA_CODES`, each with a fix link in `MISSING_DATA_FIX`), not
+     free text, so the result screen can link "Upload a statement" or "Set a budget".

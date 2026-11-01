@@ -5,3 +5,5 @@ export { floatDays, bestPurchaseDate, statementOn, dueAfter, dayInMonth, addDays
 export { applyOffer, applyOffers, bankKey, type OfferCard, type OfferOutcome } from "./offers";
 export { rewardFor, type RewardOutcome } from "./rewards";
 export { emiTrueCost, emiInstalment } from "./emi";
+export { rankPaymentOptions, utilizationImpact, buyingWindow, type UtilisationImpact } from "./options";
+export { planPurchase, affordability, decideVerdict, planCardsFromState, planContextFromState, floatToday } from "./plan";

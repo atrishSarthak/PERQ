@@ -16,7 +16,7 @@ import { loadCatalogue } from "@/lib/recommender/catalog";
 // build with finance-engine, cache per user per IST day.
 
 /** Bump when buildFinancialState's output shape changes. */
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 export function cardTerms(c: CatalogCard): CardTerms {
   return {
@@ -58,6 +58,8 @@ export async function loadStateInput(userId: string, now: Date): Promise<StateIn
       currentBalanceOverride: a.currentBalanceOverride,
       currentBalanceUpdatedAt: a.currentBalanceUpdatedAt?.toISOString() ?? null,
       isActive: a.isActive,
+      statementDay: a.statementDay,
+      dueDay: a.dueDay,
       terms: a.cardId && byId.get(a.cardId) ? cardTerms(byId.get(a.cardId)!) : null,
     })),
     statements: stmts.map((s) => ({

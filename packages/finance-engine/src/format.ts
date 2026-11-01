@@ -12,3 +12,10 @@ export function formatInr(amount: number): string {
   const grouped = rest ? `${rest.replace(/\B(?=(\d{2})+(?!\d))/g, ",")},${last3}` : last3;
   return `${sign}₹${grouped}`;
 }
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** "26 Nov" from YYYY-MM-DD (hand-rolled for the same Hermes reason as formatInr). */
+export function formatDay(iso: string): string {
+  const [, m, d] = iso.split("-").map(Number) as [number, number, number];
+  return `${d} ${MONTHS[m - 1]}`;
+}

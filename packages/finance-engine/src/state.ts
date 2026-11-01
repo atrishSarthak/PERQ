@@ -52,6 +52,9 @@ export interface StateCardAccount {
   currentBalanceUpdatedAt: string | null; // ISO instant
   isActive: boolean;
   terms: CardTerms | null; // null when not linked to a catalogue card
+  /** Day of month the statement is generated / payment is due (Step 3 timing). */
+  statementDay?: number | null;
+  dueDay?: number | null;
 }
 
 export interface StateStatement {
@@ -152,6 +155,11 @@ export interface CardState {
   feesLastCycle: { total: number; lines: { description: string; amount: number }[] };
   /** Any of this card's statements failed reconciliation (§5.4): rupee nudges from them are held back. */
   hasUnreconciled: boolean;
+  /** Statement / due day of month: the account's, else read off the latest statement (Step 3 §5.5). */
+  statementDay: number | null;
+  dueDay: number | null;
+  /** This month's purchase spend on this card by reward category (Step 3 remaining caps). */
+  monthSpendByRewardCategory: Record<string, number>;
 }
 
 export interface MissedReward {
@@ -244,6 +252,19 @@ export function amountToReachUtilisation(balance: number, limit: number, targetP
 /** Utilisation % after spending (positive) or paying (negative) an amount. */
 export function utilisationAfter(balance: number, limit: number, amount: number): number {
   return limit > 0 ? Math.round(((balance + amount) / limit) * 1000) / 10 : 0;
+}
+
+function monthSpendOnCard(txns: StateTransaction[], cardAccountId: string, key: string): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const t of txns) {
+    if (t.cardAccountId !== cardAccountId || !t.txnDate.startsWith(key)) continue;
+    if (t.kind !== "purchase" && t.kind !== "refund") continue;
+    const rc = rewardCategoryOf(t.category);
+    if (!rc) continue;
+    out[rc] = (out[rc] ?? 0) + (t.direction === "debit" ? t.amount : -t.amount);
+  }
+  for (const k of Object.keys(out)) out[k] = Math.max(0, Math.round(out[k]!));
+  return out;
 }
 
 // ---- builder -----------------------------------------------------------------
@@ -351,6 +372,9 @@ export function buildFinancialState(input: StateInput): FinancialState {
         lines: feeLines.map((t) => ({ description: t.description, amount: t.amount })),
       },
       hasUnreconciled: (stmtsByCard.get(a.id) ?? []).some((x) => !x.reconciled),
+      statementDay: a.statementDay ?? (latest ? Number(latest.statementDate.slice(8, 10)) : null),
+      dueDay: a.dueDay ?? (latest?.dueDate ? Number(latest.dueDate.slice(8, 10)) : null),
+      monthSpendByRewardCategory: monthSpendOnCard(input.transactions, a.id, today.slice(0, 7)),
     };
   });
 

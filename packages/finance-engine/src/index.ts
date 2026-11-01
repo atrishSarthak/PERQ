@@ -3,7 +3,7 @@
 // integer rupees, rounded once at the end of a calculation.
 export * from "./types";
 export * from "./finance";
-export { formatInr } from "./format";
+export { formatInr, formatDay } from "./format";
 export { reconcile, reconcileTolerance, type ReconcileInput, type ReconcileResult } from "./reconcile";
 export {
   stripCardNumbers,
