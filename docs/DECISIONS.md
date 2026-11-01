@@ -270,3 +270,13 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 76. Confirm takes several seconds in dev because it's ~8 sequential Neon HTTP round trips (account
     upsert, replace, insert, transactions, arsenal, cache, activity). That's fine for now; batch it if it
     shows up in real use.
+77. **Financial state details** (`packages/finance-engine/src/state.ts`): all calendar maths in IST.
+    A balance override counts only if it was updated after the latest statement date. "Mark as paid"
+    removes that due from `totalDueAll`. The next statement is assumed one month after the last.
+    Fee-waiver pace counts purchases net of refunds since the 1st of the anniversary month; when that
+    month is unknown it starts from the card's earliest transaction (`startAssumed: true`). Month spend
+    excludes transfers, fees/interest, EMI and cash. Best card in hindsight compares flat % rates
+    between held catalogue cards and ignores caps, so it's an estimate; the UI says "about". Goals
+    track `expectedSaved` on a straight line from creation to target date.
+78. **State cache** is keyed by `STATE_VERSION` + the IST day, because the state depends on today. It's
+    deleted on every money write via `invalidateState`.
