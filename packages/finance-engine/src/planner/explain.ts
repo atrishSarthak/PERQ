@@ -74,6 +74,9 @@ export function planTemplateExplanation(r: PlanResult): string {
       break;
     }
   }
+  // A go that's over what's left (a need-by date skips the wait) says so, before the credit tip.
+  const over = overBudgetBy(r);
+  if (over) s.push(`This is ${formatInr(over)} more than you have left to spend ${monthPhrase(r)}.`);
   if (s.length < 4 && r.verdict !== "rethink_payment") {
     const c = creditSentence(r);
     if (c) s.push(c);
@@ -116,9 +119,16 @@ export function planAllowedNumbers(r: PlanResult): Set<number> {
   return out;
 }
 
+/** How far a go goes past what's left this month, else null. */
+function overBudgetBy(r: PlanResult): number | null {
+  const after = r.affordability.afterPurchase;
+  return (r.verdict === "go" || r.verdict === "go_with_timing") && after !== null && after < 0 ? -after : null;
+}
+
 /** The answer must say why (the rule that fired), not just what. */
 function reasonMissing(text: string, r: PlanResult): string | null {
   const lower = text.toLowerCase();
+  if (overBudgetBy(r) && !/budget|left to spend|left this month/.test(lower)) return "over budget not said";
   switch (r.verdictReason) {
     case "over_budget":
       if (!/budget|left to spend|left this month|this month/.test(lower)) return "reason missing: budget";

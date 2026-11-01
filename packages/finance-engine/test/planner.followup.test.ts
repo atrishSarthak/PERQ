@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { planInputSchema, planResultSchema, type PlanInput } from "@perq/shared";
 import {
+  formatInr,
   isPlanExpired,
   planTemplateExplanation,
   validatePlanExplanation,
@@ -157,5 +158,18 @@ describe("explanation reasons", () => {
     const day = r.recommended.purchaseDate.slice(8).replace(/^0/, "");
     expect(validatePlanExplanation(`Better to wait until ${day} Nov to buy with your hdfc-millennia. It costs ${"₹2,47,500"}.`, r).ok).toBe(false);
     expect(validatePlanExplanation("Better to wait. Your hdfc-millennia gives the most rewards here.", r)).toEqual({ ok: false, reason: "reason missing: budget" });
+  });
+});
+
+describe("a go over what's left", () => {
+  it("says how far over, and an explanation that skips it is rejected", () => {
+    const r = planPurchase(input({ price: 30000, needBy: "2026-11-30" }), ctx({ cards: [card("hdfc", HDFC)], leftToSpend: 10000 }));
+    expect(["go", "go_with_timing"]).toContain(r.verdict);
+    const over = -r.affordability.afterPurchase!;
+    const text = planTemplateExplanation(r);
+    expect(text).toContain(`This is ${formatInr(over)} more than you have left to spend`);
+    expect(validatePlanExplanation(text, r)).toEqual({ ok: true });
+    const first = text.split(/(?<=\.)\s+/).slice(0, 2).join(" ");
+    expect(validatePlanExplanation(first, r)).toEqual({ ok: false, reason: "over budget not said" });
   });
 });

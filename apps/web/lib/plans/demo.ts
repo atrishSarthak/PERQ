@@ -54,8 +54,8 @@ export async function insertDemoPlans(userId: string, at: Date) {
     if (computed.result.verdict !== p.expect) {
       throw new Error(`Demo plan ${p.input.item.name}: expected ${p.expect}, got ${computed.result.verdict} (${computed.result.verdictReason})`);
     }
-    // A minute apart, so the history lists them in the demo's order.
-    const created = new Date(at.getTime() - (DEMO_PLANS.length - i) * 60_000);
+    // A minute apart, so the newest-first list shows them in the demo's order (phone on top).
+    const created = new Date(at.getTime() - (i + 1) * 60_000);
     const row = await savePlan(userId, p.input, "typed", computed, { text: planTemplateExplanation(computed.result), source: "template", runId: null }, created);
     const remindAt = p.remind ? computed.result.recommended.purchaseDate : null;
     await db

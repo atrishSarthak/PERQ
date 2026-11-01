@@ -27,7 +27,8 @@ export function planCardTerms(c: CatalogCard): PlanCardTerms {
 
 /**
  * Demo mode's take-home income (₹/month). Demo plans must open the same verdict on any account,
- * so a demo user's quiz band is not used; Reset demo brings it back.
+ * so a demo user's quiz band (and quiz-held cards without an account) aren't used; Reset demo
+ * brings them back.
  */
 export const DEMO_MONTHLY_INCOME = 100000;
 
@@ -51,7 +52,9 @@ export async function loadPlanContext(userId: string, now: Date): Promise<Loaded
   const termsById = new Map(catalogue.map((c) => [c.id, planCardTerms(c)]));
   const income = user?.isDemo ? DEMO_MONTHLY_INCOME : profile?.answers.monthlyIncome ? INCOME_BUCKET_RUPEES[profile.answers.monthlyIncome].mid : null;
   const avg = stmts.length ? averageMonthlySpend(stmts, txns).total : null;
-  const ctx = planContextFromState(state, { termsById, heldCatalogueIds: held, monthlyIncome: income, averageMonthlySpend: avg });
+  // A demo plans with its own cards only: a held card from the quiz with no account could change a demo verdict.
+  const heldIds = user?.isDemo ? [] : held;
+  const ctx = planContextFromState(state, { termsById, heldCatalogueIds: heldIds, monthlyIncome: income, averageMonthlySpend: avg });
   const monthName = new Date(`${state.month.key}-01T00:00:00Z`).toLocaleDateString("en-IN", { month: "long", timeZone: "UTC" });
   return {
     ctx,

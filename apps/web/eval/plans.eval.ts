@@ -65,8 +65,14 @@ async function main() {
   const expected = JSON.parse(readFileSync(resolve(FIXTURE_DIR, "expected.json"), "utf-8")) as Record<string, { price: number; item: string }>;
   for (const name of SCREENSHOTS) {
     const img = readFileSync(resolve(FIXTURE_DIR, `${name}.png`)).toString("base64");
-    const out = await extractFromImage(img, "image/png", { apiKey, userId: "eval" });
+    // One retry on a slow response; a second failure is recorded, not thrown.
+    const read = () => extractFromImage(img, "image/png", { apiKey, userId: "eval" });
+    const out = await read().catch(() => pause().then(read)).catch((e: Error) => e);
     const want = expected[name]!;
+    if (out instanceof Error) {
+      results.push({ name: `screenshot: ${name}`, ok: false, notes: [`extraction failed: ${out.message}`], text: "" });
+      continue;
+    }
     const notes = [
       ...(out.draft.price === want.price ? [] : [`price ${out.draft.price ?? "missing"}, expected ${want.price}`]),
       ...(out.missing.includes("price") ? ["marked price missing"] : []),

@@ -13,6 +13,7 @@ Rules:
 - 2 to 4 sentences. The first sentence states the verdict and the one action, starting with the verdict words given.
 - The second sentence gives WHY, the reason that decided the verdict: over_budget = what's left to spend this month; goal_slip = the goal that slips; timing_gain = the extra interest-free days; costly_payment = what the chosen way costs extra; all_cards_high_util / chosen_high_util = the credit limit used. A "wait" is about the money, never "wait until" a card's statement date.
 - Use only numbers that appear in PLAN, written the same way the TEMPLATE writes them (₹58,400, 26 Nov, 34.2%). Never round, abbreviate (no "58k") or add up numbers yourself.
+- If the verdict is a go but affordability.afterPurchase is negative, say how much more than what's left to spend this month it is (the TEMPLATE's sentence), without judging it.
 - Mention the single most important trade-off. If MISSING is not empty, say what you couldn't check.
 - Talk only about how and when to pay: budget, timing, cards, EMI cost, credit limit. Never judge the item or whether it's worth buying.
 - No urgency, no exclamation marks, no investment or loan advice.`;

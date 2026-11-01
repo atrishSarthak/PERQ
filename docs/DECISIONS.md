@@ -710,3 +710,11 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      demo data loaded, Gemini off, and the statement rows a confirmed parse would write inserted
      directly (the mocked parser). The user is deleted afterwards. Without `PERQ_DB_TESTS=1` it
      skips, so `pnpm test` stays offline.
+169. **A go over what's left to spend says so.** A need-by date within 14 days skips the
+     over-budget wait (§5.7), but the overshoot is still a fact the user should hear. Both the
+     template and Gemini add "This is ₹X more than you have left to spend this month."
+     `validatePlanExplanation` rejects a go whose result is over budget and whose text doesn't
+     mention the budget.
+170. **Demo users plan with their demo cards only.** Held cards from the quiz with no account are
+     left out of a demo plan, as with the fixed demo income in #162. Otherwise a held Millennia, for
+     example, could change a demo verdict and stop the demo from loading.
