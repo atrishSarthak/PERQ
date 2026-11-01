@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { recommendationResultSchema } from "./recommendation";
 import { statementDraftSchema } from "./statementApi";
+import { partialPlanInputSchema, planResultSchema } from "./planner";
 
 // Request/response bodies for the recommender API (handoff §1.5) that
 // aren't covered by the domain schemas.
@@ -46,11 +47,25 @@ export const emberEventSchema = z.discriminatedUnion("type", [
       z.object({ kind: z.literal("goal"), name: z.string(), target: z.number(), date: z.string().nullable() }),
     ]),
   }),
+  // Purchase planner (Step 3 §6.4, §7.2): the inline "Right?" card in chat,
+  // and the finished plan (from /api/plans/run or a chat plan).
+  z.object({
+    type: z.literal("planConfirm"),
+    draft: z.lazy(() => partialPlanInputSchema),
+    missing: z.array(z.enum(["price", "item"])),
+  }),
+  z.object({
+    type: z.literal("plan"),
+    planId: z.string(),
+    result: z.lazy(() => planResultSchema),
+    explanation: z.string(),
+    explanationSource: z.enum(["ai", "template"]),
+  }),
 ]);
 export type EmberEvent = z.infer<typeof emberEventSchema>;
 
-/** `nudge:<id>` or `card:<cardAccountId>` threads (§7.4, §10); none = the main Ember thread. */
-export const threadRefSchema = z.string().regex(/^(nudge|card):[A-Za-z0-9-]{1,64}$/);
+/** `nudge:<id>`, `card:<cardAccountId>` or `plan:<id>` threads; none = the main Ember thread. */
+export const threadRefSchema = z.string().regex(/^(nudge|card|plan):[A-Za-z0-9-]{1,64}$/);
 export const chatRequestSchema = z.object({ message: z.string().trim().min(1).max(1000), threadRef: threadRefSchema.optional() });
 export const nudgeChipSchema = z.object({
   label: z.string(),

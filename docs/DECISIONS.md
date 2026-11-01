@@ -450,3 +450,13 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      are genuinely `false`. HDFC Millennia earns a reduced 1% on merchant EMI, which a boolean can't
      express, so it stays `false`. The rest aren't checked yet (CARDS_README "EMI rewards"; TODOS).
      The field is in `catalogCardSchema` with `.default(false)`, so older JSON still validates.
+115. **Planner types are zod in `packages/shared/src/planner.ts`**, and finance-engine imports them as
+     types only (a new type-only dependency, enforced by `test/purity.test.ts`). This gives one source
+     of truth for the app, the API and the future extension endpoint. Dates are `YYYY-MM-DD` IST
+     strings, not `Date` objects as §5.1 sketches, so plans cross JSON and SSE unchanged.
+116. **Option ids and flags.** Option ids are stable strings (`card:<acct>:today|best`,
+     `emi:<acct>:<i>`, `upi`), so what-if and the app can refer to one. Warnings are short codes
+     (`OPTION_FLAGS`) that the app and Ember turn into words. `PlanResult` adds `verdictReason`
+     (which Locked rule fired), `affordability.monthlyIncome`, `credit.nextStatementDate`, `asOf` and
+     `engineVersion` to §5.7's shape. A pasted link is parsed on the device by a pure function, with
+     no server call (§2), so `/api/plans/extract` takes only an image or text.
