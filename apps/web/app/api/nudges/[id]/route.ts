@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { and, eq } from "drizzle-orm";
 import { db, nudges } from "@perq/db";
 import { nudgePatchSchema } from "@perq/shared";
+import { istDate, nextSendTime } from "@perq/finance-engine";
 import { isAuthed, requireAuth } from "@/lib/auth";
+import { nowFor } from "@/lib/money/clock";
 
 export const dynamic = "force-dynamic";
 
-/** PATCH /api/nudges/:id: opened / acted / dismissed. Never moves an acted nudge back. */
+/** PATCH /api/nudges/:id: opened / acted / dismissed / remind. Never moves an acted nudge back. */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAuth(req);
   if (!isAuthed(auth)) return auth;
@@ -18,6 +20,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
   const now = new Date();
   const s = body.data.status;
+  if (s === "remind") {
+    // Back in the queue for the next 09:00 IST after today; the planner sends it then (cap permitting).
+    const clock = await nowFor(auth.id);
+    const at = nextSendTime(new Date(Date.parse(`${istDate(clock)}T23:59:00+05:30`)));
+    await db.update(nudges).set({ status: "queued", scheduledFor: at, actedAt: now }).where(eq(nudges.id, id));
+    return NextResponse.json({ ok: true, status: "queued", scheduledFor: at.toISOString() });
+  }
   const set =
     s === "opened"
       ? { openedAt: row.openedAt ?? now, status: row.status === "sent" ? "opened" : row.status }

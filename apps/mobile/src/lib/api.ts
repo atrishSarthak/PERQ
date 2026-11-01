@@ -53,7 +53,8 @@ export const api = {
     http.request("/api/recommender/profile", { method: "PATCH", body: patch, schema: resultsResponseSchema }),
   setHeld: (cardId: string, held: boolean) =>
     http.request(`/api/arsenal/${encodeURIComponent(cardId)}`, { method: "PATCH", body: { held }, schema: arsenalResponseSchema }),
-  chatHistory: () => http.request("/api/ember/chat", { schema: chatHistoryResponseSchema }),
+  chatHistory: (threadRef?: string) =>
+    http.request(`/api/ember/chat${threadRef ? `?threadRef=${encodeURIComponent(threadRef)}` : ""}`, { schema: chatHistoryResponseSchema }),
 };
 
 /**

@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
-import { EmberAvatar } from "@/components/EmberAvatar";
 import { Screen } from "@/components/Screen";
 import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
+import { ChatThread } from "@/features/chat/ChatThread";
 import { moneyApi } from "@/lib/moneyApi";
 import { useTheme } from "@/theme/ThemeProvider";
 
-// A single nudge (handoff §7.4). The id is a nudge id, or "key:<dedupeKey>"
+// Nudge → chat (handoff §7.4). The id is a nudge id, or "key:<dedupeKey>"
 // when it comes from a local notification scheduled on the device.
 export default function NudgeScreen() {
   const t = useTheme();
@@ -35,71 +35,83 @@ export default function NudgeScreen() {
     return (
       <Screen edges={["bottom"]}>
         <Text variant="heading">This nudge isn't here yet</Text>
-        <Text tone="muted">Ember may still be catching up. Pull your inbox again in a moment.</Text>
+        <Text tone="muted">Ember may still be catching up. Open your inbox again in a moment.</Text>
         <Button label="Close" kind="secondary" onPress={() => router.back()} />
       </Screen>
     );
   }
 
+  const done = (msg: string) => {
+    qc.invalidateQueries({ queryKey: ["nudges"] });
+    qc.invalidateQueries({ queryKey: ["state"] });
+    Alert.alert(msg);
+    router.back();
+  };
+
   return (
-    <Screen edges={["bottom"]}>
-      <Stack.Screen options={{ title: "Ember noticed" }} />
-      <Card>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[2] }}>
-          <EmberAvatar size={24} />
-          <Text variant="caption" tone="ember">
-            EMBER NOTICED
-          </Text>
-        </View>
-        <Text variant="heading">{nudge.title}</Text>
-        <Text>{nudge.body}</Text>
-      </Card>
-      <Button
-        label="Got it"
-        onPress={async () => {
-          await moneyApi.markNudge(nudge.id, "acted").catch(() => {});
-          qc.invalidateQueries({ queryKey: ["nudges"] });
-          router.back();
+    <View style={{ flex: 1, backgroundColor: t.colors.bg }}>
+      <Stack.Screen options={{ title: nudge.title.length > 28 ? "Ember noticed" : nudge.title }} />
+      <ChatThread
+        threadRef={`nudge:${nudge.id}`}
+        onAction={async (action) => {
+          if (action === "upload") {
+            await moneyApi.markNudge(nudge.id, "acted").catch(() => {});
+            router.replace("/upload");
+          } else if (action === "remind_tomorrow") {
+            await moneyApi.markNudge(nudge.id, "remind");
+            done("Ember will remind you tomorrow at 9 am.");
+          } else if (action === "mark_paid" && nudge.cardAccountId) {
+            await moneyApi.markPaid(nudge.cardAccountId);
+            await moneyApi.markNudge(nudge.id, "acted").catch(() => {});
+            done("Marked as paid. Ember won't remind you about this bill again.");
+          }
         }}
-      />
-      <Button
-        label="Not useful"
-        kind="ghost"
-        onPress={async () => {
-          await moneyApi.markNudge(nudge.id, "dismissed").catch(() => {});
-          qc.invalidateQueries({ queryKey: ["nudges"] });
-          router.back();
-        }}
-      />
-      <Pressable onPress={() => setShowWhy((v) => !v)} accessibilityRole="button">
-        <Text tone="link" variant="small">
-          Why am I seeing this?
-        </Text>
-      </Pressable>
-      {showWhy ? (
-        why.data ? (
-          <Card>
-            <Text variant="small">{why.data.description}</Text>
-            {why.data.figures.map((f) => (
-              <View key={f.label} style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text variant="small" tone="muted">
-                  {f.label}
-                </Text>
-                <Text variant="small">{f.value}</Text>
-              </View>
-            ))}
-            {why.data.dataDate ? (
-              <Text variant="caption" tone="muted">
-                {why.data.dataDate}
+        footer={
+          <View style={{ gap: t.spacing[2] }}>
+            <Pressable onPress={() => setShowWhy((v) => !v)} accessibilityRole="button">
+              <Text tone="link" variant="small">
+                Why am I seeing this?
               </Text>
+            </Pressable>
+            {showWhy ? (
+              why.data ? (
+                <Card>
+                  <Text variant="small">{why.data.description}</Text>
+                  {why.data.figures.map((f) => (
+                    <View key={f.label} style={{ flexDirection: "row", justifyContent: "space-between", gap: t.spacing[3] }}>
+                      <Text variant="small" tone="muted">
+                        {f.label}
+                      </Text>
+                      <Text variant="small">{f.value}</Text>
+                    </View>
+                  ))}
+                  {why.data.dataDate ? (
+                    <Text variant="caption" tone="muted">
+                      {why.data.dataDate}
+                    </Text>
+                  ) : null}
+                </Card>
+              ) : (
+                <Text tone="muted" variant="small">
+                  Loading…
+                </Text>
+              )
             ) : null}
-          </Card>
-        ) : (
-          <Text tone="muted" variant="small">
-            Loading…
-          </Text>
-        )
-      ) : null}
-    </Screen>
+            <Pressable
+              accessibilityRole="button"
+              onPress={async () => {
+                await moneyApi.markNudge(nudge.id, "dismissed").catch(() => {});
+                qc.invalidateQueries({ queryKey: ["nudges"] });
+                router.back();
+              }}
+            >
+              <Text tone="muted" variant="small">
+                Not useful? Dismiss
+              </Text>
+            </Pressable>
+          </View>
+        }
+      />
+    </View>
   );
 }

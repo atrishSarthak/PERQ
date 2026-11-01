@@ -11,7 +11,7 @@ const SCHEMA: ResponseSchema = {
   required: ["title", "body"],
 };
 
-const TIMEOUT_MS = 8_000;
+const TIMEOUT_MS = 20_000; // copy is written off the request path (cron or after())
 
 export interface NudgeCopyInput {
   ruleId: string;
@@ -32,7 +32,7 @@ export function nudgeCopyPrompt(n: NudgeCopyInput): string {
     `- title at most ${NUDGE_COPY_LIMITS.title} characters, body at most ${NUDGE_COPY_LIMITS.body}.`,
     "- Use only numbers that appear in DATA or TEMPLATE, written the same way (₹18,240, not ₹18k or 18.2k).",
     "- No urgency or pressure: no exclamation marks, no 'urgent', 'hurry', 'now', 'warning', 'last chance'.",
-    "- Plain English, second person, one idea. No advice about investments or loans.",
+    "- Write dates like 15 Nov (never 2026-11-15). Plain English, second person, one idea. No advice about investments or loans.",
     "",
     `RULE: ${n.ruleId}`,
     `DATA: ${JSON.stringify(n.payload)}`,
@@ -58,7 +58,8 @@ export async function writeNudgeCopy(n: NudgeCopyInput): Promise<NudgeCopy> {
       return template;
     }
     return { ...copy, source: "ai" };
-  } catch {
+  } catch (err) {
+    console.warn("nudge copy failed", { ruleId: n.ruleId, error: err instanceof Error ? err.message.slice(0, 120) : "unknown" });
     return template;
   }
 }

@@ -327,3 +327,31 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     Gemini receives here is statement text (extraction fallback only), merchant names (categorisation)
     and nudge payloads (copy). **Recommendation: move the key to the paid tier before any real user's
     statement is processed.** Until then, use only synthetic statements.
+89. **Money tools live in `apps/web/lib/ember/money/`**, next to the Step 1 recommender tools, not in
+    `packages/ai` as §8 literally says. They need the user's DB rows, and `packages/ai` stays free of DB
+    and app code; they still run through the Step 0 `runEmber` registry. There is one extra read tool,
+    `listStatements`, because the model has no other way to learn statement ids for `getStatement`.
+    Transactions reach the model only as the normalised merchant, never the raw line.
+90. **One Ember, two tool sets.** `/api/ember/chat` gives the model the recommender tools when the quiz
+    is done, the money tools when a statement exists, or both. It needs one of the two, and the run's
+    `maxPermission` is 3. `proposeBudget`/`proposeGoal` are level 3: they emit a `proposal` SSE event
+    and save nothing, and the app saves only on Confirm. `proposeBudget` takes a list of
+    `{category, amount}`, because Gemini tool schemas can't express a free-form record.
+91. **Threads.** The main thread stays `thread = "recommender"` with no `thread_ref`, so Step 1 history
+    is kept. Nudge and card threads are `thread = "money"` plus `thread_ref` (`nudge:<id>`, `card:<id>`).
+    Opening a nudge thread with no messages stores Ember's deterministic opening (the nudge's body plus
+    an offer), and the response carries rule-specific chips. "Mark as paid", "Remind me tomorrow" and
+    "Upload statement" are app buttons that never go to the model. Replying in a nudge thread marks it
+    `acted`. "Remind me" re-queues it for 09:00 IST tomorrow and the planner sends it then.
+92. **Grounding and fallback.** Every reply goes through `ungroundedRupees` against this turn's tool
+    outputs. A miss, or no Gemini, gives a deterministic answer: the nudge body in a nudge thread, the
+    total due otherwise, or the Step 1 fallback for recommender-only users.
+93. **agent_runs redaction.** `logAgentRun` stores `redactRun(record)`: tool name, ms, status, input key
+    names, output shape and `count`. Narration and errors keep their wording, with ₹ amounts and 3+
+    digit runs masked, and errors also lose upper-case (merchant) words. Tested in `test/money/redact.test.ts`.
+94. **Nudge engine after writes uses `after()`** (Next 15), so a statement save or mark-paid returns
+    without waiting on Gemini copy. Gemini copy took about 9 s per call on the free tier, so the copy
+    budget is 20 s, which is fine off the request path.
+95. **`PATCH /api/card-accounts/:id` came early** (checkpoint 10, not 11) because the nudge chat's
+    "Mark as paid" needs it. `markPaid` sets `marked_paid_at` on the latest statement. It's the user's
+    own flag, and Ember never claims a bill was paid.

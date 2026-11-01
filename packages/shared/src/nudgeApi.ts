@@ -19,7 +19,8 @@ export type NudgeItem = z.infer<typeof nudgeItemSchema>;
 
 export const nudgesResponseSchema = z.object({ nudges: z.array(nudgeItemSchema), unread: z.number().int() });
 
-export const nudgePatchSchema = z.object({ status: z.enum(["opened", "acted", "dismissed"]) });
+/** "remind" re-queues the nudge for 09:00 IST tomorrow. */
+export const nudgePatchSchema = z.object({ status: z.enum(["opened", "acted", "dismissed", "remind"]) });
 
 export const nudgeWhySchema = z.object({
   ruleId: z.string(),

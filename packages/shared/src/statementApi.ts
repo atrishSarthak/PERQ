@@ -122,3 +122,19 @@ export const consentsResponseSchema = z.object({
 
 /** Current privacy notice versions (bump when the wording changes). */
 export const NOTICE_VERSIONS = { statements: "2026-11-01", notifications: "2026-11-01" } as const;
+
+/** PATCH /api/card-accounts/:id (§11): label, catalogue link, balance override, mark paid, days. */
+export const cardAccountPatchSchema = z
+  .object({
+    cardLabel: z.string().trim().min(1).max(60).optional(),
+    catalogueCardId: z.string().nullable().optional(),
+    currentBalance: z.number().int().min(0).max(100_000_000).nullable().optional(),
+    creditLimit: z.number().int().positive().max(100_000_000).nullable().optional(),
+    /** Marks the latest statement paid (true) or not (false). A user flag, never a payment. */
+    markPaid: z.boolean().optional(),
+    statementDay: z.number().int().min(1).max(31).nullable().optional(),
+    dueDay: z.number().int().min(1).max(31).nullable().optional(),
+    isActive: z.boolean().optional(),
+  })
+  .refine((o) => Object.keys(o).length > 0, "Nothing to change");
+export type CardAccountPatch = z.infer<typeof cardAccountPatchSchema>;
