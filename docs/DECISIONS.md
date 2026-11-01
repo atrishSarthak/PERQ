@@ -673,3 +673,40 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
 159. **Plans are stamped with the user's clock.** `created_at` comes from the user's clock, so in a
      demo with time travel, matching (plan day to 30 days later) and expiry use the same day the
      plan was made.
+160. **The demo's HDFC card is a Regalia Gold.** It's added with no statements and an entered
+     balance (₹8,000). The phone's ₹1,500 offer needs an HDFC card. Millennia would earn 5% on
+     shopping and food, which would rewrite the Step 2 missed-rewards story (₹340). Regalia Gold
+     earns 0.5% everywhere, so it is never the better card in hindsight.
+161. **Demo plans: "on 26 Nov", not "on the 16th".** The HDFC statement closes on the 25th and
+     the bill is due on the 14th. On the demo date, 22 Nov, buying on 26 Nov gives 49 interest-free
+     days instead of 22, i.e. 27 more, against the spec's illustrative "extra 30". That keeps the
+     Step 2 demo date and the date of every nudge already in it. The phone is needed by 5 Dec, so
+     the over-budget wait doesn't apply (§5.7: need-by within 14 days). The reminder is set for
+     26 Nov, so time travel to that day fires `plan_buy_window`.
+162. **The demo budget is ₹28,000 (was ₹40,000), and demo users plan with a ₹1,00,000 income.**
+     The trip (₹38,000) has to be a wait. It's best bought on 5 Dec on ACE, i.e. from December's
+     fresh budget, so the over-budget rule needs a monthly budget below ₹30,400. The phone's goal
+     slip depends on the saving rate, which comes from income. A demo account's own quiz income band
+     would make the verdicts differ from account to account, so `loadPlanContext` uses
+     `DEMO_MONTHLY_INCOME` for `is_demo` users. The quiz answers aren't touched, and Reset brings
+     them back. `insertDemoPlans` throws if a demo plan's verdict ever drifts. Step 2 nudges are
+     unchanged: food delivery is still ₹4,100 of ₹5,000.
+163. **Demo plans use the template wording.** There's no Gemini call at load, so loading is
+     instant, repeatable and costs no quota. Asking Ember in the plan thread still uses Gemini.
+164. **A one-month goal reads as "put that aside by <day>".** When the proposal's monthly saving is
+     the whole price, the card doesn't say "₹38,000 a month".
+165. **Reaching the planned day isn't a change.** `plan_buy_window` treats `go` and
+     `go_with_timing` as one answer. A "Go ahead, on 26 Nov" plan re-run on 26 Nov comes out `go`
+     ("Today works…"), not "your plan changed".
+166. **Deleting money data deletes purchase plans, and the main-chat cards that show them.** This
+     was a Step 3 gap: plans survived "Delete my data" and demo reloads.
+167. **The planner eval is its own runner, `pnpm eval:plans`**, alongside `eval:money`. The spec
+     named `ember.eval.ts`, but the recommender eval there has its own fixture count and checks.
+     It has 10 fixtures: 4 explanations, one per verdict; 1 chat message without a price; and the
+     5 synthetic screenshots. `test/eval/planFixtures.test.ts` checks the verdicts offline. It needs
+     `tsx --env-file=.env` because the plan tools import the DB client.
+168. **The API round trip is a DB test, `pnpm --filter @perq/web test:db`.** It covers run → save
+     → what-if → remind → statement match. It calls the real route handlers on a throwaway user:
+     demo data loaded, Gemini off, and the statement rows a confirmed parse would write inserted
+     directly (the mocked parser). The user is deleted afterwards. Without `PERQ_DB_TESTS=1` it
+     skips, so `pnpm test` stays offline.

@@ -8,9 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
+    "test:db": "PERQ_DB_TESTS=1 node --env-file=.env ../../node_modules/vitest/vitest.mjs run test/plans/roundtrip.db.test.ts",
     "eval": "tsx eval/ember.eval.ts",
     "nudges:run": "tsx --env-file=../../.env scripts/nudges-run.ts",
-    "eval:money": "tsx eval/money.eval.ts"
+    "eval:money": "tsx eval/money.eval.ts",
+    "eval:plans": "tsx --env-file=.env eval/plans.eval.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.2",

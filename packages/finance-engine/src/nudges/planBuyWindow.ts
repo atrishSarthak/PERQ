@@ -30,6 +30,8 @@ export const planDedupeKey = (planId: string, remindAt: string) => `plan_buy_win
 export const planIdFromDedupeKey = (key: string): string | null => (key.startsWith("plan_buy_window:") ? key.split(":")[1] ?? null : null);
 
 const lcFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+/** "Go ahead" and "Go ahead, on <day>" are one answer: the day arriving isn't a change. */
+const family = (v: Verdict) => (v === "go_with_timing" ? "go" : v);
 
 export const PLAN_BUY_WINDOW_DESCRIPTION = "You asked Ember to remind you about a purchase plan on this day; it re-checks the plan with fresh numbers first.";
 
@@ -40,7 +42,7 @@ export function planBuyWindowCandidates(plans: PlanReminder[], now: Date, config
     .map((p) => {
       const r = p.result;
       const o = r.recommended;
-      const changed = p.previousVerdict !== null && p.previousVerdict !== r.verdict;
+      const changed = p.previousVerdict !== null && family(p.previousVerdict) !== family(r.verdict);
       const item = p.itemName;
       let body: string;
       if (changed) {

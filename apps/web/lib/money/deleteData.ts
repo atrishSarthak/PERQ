@@ -1,4 +1,4 @@
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, eq, isNotNull, like } from "drizzle-orm";
 import {
   activityEvents,
   budgets,
@@ -7,6 +7,7 @@ import {
   db,
   financialStateCache,
   nudges,
+  purchasePlans,
   savingsGoals,
   userMerchantOverrides,
   userProfile,
@@ -14,10 +15,14 @@ import {
 
 /**
  * Every statement, transaction, card account, budget, goal, nudge, nudge/card
- * chat, merchant override, the cached state and activity (§10.9, §12).
+ * chat, merchant override, purchase plan (and the chat cards showing them),
+ * the cached state and activity (§10.9, §12; Step 3 §4).
  * Consents stay: they're the dated record of what the user agreed to.
  */
 export async function deleteFinancialData(userId: string): Promise<void> {
+  // Plans first: a bought plan points at a transaction.
+  await db.delete(purchasePlans).where(eq(purchasePlans.userId, userId));
+  await db.delete(chatMessages).where(and(eq(chatMessages.userId, userId), like(chatMessages.content, "%[plan:%]")));
   // card_accounts cascades to statements and transactions.
   await db.delete(cardAccounts).where(eq(cardAccounts.userId, userId));
   await db.delete(nudges).where(eq(nudges.userId, userId));

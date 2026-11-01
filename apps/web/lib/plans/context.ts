@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db, statements, transactions } from "@perq/db";
+import { db, statements, transactions, users } from "@perq/db";
 import { averageMonthlySpend, planContextFromState, type PlanCardTerms, type PlanContext } from "@perq/finance-engine";
 import { INCOME_BUCKET_RUPEES, type CatalogCard } from "@perq/shared";
 import { getFinancialState } from "@/lib/money/state";
@@ -25,6 +25,12 @@ export function planCardTerms(c: CatalogCard): PlanCardTerms {
   };
 }
 
+/**
+ * Demo mode's take-home income (₹/month). Demo plans must open the same verdict on any account,
+ * so a demo user's quiz band is not used; Reset demo brings it back.
+ */
+export const DEMO_MONTHLY_INCOME = 100000;
+
 export interface LoadedPlanContext {
   ctx: PlanContext;
   /** The state figures a plan used, stored as purchase_plans.inputs_snapshot. */
@@ -33,16 +39,17 @@ export interface LoadedPlanContext {
 }
 
 export async function loadPlanContext(userId: string, now: Date): Promise<LoadedPlanContext> {
-  const [state, catalogue, held, profile, stmts, txns] = await Promise.all([
+  const [state, catalogue, held, profile, stmts, txns, [user]] = await Promise.all([
     getFinancialState(userId, now),
     loadCatalogue(),
     getHeldCardIds(userId),
     getProfile(userId),
     db.select().from(statements).where(eq(statements.userId, userId)),
     db.select().from(transactions).where(eq(transactions.userId, userId)),
+    db.select({ isDemo: users.isDemo }).from(users).where(eq(users.id, userId)).limit(1),
   ]);
   const termsById = new Map(catalogue.map((c) => [c.id, planCardTerms(c)]));
-  const income = profile?.answers.monthlyIncome ? INCOME_BUCKET_RUPEES[profile.answers.monthlyIncome].mid : null;
+  const income = user?.isDemo ? DEMO_MONTHLY_INCOME : profile?.answers.monthlyIncome ? INCOME_BUCKET_RUPEES[profile.answers.monthlyIncome].mid : null;
   const avg = stmts.length ? averageMonthlySpend(stmts, txns).total : null;
   const ctx = planContextFromState(state, { termsById, heldCatalogueIds: held, monthlyIncome: income, averageMonthlySpend: avg });
   const monthName = new Date(`${state.month.key}-01T00:00:00Z`).toLocaleDateString("en-IN", { month: "long", timeZone: "UTC" });

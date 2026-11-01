@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { budgets, cardAccounts, db, savingsGoals, statements, transactions, users } from "@perq/db";
 import { PARSER_VERSION } from "@perq/statements";
+import { insertDemoPlans } from "@/lib/plans/demo";
 import { setHeld } from "@/lib/recommender/service";
 import { invalidateState, logActivity } from "./activity";
 import { setDemoClock } from "./clock";
@@ -171,14 +172,23 @@ export async function loadDemo(userId: string, at: Date = DEMO_DATE) {
     { issuer: "SBI Card", last4: "7710", cardId: "sbi-simplyclick", label: "SimplyCLICK", limit: 50000, statementDay: 26, dueDay: 15, anniversary: 3, balance: { amount: 37000, at: new Date("2026-11-21T08:00:00Z") } },
     clickCycles()
   );
+  // Step 3: an HDFC card for the phone offer. No statements yet (added last week), so its balance is entered.
+  // Regalia Gold earns 0.5% everywhere, so it never changes the Step 2 missed-rewards story above.
+  await insertCard(
+    userId,
+    { issuer: "HDFC Bank", last4: "4421", cardId: "hdfc-regalia-gold", label: "Regalia Gold", limit: 150000, statementDay: 25, dueDay: 14, anniversary: 9, balance: { amount: 8000, at: new Date("2026-11-20T08:00:00Z") } },
+    []
+  );
   await setHeld(userId, "axis-ace", true);
   await setHeld(userId, "sbi-simplyclick", true);
-  await db.insert(budgets).values({ userId, month: null, totalLimit: 40000, categoryLimits: { food_delivery: 5000, online_shopping: 8000 } });
+  await setHeld(userId, "hdfc-regalia-gold", true);
+  await db.insert(budgets).values({ userId, month: null, totalLimit: 28000, categoryLimits: { food_delivery: 5000, online_shopping: 8000 } });
   await db.insert(savingsGoals).values({ userId, name: "Goa trip fund", targetAmount: 30000, targetDate: "2027-05-12", savedAmount: 3000, createdAt: new Date("2026-05-12T06:00:00Z") });
   await invalidateState(userId);
-  await logActivity(userId, "demo_loaded", `Loaded demo data: 2 cards, 6 statements, ${ace.count + click.count} transactions`);
+  await logActivity(userId, "demo_loaded", `Loaded demo data: 3 cards, 6 statements, 3 purchase plans, ${ace.count + click.count} transactions`);
+  const plans = await insertDemoPlans(userId, at);
   const run = await runNudgeEngine(userId, at);
-  return { cards: 2, statements: 6, transactions: ace.count + click.count, nudgesSent: run.sent.length, now: at.toISOString() };
+  return { cards: 3, plans: plans.length, statements: 6, transactions: ace.count + click.count, nudgesSent: run.sent.length, now: at.toISOString() };
 }
 
 export async function resetDemo(userId: string) {

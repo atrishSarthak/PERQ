@@ -138,7 +138,9 @@ export function PlanActions({ plan }: { plan: PlanDetailResponse }) {
             {gp.targetDate ? ` by ${formatDay(gp.targetDate)}` : ""}
           </Text>
           <Text variant="small" tone="muted">
-            {gp.monthlySaving
+            {gp.monthlySaving && gp.monthlySaving >= gp.target && gp.targetDate
+              ? `You can put that aside by ${formatDay(gp.targetDate)}, from what you have left after your other goals.`
+              : gp.monthlySaving
               ? `That's ${formatInr(gp.monthlySaving)} a month, from what you have left after your other goals.`
               : "Ember doesn't know your saving pace yet, so pick a date in Goals after you add it."}
           </Text>

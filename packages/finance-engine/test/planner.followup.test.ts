@@ -125,6 +125,12 @@ describe("plan_buy_window", () => {
     expect(c!.templateBody).toMatch(/the answer changed: better to wait, not go ahead/);
   });
 
+  it("isn't a change when a 'go ahead, on <day>' plan reaches its day", () => {
+    const [c] = planBuyWindowCandidates([reminder({ previousVerdict: "go_with_timing", previousHeadline: "Go ahead, on 26 Nov" })], at9("2026-11-26"));
+    expect(c!.payload.changed).toBe(false);
+    expect(c!.templateTitle).toBe("Your Phone plan");
+  });
+
   it("joins the Expo Go simulation on its day", () => {
     const stateInput = { now: at9("2026-11-24"), cardAccounts: [], statements: [], transactions: [], budget: null, goals: [] };
     const up = simulateUpcoming(stateInput, [], [], (when) => planBuyWindowCandidates([reminder()], when));
