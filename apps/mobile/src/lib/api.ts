@@ -53,6 +53,8 @@ export const api = {
     http.request("/api/recommender/profile", { method: "PATCH", body: patch, schema: resultsResponseSchema }),
   setHeld: (cardId: string, held: boolean) =>
     http.request(`/api/arsenal/${encodeURIComponent(cardId)}`, { method: "PATCH", body: { held }, schema: arsenalResponseSchema }),
+  syncSpend: (source: "statements" | "quiz") =>
+    http.request("/api/recommender/sync-spend", { method: "POST", body: { source }, schema: resultsResponseSchema }),
   chatHistory: (threadRef?: string) =>
     http.request(`/api/ember/chat${threadRef ? `?threadRef=${encodeURIComponent(threadRef)}` : ""}`, { schema: chatHistoryResponseSchema }),
 };

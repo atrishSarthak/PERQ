@@ -68,3 +68,12 @@ export function useSetHeld() {
     onSettled: () => qc.invalidateQueries({ queryKey: RESULTS_KEY }),
   });
 }
+
+/** Step 2 §9: rank on real statement spend, or back on quiz answers. */
+export function useSyncSpend() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (source: "statements" | "quiz") => api.syncSpend(source),
+    onSuccess: (data) => qc.setQueryData(RESULTS_KEY, data),
+  });
+}

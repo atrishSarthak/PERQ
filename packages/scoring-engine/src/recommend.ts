@@ -18,8 +18,10 @@ import {
   INCOME_BUCKET_RUPEES,
   SPEND_BUCKET_RUPEES,
   TRAVEL_BUCKET_TRIPS,
+  TXN_TO_RECOMMENDER,
   travelMonthlySpend,
   type CatalogCard,
+  type TxnCategory,
   type Priority,
   type QuizAnswersV2,
   type RecommendationResult,
@@ -181,6 +183,22 @@ function oneLineReason(card: CatalogCard, lines: ScoredCardV2["breakdown"], fee:
 export interface RecommendOptions {
   /** Card ids the user holds (from the arsenal; falls back to answers.cardsHeld). */
   heldCardIds?: string[];
+  /** Real spend from statements (handoff Step 2 §9), replacing the quiz buckets. */
+  spendOverride?: { spend: MonthlySpend; statementCount: number; dataThrough: string | null };
+}
+
+/**
+ * Average monthly spend by transaction category (finance-engine
+ * averageMonthlySpend) → the recommender's categories via TXN_TO_RECOMMENDER.
+ * Rent, EMI, fees, cash and transfers don't earn rewards and are left out.
+ */
+export function statementSpendToMonthly(perMonth: Record<string, number>): MonthlySpend {
+  const out = Object.fromEntries(CATEGORIES.map((c) => [c, 0])) as MonthlySpend;
+  for (const [txnCat, v] of Object.entries(perMonth)) {
+    const cat = TXN_TO_RECOMMENDER[txnCat as TxnCategory];
+    if (cat && cat in out) out[cat as Category] += Math.round(v);
+  }
+  return out;
 }
 
 /**
@@ -192,7 +210,7 @@ export function recommend(
   catalogue: CatalogCard[],
   opts: RecommendOptions = {}
 ): RecommendationResult {
-  const spend = answersToMonthlySpend(answers);
+  const spend = opts.spendOverride?.spend ?? answersToMonthlySpend(answers);
   const held = new Set(opts.heldCardIds ?? answers.cardsHeld);
   const verified = catalogue.filter((c) => c.verified);
 
@@ -303,6 +321,8 @@ export function recommend(
       travelTripsPerYear: TRAVEL_BUCKET_TRIPS[answers.travelPerYear],
       avgTripSpend: AVG_TRIP_SPEND,
       gstRatePct: GST_RATE * 100,
+      spendSource: opts.spendOverride ? "statements" : "quiz",
+      ...(opts.spendOverride ? { statementCount: opts.spendOverride.statementCount, dataThrough: opts.spendOverride.dataThrough } : {}),
     },
     catalogue: { total: catalogue.length, verified: verified.length, checkedOn },
   };

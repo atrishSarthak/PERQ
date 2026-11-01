@@ -146,3 +146,21 @@ describe("recommend on the real 40-card catalogue", () => {
     expect((top.rewardRates.food_delivery ?? 0) >= 4).toBe(true);
   });
 });
+
+describe("real spend from statements (Step 2 §9)", () => {
+  it("maps transaction categories to recommender categories and drops non-reward ones", async () => {
+    const { statementSpendToMonthly } = await import("../src/recommend");
+    expect(statementSpendToMonthly({ food_delivery: 3000, entertainment: 400, health: 600, rent: 25000, emi: 5000, travel: 6000 })).toEqual({
+      ...zero, food_delivery: 3000, other: 1000, travel: 6000,
+    });
+  });
+
+  it("re-scores on the override and reports the basis", () => {
+    const quiz = recommend(base, catalogue);
+    const real = recommend(base, catalogue, { spendOverride: { spend: { ...zero, food_delivery: 12000 }, statementCount: 3, dataThrough: "2026-10-15" } });
+    expect(quiz.assumptions.spendSource).toBe("quiz");
+    expect(real.assumptions).toMatchObject({ spendSource: "statements", statementCount: 3, dataThrough: "2026-10-15" });
+    expect(real.assumptions.monthlySpend.food_delivery).toBe(12000);
+    expect(real.ranked[0]!.cardId).toBe("food-cobrand");
+  });
+});

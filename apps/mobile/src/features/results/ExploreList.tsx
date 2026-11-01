@@ -15,6 +15,7 @@ import {
   type SortMode,
 } from "./filterSort";
 import { useResults, useSetHeld } from "@/lib/queries";
+import { SpendSyncPrompt, spendBasisLine } from "./SpendSync";
 import { useExplanation } from "./useExplanation";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -62,6 +63,12 @@ export function ExploreList({ header }: { header?: ReactNode }) {
         ListHeaderComponent={
           <View style={{ gap: t.spacing[4] }}>
             {header}
+            <SpendSyncPrompt />
+            {spendBasisLine(data.spendSync) ? (
+              <Text variant="small" tone="ember">
+                {spendBasisLine(data.spendSync)}
+              </Text>
+            ) : null}
             <LeakageBanner leakage={data.result.leakage} />
             {showTop ? <TopPickCard card={top!} explanation={explanation} working={emberStep} /> : null}
             <Segmented<SortMode>

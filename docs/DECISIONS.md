@@ -378,3 +378,14 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
     The phone also forgets remembered statement passwords and cancels scheduled local notifications.
 102. **Inbox swipe-to-dismiss** uses RN `PanResponder` (no new native module), with an accessibility
     "Dismiss" action for VoiceOver.
+103. **Recommender sync (§9).** `recommend()` takes an optional `spendOverride`, built from
+    finance-engine `averageMonthlySpend` (reconciled statements only, each card's latest 3, cards
+    summed). `statementSpendToMonthly` maps it through `TXN_TO_RECOMMENDER`: entertainment, health and
+    education count as `other`, while rent, EMI, fees, cash and transfers are dropped because they
+    don't earn rewards. Quiz-derived travel is replaced by real travel spend. The profile stores
+    `spend_source` and `synced_spend`. Real spend is in the profile hash, so switching re-ranks and a
+    changed Top Pick gets a fresh explanation through the existing guardrail. Leakage uses the same
+    spend. Each statement save or delete recomputes `synced_spend`, and deleting the last reconciled
+    statement reverts to the quiz. `getUserProfile` (Ember) reports `spendSource` and the statement
+    count. The results response carries `spendSync` for the Home/Cards prompt, the "Based on your last
+    N statements" line, and the Profile switch. `statementCount` counts statements across all cards.

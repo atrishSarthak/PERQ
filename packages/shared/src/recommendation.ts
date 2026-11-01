@@ -78,6 +78,10 @@ export const assumptionsSchema = z.object({
   travelTripsPerYear: z.number(),
   avgTripSpend: z.number(),
   gstRatePct: z.number(),
+  /** Step 2 §9: "statements" once the user switched to real spend. */
+  spendSource: z.enum(["quiz", "statements"]).default("quiz"),
+  statementCount: z.number().int().optional(),
+  dataThrough: z.string().nullable().optional(),
 });
 
 export const recommendationResultSchema = z.object({
@@ -92,6 +96,15 @@ export type RecommendationResult = z.infer<typeof recommendationResultSchema>;
 /** What GET /api/recommender/results returns to the apps. */
 export const resultsResponseSchema = z.object({
   answers: quizAnswersV2Schema,
+  /** Step 2 §9: whether real spend from statements is available / in use. */
+  spendSync: z
+    .object({
+      source: z.enum(["quiz", "statements"]),
+      available: z.boolean(),
+      statementCount: z.number().int(),
+      dataThrough: z.string().nullable(),
+    })
+    .optional(),
   needsConfirmation: z.array(z.string()),
   result: recommendationResultSchema,
   explanation: z

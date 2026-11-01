@@ -20,6 +20,7 @@ import {
 import type { ConfirmStatementRequest, StatementParseError } from "@perq/shared";
 import { loadCatalogue } from "@/lib/recommender/catalog";
 import { setHeld } from "@/lib/recommender/service";
+import { refreshSyncedSpend } from "@/lib/recommender/spendSync";
 import { invalidateState, logActivity } from "./activity";
 import { signDraft, verifyDraft, type DraftPayload } from "./parseToken";
 import { statementLlm } from "./llm";
@@ -241,6 +242,7 @@ export async function confirmForUser(userId: string, req: ConfirmStatementReques
   }
 
   if (catalogueCardId) await setHeld(userId, catalogueCardId, true);
+  await refreshSyncedSpend(userId);
   await invalidateState(userId);
   await logActivity(
     userId,

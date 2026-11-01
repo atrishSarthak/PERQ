@@ -9,6 +9,7 @@ import {
   type ResultsResponse,
 } from "@perq/shared";
 import { catalogueVersion, loadCatalogue } from "./catalog";
+import { getSpendSource, statementSpend } from "./spendSync";
 
 // Server side of the recommender (handoff §1.3/§1.5). Shared by the API
 // routes and Ember's tools so they can never disagree.
@@ -112,9 +113,9 @@ function stableStringify(value: unknown): string {
 }
 
 /** sha256 of the answers + held cards, key-order independent (D6). */
-export function profileHash(answers: QuizAnswersV2, heldIds: string[]): string {
+export function profileHash(answers: QuizAnswersV2, heldIds: string[], realSpend?: unknown): string {
   return createHash("sha256")
-    .update(stableStringify({ ...answers, cardsHeld: [...heldIds].sort() }))
+    .update(stableStringify({ ...answers, cardsHeld: [...heldIds].sort(), ...(realSpend ? { realSpend } : {}) }))
     .digest("hex");
 }
 
@@ -132,10 +133,15 @@ export interface ComputedResults {
 export async function computeResults(userId: string): Promise<ComputedResults | null> {
   const profile = await getProfile(userId);
   if (!profile) return null;
-  const [catalogue, held] = await Promise.all([loadCatalogue(), getHeldCardIds(userId)]);
+  const [catalogue, held, spendSource, available] = await Promise.all([loadCatalogue(), getHeldCardIds(userId), getSpendSource(userId), statementSpend(userId)]);
   const answers = { ...profile.answers, cardsHeld: held };
-  const result = recommend(answers, catalogue, { heldCardIds: held });
-  const hash = profileHash(answers, held);
+  const synced = spendSource.source === "statements" ? spendSource.synced : null;
+  const result = recommend(answers, catalogue, {
+    heldCardIds: held,
+    ...(synced ? { spendOverride: { spend: synced.spend, statementCount: synced.statementCount, dataThrough: synced.dataThrough } } : {}),
+  });
+  // Real spend is part of the hash, so switching re-ranks and a new Top Pick gets a new explanation.
+  const hash = profileHash(answers, held, synced?.spend);
   const cardsVersion = catalogueVersion(catalogue);
 
   const [stored] = await db
@@ -162,6 +168,12 @@ export async function computeResults(userId: string): Promise<ComputedResults | 
     cardsVersion,
     response: {
       answers,
+      spendSync: {
+        source: synced ? "statements" : "quiz",
+        available: available.statementCount > 0,
+        statementCount: synced?.statementCount ?? available.statementCount,
+        dataThrough: synced?.dataThrough ?? available.dataThrough,
+      },
       needsConfirmation: profile.needsConfirmation,
       result,
       profileHash: hash,

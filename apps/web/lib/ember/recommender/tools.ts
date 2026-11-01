@@ -123,7 +123,8 @@ const spendChange = z
 export function createRecommenderTools(ctx: RecommenderToolContext): EmberTool<any, any>[] {
   const getUserProfile: EmberTool<Record<string, never>, unknown> = {
     name: "getUserProfile",
-    description: "The user's quiz answers and the ₹/month PERQ assumed for each spend category.",
+    description:
+      "The user's quiz answers and the ₹/month PERQ uses for each spend category: real average spend from their statements when spendSource is 'statements', otherwise quiz estimates.",
     input: z.object({}),
     permission: PERMISSION.OBSERVE,
     narration: "Checked your answers",
@@ -134,6 +135,8 @@ export function createRecommenderTools(ctx: RecommenderToolContext): EmberTool<a
       priorities: ctx.answers.priorities,
       travelPerYear: ctx.answers.travelPerYear,
       assumedMonthlySpend: ctx.result.assumptions.monthlySpend,
+      spendSource: ctx.result.assumptions.spendSource,
+      ...(ctx.result.assumptions.spendSource === "statements" ? { basedOnStatements: ctx.result.assumptions.statementCount, statementsUpTo: ctx.result.assumptions.dataThrough } : {}),
       cardsHeld: ctx.heldCardIds.map((id) => ctx.catalogue.find((c) => c.id === id)?.name ?? id),
       openToSecured: ctx.answers.openToSecured,
     }),

@@ -10,6 +10,7 @@ import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
 import { Amount, CategoryBars, dueLine, monthName, shortDate } from "@/features/money/components";
 import { LeakageBanner } from "@/features/results/components";
+import { SpendSyncPrompt } from "@/features/results/SpendSync";
 import { useAuth } from "@/lib/auth";
 import { useMarkPaid, useMoneyState, useNudges } from "@/lib/moneyQueries";
 import { hasAskedForNotifications } from "@/lib/notifications";
@@ -156,6 +157,7 @@ export default function Home() {
         </>
       )}
 
+      <SpendSyncPrompt />
       {results.data ? <LeakageBanner leakage={results.data.result.leakage} /> : null}
       {top ? (
         <Pressable onPress={() => router.push("/cards")} accessibilityRole="button" accessibilityHint="Opens your ranked cards">

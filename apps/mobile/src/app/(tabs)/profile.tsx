@@ -8,7 +8,7 @@ import { Segmented } from "@/components/Segmented";
 import { Text } from "@/components/Text";
 import { answerSummary } from "@/features/quiz/answerLabels";
 import { useAuth } from "@/lib/auth";
-import { useCatalogue, useResults, useSetHeld } from "@/lib/queries";
+import { useCatalogue, useResults, useSetHeld, useSyncSpend } from "@/lib/queries";
 import { useThemeContext, type ThemePreference } from "@/theme/ThemeProvider";
 
 const SHORT_TITLES: Record<QuizKey, string> = {
@@ -28,6 +28,8 @@ export default function Profile() {
   const results = useResults();
   const catalogue = useCatalogue();
   const setHeld = useSetHeld();
+  const syncSpend = useSyncSpend();
+  const spendSync = results.data?.spendSync;
   const answers = results.data?.answers;
   const name = (id: string) => catalogue.data?.cards.find((c) => c.id === id)?.name ?? id;
   const confirm = new Set(results.data?.needsConfirmation ?? []);
@@ -41,6 +43,23 @@ export default function Profile() {
         </Text>
       </Pressable>
       <Text tone="muted">{user?.email}</Text>
+
+      {spendSync?.available ? (
+        <Card>
+          <Text variant="heading">Card ranking uses</Text>
+          <Text variant="small" tone="muted">
+            {spendSync.source === "statements"
+              ? `Your real spending from ${spendSync.statementCount} statement${spendSync.statementCount === 1 ? "" : "s"}.`
+              : "Your quiz estimates."}
+          </Text>
+          <Button
+            label={spendSync.source === "statements" ? "Switch back to quiz answers" : "Use my real spending"}
+            kind="secondary"
+            loading={syncSpend.isPending}
+            onPress={() => syncSpend.mutate(spendSync.source === "statements" ? "quiz" : "statements")}
+          />
+        </Card>
+      ) : null}
 
       <Card>
         <Text variant="heading">Money</Text>
