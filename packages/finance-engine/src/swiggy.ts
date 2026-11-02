@@ -30,6 +30,14 @@ export function swiggySummary(orders: SwiggyOrder[], month: string, now: Date, f
     .filter((o) => isLateNight(o) && Date.parse(o.orderedAt) <= now.getTime() && Date.parse(o.orderedAt) > now.getTime() - WEEK_MS)
     .sort((a, b) => a.orderedAt.localeCompare(b.orderedAt));
   const foodSpend = sum(food);
+  const today = istDate(now);
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const date = istDate(new Date(Date.parse(`${today}T12:00:00Z`) - (6 - i) * 86_400_000));
+    const day = orders.filter((o) => istDate(new Date(o.orderedAt)) === date && Date.parse(o.orderedAt) <= now.getTime());
+    const f = sum(day.filter((o) => o.service === "food"));
+    const m = sum(day.filter((o) => o.service === "instamart"));
+    return { date, food: f, instamart: m, total: f + m };
+  });
   return {
     month,
     spend: sum(inMonth),
@@ -39,6 +47,7 @@ export function swiggySummary(orders: SwiggyOrder[], month: string, now: Date, f
     orders: inMonth.length,
     lateNightOrders: food.filter(isLateNight).length,
     lateNightWeek: { count: week.length, amount: sum(week), latestDay: week.length ? istDate(new Date(week.at(-1)!.orderedAt)) : null },
+    last7Days,
     foodBudget: foodBudgetLimit !== null && foodBudgetLimit > 0 ? { limit: foodBudgetLimit, left: foodBudgetLimit - foodSpend } : null,
   };
 }

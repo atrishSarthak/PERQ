@@ -9,6 +9,7 @@
     "@perq/shared": "workspace:*",
     "@tanstack/react-query": "^5.105.0",
     "expo": "~58.0.21",
+    "expo-blur": "~58.0.5",
     "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.14",
     "expo-document-picker": "~58.0.4",

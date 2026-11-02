@@ -8,8 +8,8 @@ const raw = JSON.parse(readFileSync(resolve(__dirname, "../../db/data/cards.json
 describe("card catalogue (packages/db/data/cards.json)", () => {
   const cards = catalogFileSchema.parse(raw);
 
-  it("has 40 cards with unique ids", () => {
-    expect(cards).toHaveLength(40);
+  it("has 41 cards with unique ids", () => {
+    expect(cards).toHaveLength(41);
   });
 
   it("gives every card a source link and a checked date", () => {

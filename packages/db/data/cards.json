@@ -349,6 +349,67 @@
     "emiRewards": false
   },
   {
+    "id": "hdfc-moneyback-plus",
+    "name": "HDFC Bank MoneyBack+ Credit Card",
+    "issuer": "HDFC Bank",
+    "networks": [
+      "Visa",
+      "Mastercard"
+    ],
+    "bucket": "entry_cashback",
+    "tier": null,
+    "cardType": "unsecured",
+    "fdMinAmount": null,
+    "lifetimeFree": false,
+    "upiEnabled": false,
+    "joiningFee": 500,
+    "annualFee": 500,
+    "feeWaiverSpend": 50000,
+    "waiverExcludes": [],
+    "rewardRates": {
+      "food_delivery": 2.5,
+      "online_shopping": 2.5,
+      "groceries": 0.25,
+      "dining": 0.25,
+      "fuel": 0,
+      "bills": 0.25,
+      "upi": 0,
+      "travel": 0.25,
+      "other": 0.25
+    },
+    "rewardCaps": {},
+    "capGroups": [
+      {
+        "categories": [
+          "food_delivery",
+          "online_shopping"
+        ],
+        "monthlyCap": 625,
+        "label": "10X on Amazon, Flipkart, Swiggy and more"
+      }
+    ],
+    "rewardNotes": "UNVERIFIED: HDFC's page blocked our reader and secondary sources disagree on the base rate (2 CashPoints per ₹150 or per ₹200) and on the 15 May 2026 changes. Modelled conservatively: 2 CashPoints per ₹200 at ₹0.25 each (0.25%), 10X on Amazon, Flipkart, Swiggy, BigBasket and Reliance SmartBazaar (2.5%, extra points capped at 2,500 a month, so ₹625). Groceries use the base rate because BigBasket is one merchant among many. ₹500 voucher each quarter with ₹50,000 spend, modelled as ₹2,000 at ₹2 lakh a year. Welcome 500 CashPoints (₹125). Nothing on fuel or wallets.",
+    "milestones": [
+      {
+        "annualSpend": 200000,
+        "value": 2000
+      }
+    ],
+    "welcomeBenefitValue": 125,
+    "redemptionValue": 0.25,
+    "coBrandPartner": null,
+    "minAge": 21,
+    "eligibleOccupations": [
+      "salaried",
+      "self_employed"
+    ],
+    "minMonthlyIncome": null,
+    "sourceUrl": "https://www.hdfc.bank.in/credit-cards/moneyback-plus-credit-card",
+    "sourceUpdatedAt": "2026-10-31",
+    "verified": false,
+    "emiRewards": false
+  },
+  {
     "id": "hdfc-tata-neu-plus",
     "name": "Tata Neu Plus HDFC Bank Credit Card",
     "issuer": "HDFC Bank",

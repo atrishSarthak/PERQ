@@ -766,3 +766,17 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      the budget's `food_delivery` limit, set against Swiggy food spend only (not Instamart groceries).
      The financial state gained `swiggy`, so `STATE_VERSION` is 3. `/api/swiggy/*` was added to the
      CORS matcher for the web preview.
+179. **"I have this card" adds the card to My cards.** Turning it on creates a card account with
+     no statement and a placeholder last4 (`#<card id>`), so the planner, Home and Ember use the card.
+     Turning it off removes that account while it has no statements. The first statement for the card
+     takes the account over (`claimHeldCardAccount`) instead of making a second one. Removing a card
+     from My cards (`DELETE /api/card-accounts/:id`) deletes its statements and transactions (cascade),
+     its nudges and its Ember thread, and turns the switch off when no other account is that card.
+180. **The planner uses the cards in My cards only.** Cards ticked in the quiz stand in only until the
+     first card account exists. Before this, every quiz-held card was planned with, even ones the user
+     had no statement for.
+181. **HDFC MoneyBack+ is in the catalogue, unverified.** HDFC's page blocked our reader and secondary
+     sources disagree on the base rate and the May 2026 changes, so it's modelled conservatively
+     (0.25% base, 2.5% on Amazon/Flipkart/Swiggy capped at ₹625 a month) and excluded from ranking.
+     Its terms still drive the user's own MoneyBack+ maths. The matcher reads "Plus" as "+".
+     `build-cards.py` now writes `emiRewards` and the README's EMI section, which had been added by hand.

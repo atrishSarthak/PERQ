@@ -8,10 +8,11 @@ import { EmberAvatar } from "@/components/EmberAvatar";
 import { Screen } from "@/components/Screen";
 import { ErrorState, Loading } from "@/components/StateViews";
 import { Text } from "@/components/Text";
-import { Amount, CategoryBars, dueLine, monthName, shortDate } from "@/features/money/components";
-import { LeakageBanner } from "@/features/results/components";
+import { CanIBuyTile, Caption, Meter, NudgeStrip, Row, Tile } from "@/features/home/Bento";
+import { SpendOverview } from "@/features/home/SpendOverview";
+import { monthName, shortDate } from "@/features/money/components";
 import { SpendSyncPrompt } from "@/features/results/SpendSync";
-import { SwiggyHomeCard, useSwiggySyncOnFocus } from "@/features/swiggy/HomeCard";
+import { ConnectSwiggyTile, useSwiggySyncOnFocus } from "@/features/swiggy/HomeCard";
 import { useAuth } from "@/lib/auth";
 import { useMarkPaid, useMoneyState, useNudges } from "@/lib/moneyQueries";
 import { hasAskedForNotifications } from "@/lib/notifications";
@@ -19,8 +20,9 @@ import { usePlans } from "@/lib/plannerApi";
 import { useResults } from "@/lib/queries";
 import { useTheme } from "@/theme/ThemeProvider";
 
-// Home (handoff §10.1): left to spend, Ember noticed, upcoming dues,
-// spending this month, and the Step 1 pick. Empty state before any statement.
+// Home (handoff §10.1) as a bento grid: left to spend, the month's spend by
+// category, Ember noticed, then one tile per feature with its headline number.
+// Empty state before any statement.
 
 function greeting(): string {
   const h = new Date().getHours();
@@ -51,15 +53,39 @@ export default function Home() {
   const unread = nudges.data?.nudges.find((n) => n.status === "sent") ?? nudges.data?.nudges.find((n) => n.status === "opened");
   const unreadCount = nudges.data?.unread ?? 0;
   const openPlans = (plans.data?.plans ?? []).filter((p) => p.status === "planned" || p.status === "reminder_set");
-  const swiggyCard = s.swiggy ? <SwiggyHomeCard s={s.swiggy} daysLeft={s.month.daysLeft} /> : null;
   const dues = s.cards
     .filter((c) => c.latestStatement?.dueDate && c.latestStatement.totalDue !== null && (c.daysToDue ?? -1) >= 0)
     .sort((a, b) => (a.daysToDue ?? 99) - (b.daysToDue ?? 99));
 
+  const utilPct = s.totals.utilisationOverallPct;
+  const goal = s.goals[0];
+  const due = dues[0];
+  const pickTile = top ? (
+    <Tile href="/cards" label={`Ember's pick: ${top.name}`}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3] }}>
+        <EmberAvatar size={40} />
+        <View style={{ flex: 1 }}>
+          <Caption tone="ember">EMBER'S PICK FOR YOU</Caption>
+          <Text variant="bodyStrong" numberOfLines={1}>
+            {top.name}
+          </Text>
+        </View>
+        <View style={{ alignItems: "flex-end" }}>
+          <Text variant="heading" tone="ember">
+            {formatInr(top.ongoingValue)}
+          </Text>
+          <Text variant="caption" tone="muted">
+            a year
+          </Text>
+        </View>
+      </View>
+    </Tile>
+  ) : null;
+
   return (
-    <Screen>
+    <Screen contentStyle={{ gap: t.spacing[3] }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Text variant="title" style={{ flex: 1 }}>
+        <Text variant="heading" style={{ flex: 1 }}>
           {greeting()}
           {name ? `, ${name}` : ""}
         </Text>
@@ -70,148 +96,120 @@ export default function Home() {
 
       {!hasStatements ? (
         <>
-        <Card>
-          <Text variant="heading">See your real money picture</Text>
-          <Text tone="muted">Upload a credit card statement and Ember will track dues, fees, rewards and spending for you.</Text>
-          <Button label="Upload your first statement" onPress={() => router.push("/upload")} />
-          <Text variant="caption" tone="muted">
-            We read it once and delete the file. The password is never stored on our side.
-          </Text>
-        </Card>
-        <Button label="Should I buy this?" kind="secondary" onPress={() => router.push("/plan/new")} accessibilityHint="Ember checks your cards and budget" />
-        {swiggyCard}
+          <Card style={{ borderRadius: 26 }}>
+            <Text variant="heading">See your real money picture</Text>
+            <Text tone="muted">Upload a credit card statement and Ember will track dues, fees, rewards and spending for you.</Text>
+            <Button label="Upload your first statement" onPress={() => router.push("/upload")} />
+            <Text variant="caption" tone="muted">
+              We read it once and delete the file. The password is never stored on our side.
+            </Text>
+          </Card>
+          <SpendOverview state={s} statements={false} />
+          <Row>
+            <CanIBuyTile openPlans={openPlans.length} />
+            {s.swiggy ? null : <ConnectSwiggyTile />}
+          </Row>
         </>
       ) : (
         <>
-          <Pressable onPress={() => router.push("/budgets")} accessibilityRole="button">
+          <Pressable onPress={() => router.push("/budgets")} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: t.spacing[4], gap: 4 }}>
+            <Caption>{s.month.leftToSpend !== null ? `LEFT TO SPEND IN ${monthName(s.month.key).toUpperCase()}` : `SPENT IN ${monthName(s.month.key).toUpperCase()}`}</Caption>
+            <Text variant="display" tone={s.month.leftToSpend !== null && s.month.leftToSpend < 0 ? "danger" : "default"} style={{ fontSize: 46, lineHeight: 52 }}>
+              {formatInr(s.month.leftToSpend ?? s.month.totalSpend)}
+            </Text>
             {s.month.leftToSpend !== null ? (
-              <View>
-                <Text variant="caption" tone="muted">
-                  LEFT TO SPEND IN {monthName(s.month.key).toUpperCase()}
-                </Text>
-                <Text variant="display" tone={s.month.leftToSpend < 0 ? "danger" : "default"}>
-                  {formatInr(s.month.leftToSpend)}
-                </Text>
-                <Text tone="muted" variant="small">
-                  {s.month.daysLeft} days left · {formatInr(s.month.totalSpend)} spent
-                </Text>
-              </View>
+              <Text variant="small" tone="muted">
+                {s.month.daysLeft} days left
+                {s.month.coverage === "partial" ? " · month not fully covered yet" : ""}
+              </Text>
             ) : (
-              <View>
-                <Text variant="caption" tone="muted">
-                  SPENT IN {monthName(s.month.key).toUpperCase()}
-                </Text>
-                <Text variant="display">{formatInr(s.month.totalSpend)}</Text>
-                <Text tone="link" variant="small">
-                  Set a monthly budget ›
-                </Text>
-              </View>
+              <Text variant="small" tone="link">
+                Set a monthly budget ›
+              </Text>
             )}
           </Pressable>
-          <Text variant="caption" tone="muted">
-            Based on statements up to {shortDate(s.dataThrough)}
-            {s.month.coverage === "partial" ? " · this month isn't fully covered yet" : ""}
-          </Text>
 
-          {unread ? (
-            <Pressable onPress={() => router.push(`/nudge/${unread.id}`)} accessibilityRole="button" accessibilityHint="Opens a chat with Ember about this">
-              <Card style={{ borderColor: t.colors.ember, borderLeftWidth: 4 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[2] }}>
-                  <EmberAvatar size={24} />
-                  <Text variant="caption" tone="ember">
-                    EMBER NOTICED
-                  </Text>
-                </View>
-                <Text variant="bodyStrong">{unread.title}</Text>
-                <Text tone="muted" variant="small">
-                  {unread.body}
-                </Text>
-              </Card>
-            </Pressable>
-          ) : null}
+          <SpendOverview state={s} statements />
 
-          <Button label="Should I buy this?" onPress={() => router.push("/plan/new")} accessibilityHint="Ember checks your budget, cards and statement dates" />
-          {openPlans.length ? (
-            <Pressable onPress={() => router.push("/plans")} accessibilityRole="button">
-              <Card>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                  <Text variant="bodyStrong">Your plans</Text>
-                  <Text tone="link" variant="small">
-                    {openPlans.length} open ›
-                  </Text>
-                </View>
-                {openPlans.slice(0, 2).map((p) => (
-                  <Text key={p.id} variant="small" tone="muted" numberOfLines={1}>
-                    {p.itemName} · {formatInr(p.price)}
-                    {p.remindAt ? ` · reminder ${shortDate(p.remindAt)}` : ""}
-                  </Text>
-                ))}
-              </Card>
-            </Pressable>
-          ) : null}
+          {unread ? <NudgeStrip id={unread.id} title={unread.title} body={unread.body} /> : null}
 
-          {swiggyCard}
-
-          <Card>
-            <Text variant="heading">Upcoming dues</Text>
-            {dues.length ? (
-              dues.map((c) => (
-                <View key={c.cardAccountId} style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[3] }}>
-                  <Pressable style={{ flex: 1 }} onPress={() => router.push(`/account/${c.cardAccountId}`)} accessibilityRole="button">
-                    <Text variant="bodyStrong">{c.label}</Text>
-                    <Text variant="small" tone={c.daysToDue !== null && c.daysToDue <= 3 && !c.isPaidMarked ? "danger" : "muted"}>
-                      {dueLine(c)}
-                    </Text>
-                  </Pressable>
-                  <View style={{ alignItems: "flex-end", gap: 4 }}>
-                    <Amount value={c.latestStatement!.totalDue!} href={`/account/${c.cardAccountId}`} />
-                    {!c.isPaidMarked ? (
-                      <Pressable onPress={() => markPaid.mutate(c.cardAccountId)} accessibilityRole="button" hitSlop={6}>
-                        <Text tone="link" variant="small">
+          <Row>
+            <CanIBuyTile openPlans={openPlans.length} tall />
+            <View style={{ flex: 1, gap: t.spacing[3] }}>
+              <Tile>
+                {due ? (
+                  <>
+                    <Pressable onPress={() => router.push(`/account/${due.cardAccountId}`)} accessibilityRole="button" style={{ gap: t.spacing[2] }}>
+                      <Caption>NEXT DUE</Caption>
+                      <Text variant="heading">{formatInr(due.latestStatement!.totalDue!)}</Text>
+                      <Text variant="caption" tone={due.daysToDue !== null && due.daysToDue <= 3 && !due.isPaidMarked ? "danger" : "muted"} numberOfLines={1}>
+                        {due.isPaidMarked ? "Marked paid" : due.daysToDue === 0 ? "Today" : `In ${due.daysToDue} day${due.daysToDue === 1 ? "" : "s"}`} · {due.label}
+                      </Text>
+                    </Pressable>
+                    {!due.isPaidMarked ? (
+                      <Pressable onPress={() => markPaid.mutate(due.cardAccountId)} accessibilityRole="button" hitSlop={6}>
+                        <Text variant="caption" tone="link">
                           Mark as paid
                         </Text>
                       </Pressable>
                     ) : null}
-                  </View>
-                </View>
-              ))
+                  </>
+                ) : (
+                  <>
+                    <Caption>NEXT DUE</Caption>
+                    <Text variant="small" tone="muted">
+                      No bills due
+                    </Text>
+                  </>
+                )}
+              </Tile>
+              <Tile href="/cards" label="Credit used">
+                <Caption>CREDIT USED</Caption>
+                <Text variant="heading" tone={utilPct !== null && utilPct > 70 ? "danger" : "default"}>
+                  {utilPct !== null ? `${Math.round(utilPct)}%` : "—"}
+                </Text>
+                {utilPct !== null ? <Meter pct={utilPct} color={utilPct > 70 ? t.colors.danger : utilPct > 30 ? t.colors.ember : t.colors.success} /> : null}
+                <Text variant="caption" tone="muted">
+                  {formatInr(s.totals.totalDueAll)} due in all
+                </Text>
+              </Tile>
+            </View>
+          </Row>
+
+          <Row>
+            {s.swiggy ? null : <ConnectSwiggyTile />}
+            {goal ? (
+              <Tile href="/budgets" label={`Goal ${goal.name}`}>
+                <Caption>GOAL · {goal.name.toUpperCase()}</Caption>
+                <Text variant="heading">{Math.round(goal.pctDone)}%</Text>
+                <Text variant="small" tone="muted" numberOfLines={1}>
+                  {formatInr(goal.saved)} of {formatInr(goal.target)}
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Meter pct={goal.pctDone} color={goal.behindBy > 0 ? t.colors.ember : t.colors.success} />
+              </Tile>
             ) : (
-              <Text tone="muted">No bills due right now.</Text>
+              <Tile href="/cards" label="Missed rewards">
+                <Caption>MISSED REWARDS</Caption>
+                <Text variant="heading" tone={s.missedRewardsLastCycle.total ? "ember" : "default"}>
+                  {formatInr(s.missedRewardsLastCycle.total)}
+                </Text>
+                <Text variant="small" tone="muted">
+                  last cycle, from paying with the wrong card
+                </Text>
+              </Tile>
             )}
-          </Card>
-
-          <Card>
-            <Text variant="heading">Spending this month</Text>
-            <CategoryBars spend={s.month.spendByCategory} limits={s.month.budget?.categoryLimits} />
-          </Card>
-
-          <Button label="Upload a statement" kind="secondary" onPress={() => router.push("/upload")} />
+          </Row>
         </>
       )}
 
+      {pickTile}
       <SpendSyncPrompt />
-      {results.data ? <LeakageBanner leakage={results.data.result.leakage} /> : null}
-      {top ? (
-        <Pressable onPress={() => router.push("/cards")} accessibilityRole="button" accessibilityHint="Opens your ranked cards">
-          <Card>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[2] }}>
-              <EmberAvatar size={24} />
-              <Text variant="caption" tone="ember">
-                EMBER'S PICK FOR YOU
-              </Text>
-            </View>
-            <Text variant="heading">{top.name}</Text>
-            <Text variant="display" tone="ember">
-              {formatInr(top.ongoingValue)}
-              <Text tone="muted"> / yr</Text>
-            </Text>
-            <Text tone="muted" variant="small">
-              {top.reason}
-            </Text>
-            <Text tone="link" variant="bodyStrong">
-              See all your cards ›
-            </Text>
-          </Card>
+      {hasStatements ? (
+        <Pressable onPress={() => router.push("/upload")} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: t.spacing[2] }}>
+          <Text variant="caption" tone="muted">
+            Based on statements up to {shortDate(s.dataThrough)} · <Text variant="caption" tone="link">Upload a statement</Text>
+          </Text>
         </Pressable>
       ) : null}
     </Screen>

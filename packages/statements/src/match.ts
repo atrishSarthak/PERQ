@@ -31,6 +31,8 @@ export function tokens(s: string): string[] {
   return s
     .toUpperCase()
     .replace(/[^A-Z0-9+ ]/g, " ")
+    // "MoneyBack Plus" / "MoneyBack +" = "MoneyBack+".
+    .replace(/\s+(?:\+|PLUS\b)/g, "+")
     .split(/\s+/)
     .filter((w) => w.length > 1 && !STOP.has(w));
 }

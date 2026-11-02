@@ -21,6 +21,16 @@ export function useMarkPaid() {
   return useMutation({ mutationFn: (cardAccountId: string) => moneyApi.markPaid(cardAccountId), onSuccess: invalidate });
 }
 
+/** Removes a card from My cards, with its statements and transactions. */
+export function useDeleteCardAccount() {
+  const invalidate = useInvalidateMoney();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (cardAccountId: string) => moneyApi.deleteCardAccount(cardAccountId),
+    onSuccess: () => Promise.all([invalidate(), qc.invalidateQueries({ queryKey: ["plans"] })]),
+  });
+}
+
 /** Saves an Ember proposal (level 3) once the user taps Confirm. */
 export function useConfirmProposal() {
   const invalidate = useInvalidateMoney();

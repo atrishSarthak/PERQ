@@ -62,6 +62,8 @@ export const swiggySummarySchema = z.object({
   lateNightOrders: z.number().int(),
   /** Late-night (22:00–05:00 IST) food orders in the 7 days up to now. */
   lateNightWeek: z.object({ count: z.number().int(), amount: z.number().int(), latestDay: z.string().nullable() }),
+  /** Each of the last 7 IST days, oldest first, ending today: Swiggy spend that day. */
+  last7Days: z.array(z.object({ date: z.string(), food: z.number().int(), instamart: z.number().int(), total: z.number().int() })),
   /** The food delivery budget against Swiggy food spend; null without one. */
   foodBudget: z.object({ limit: z.number().int(), left: z.number().int() }).nullable(),
 });

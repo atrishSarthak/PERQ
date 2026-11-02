@@ -1,4 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { claimHeldCardAccount } from "./heldCards";
 import {
   cardAccounts,
   db,
@@ -174,6 +175,7 @@ export async function confirmForUser(userId: string, req: ConfirmStatementReques
     creditLimit: toInt(s.creditLimit),
     ...(feeAnniversaryMonth(draft.transactions) ? { feeAnniversaryMonth: feeAnniversaryMonth(draft.transactions) } : {}),
   };
+  await claimHeldCardAccount(userId, catalogueCardId ?? null, issuer, last4);
   const [account] = await db
     .insert(cardAccounts)
     .values(accountValues)

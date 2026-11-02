@@ -52,8 +52,9 @@ export async function loadPlanContext(userId: string, now: Date): Promise<Loaded
   const termsById = new Map(catalogue.map((c) => [c.id, planCardTerms(c)]));
   const income = user?.isDemo ? DEMO_MONTHLY_INCOME : profile?.answers.monthlyIncome ? INCOME_BUCKET_RUPEES[profile.answers.monthlyIncome].mid : null;
   const avg = stmts.length ? averageMonthlySpend(stmts, txns).total : null;
-  // A demo plans with its own cards only: a held card from the quiz with no account could change a demo verdict.
-  const heldIds = user?.isDemo ? [] : held;
+  // Plans use the cards in My cards. Cards ticked in the quiz stand in only until the first statement;
+  // a demo never uses them, since they could change a demo verdict.
+  const heldIds = user?.isDemo || state.cards.length ? [] : held;
   const ctx = planContextFromState(state, { termsById, heldCatalogueIds: heldIds, monthlyIncome: income, averageMonthlySpend: avg });
   const monthName = new Date(`${state.month.key}-01T00:00:00Z`).toLocaleDateString("en-IN", { month: "long", timeZone: "UTC" });
   return {

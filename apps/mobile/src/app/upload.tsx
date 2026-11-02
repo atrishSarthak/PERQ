@@ -10,6 +10,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { ChoiceRow } from "@/components/Choice";
 import { EmberAvatar } from "@/components/EmberAvatar";
+import { Notice } from "@/components/Notice";
 import { Text } from "@/components/Text";
 import { TextField } from "@/components/TextField";
 import { moneyApi } from "@/lib/moneyApi";
@@ -330,10 +331,7 @@ function Review({ draft, busy, onConfirm }: { draft: StatementDraft; busy: boole
   return (
     <View style={{ gap: t.spacing[4] }}>
       <Text variant="title">Check before saving</Text>
-      <View
-        style={{ borderRadius: t.radii.md, padding: t.spacing[4], backgroundColor: t.colors.surface2, borderLeftWidth: 4, borderLeftColor: r.reconciled ? t.colors.success : t.colors.danger }}
-      >
-        <Text variant="bodyStrong">{r.reconciled ? "The totals add up ✓" : "The totals don't add up"}</Text>
+      <Notice tone={r.reconciled ? "success" : "danger"} title={r.reconciled ? "The totals add up ✓" : "The totals don't add up"}>
         {r.reconciled ? (
           <Text variant="small" tone="muted">
             Previous balance, payments, purchases, fees and charges match the total due, and the {draft.transactions.length} lines match the summary.
@@ -350,7 +348,7 @@ function Review({ draft, busy, onConfirm }: { draft: StatementDraft; busy: boole
             </Text>
           </>
         )}
-      </View>
+      </Notice>
 
       <Card>
         <Text variant="heading">Card</Text>

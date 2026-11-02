@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { MONEY_KEYS } from "./moneyQueries";
 import type { ProfilePatch, QuizAnswersV2, ResultsResponse } from "@perq/shared";
 import { api, ApiError } from "./api";
 
@@ -65,7 +66,8 @@ export function useSetHeld() {
       return { prev };
     },
     onError: (_e, _v, ctx) => ctx?.prev !== undefined && qc.setQueryData(RESULTS_KEY, ctx.prev),
-    onSettled: () => qc.invalidateQueries({ queryKey: RESULTS_KEY }),
+    // The card also joins or leaves My cards (and so plans and Home).
+    onSettled: () => Promise.all([RESULTS_KEY, ...MONEY_KEYS.map((k) => [k]), ["plans"]].map((queryKey) => qc.invalidateQueries({ queryKey }))),
   });
 }
 

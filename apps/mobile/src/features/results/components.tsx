@@ -4,8 +4,10 @@ import { formatInr } from "@perq/finance-engine";
 import type { LeakageResult, ScoredCardV2 } from "@perq/shared";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { CARD_INK_MUTED, CreditCardFace } from "@/components/CreditCardFace";
 import { Pill } from "@/components/Choice";
 import { EmberAvatar } from "@/components/EmberAvatar";
+import { Notice } from "@/components/Notice";
 import { Text } from "@/components/Text";
 import { useTheme } from "@/theme/ThemeProvider";
 import { type FeeRange, type Filters, EMPTY_FILTERS } from "./filterSort";
@@ -13,23 +15,15 @@ import { type FeeRange, type Filters, EMPTY_FILTERS } from "./filterSort";
 const openMath = (cardId: string) => router.push({ pathname: "/card/[id]", params: { id: cardId } });
 
 export function LeakageBanner({ leakage }: { leakage: LeakageResult }) {
-  const t = useTheme();
   const leaking = leakage.hasCards && !leakage.holdsBest && leakage.amount > 0;
+  const best = leakage.bestCardId;
   return (
-    <Pressable
-      accessibilityRole={leakage.bestCardId ? "button" : undefined}
-      accessibilityHint={leakage.bestCardId ? "Opens the math for the best card" : undefined}
-      onPress={() => leakage.bestCardId && openMath(leakage.bestCardId)}
-      style={{
-        borderRadius: t.radii.md,
-        padding: t.spacing[4],
-        backgroundColor: t.colors.surface2,
-        borderLeftWidth: 4,
-        borderLeftColor: leaking ? t.colors.danger : t.colors.success,
-      }}
-    >
-      <Text variant="bodyStrong">{leakage.message}</Text>
-    </Pressable>
+    <Notice
+      tone={leaking ? "danger" : "success"}
+      title={leakage.message}
+      onPress={best ? () => openMath(best) : undefined}
+      accessibilityHint={best ? "Opens the math for the best card" : undefined}
+    />
   );
 }
 
@@ -55,41 +49,53 @@ function Flags({ card }: { card: ScoredCardV2 }) {
   );
 }
 
-/** The Top Pick: an Ember recommendation, deliberately plain (not an ad). */
+/** The Top Pick: an Ember recommendation shown as the card itself, with the
+ * value and Ember's reason under it (deliberately plain, not an ad). */
 export function TopPickCard({
   card,
   explanation,
   working,
+  onToggleHeld,
 }: {
   card: ScoredCardV2;
   explanation: string | null;
   working?: string | null;
+  onToggleHeld: (held: boolean) => void;
 }) {
   const t = useTheme();
   return (
-    <Card style={{ borderColor: t.colors.ember, borderWidth: 1.5 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[2], backgroundColor: t.colors.ember, borderRadius: t.radii.pill, paddingHorizontal: t.spacing[3], paddingVertical: 4 }}>
-          <Text variant="caption" tone="onEmber">
-            EMBER'S PICK
-          </Text>
-        </View>
-        <Text variant="caption" tone="muted">
-          {card.issuer}
+    <Card>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: t.spacing[2] }}>
+        <EmberAvatar size={24} />
+        <Text variant="caption" tone="ember" style={{ letterSpacing: 0.8 }}>
+          EMBER'S PICK FOR YOU
         </Text>
       </View>
-      <Text variant="heading">{card.name}</Text>
+      <Pressable onPress={() => openMath(card.cardId)} accessibilityRole="button" accessibilityLabel={`${card.name} by ${card.issuer}. See the math`}>
+        <CreditCardFace
+          issuer={card.issuer}
+          name={card.name}
+          networks={card.networks}
+          footer={
+            <Text variant="caption" style={{ color: CARD_INK_MUTED }}>
+              {card.flags.lifetimeFree ? "Lifetime free" : card.fee.waived ? "Fee waived for you" : `Fee ${formatInr(card.fee.payable)} a year`}
+            </Text>
+          }
+        />
+      </Pressable>
       <Pressable onPress={() => openMath(card.cardId)} accessibilityRole="button" accessibilityLabel={`${formatInr(card.ongoingValue)} a year. See the math`}>
-        <Text variant="display" tone="ember">
-          {formatInr(card.ongoingValue)}
-          <Text variant="body" tone="muted">
-            {" "}
-            / yr
+        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <Text variant="display" tone="ember">
+            {formatInr(card.ongoingValue)}
+            <Text variant="body" tone="muted">
+              {" "}
+              / yr
+            </Text>
           </Text>
-        </Text>
-        <Text variant="small" tone="muted">
-          Year 1: {formatInr(card.year1Value)}
-        </Text>
+          <Text variant="small" tone="muted" style={{ marginBottom: 6 }}>
+            Year 1: {formatInr(card.year1Value)}
+          </Text>
+        </View>
       </Pressable>
       <View style={{ flexDirection: "row", gap: t.spacing[3], alignItems: "flex-start" }}>
         <EmberAvatar size={28} />
@@ -104,6 +110,7 @@ export function TopPickCard({
       </View>
       <Flags card={card} />
       <Button kind="secondary" label="See the math" onPress={() => openMath(card.cardId)} />
+      <HeldSwitch card={card} onToggleHeld={onToggleHeld} />
     </Card>
   );
 }
@@ -136,16 +143,23 @@ export function CardRow({ card, onToggleHeld }: { card: ScoredCardV2; onToggleHe
         <Text variant="small">{fee}</Text>
         <Flags card={card} />
       </Pressable>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: t.colors.border, paddingTop: t.spacing[3] }}>
-        <Text variant="small">I have this card</Text>
-        <Switch
-          accessibilityLabel={`I have the ${card.name}`}
-          value={card.flags.held}
-          onValueChange={onToggleHeld}
-          trackColor={{ true: t.colors.primary, false: t.colors.surface2 }}
-        />
-      </View>
+      <HeldSwitch card={card} onToggleHeld={onToggleHeld} />
     </Card>
+  );
+}
+
+function HeldSwitch({ card, onToggleHeld }: { card: ScoredCardV2; onToggleHeld: (held: boolean) => void }) {
+  const t = useTheme();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: t.colors.border, paddingTop: t.spacing[3] }}>
+      <Text variant="small">I have this card</Text>
+      <Switch
+        accessibilityLabel={`I have the ${card.name}`}
+        value={card.flags.held}
+        onValueChange={onToggleHeld}
+        trackColor={{ true: t.colors.primary, false: t.colors.surface2 }}
+      />
+    </View>
   );
 }
 

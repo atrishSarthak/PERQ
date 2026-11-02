@@ -14,6 +14,13 @@ describe("matchCard (§5.6)", () => {
     expect(matchCard({ issuer: "Axis Bank", cardName: "Axis Bank ACE Credit Card", last4: "0093" }, catalogue, []).catalogueCardId).toBe("axis-ace");
   });
 
+  it("reads MoneyBack+ however the statement spells the plus", () => {
+    for (const name of ["MoneyBack+", "MONEYBACK PLUS CREDIT CARD", "Moneyback + Credit Card"]) {
+      expect(matchCard({ issuer: "HDFC Bank", cardName: name, last4: "1234" }, catalogue, []).catalogueCardId).toBe("hdfc-moneyback-plus");
+    }
+    expect(matchCard({ issuer: "HDFC Bank", cardName: "Tata Neu Plus", last4: "1234" }, catalogue, []).catalogueCardId).toBe("hdfc-tata-neu-plus");
+  });
+
   it("doesn't guess when the name is ambiguous or unknown, but still offers candidates", () => {
     const m = matchCard({ issuer: "HDFC Bank", cardName: "Credit Card", last4: "1111" }, catalogue, []);
     expect(m.catalogueCardId).toBeNull();

@@ -77,6 +77,8 @@ export const moneyApi = {
     http.request("/api/demo/clock", { method: "POST", body, schema: z.object({ now: z.string(), nudgesSent: z.number(), quietHours: z.boolean() }) }),
   markPaid: (cardAccountId: string) =>
     http.request(`/api/card-accounts/${encodeURIComponent(cardAccountId)}`, { method: "PATCH", body: { markPaid: true }, schema: z.object({ ok: z.boolean() }) }),
+  deleteCardAccount: (cardAccountId: string) =>
+    http.request(`/api/card-accounts/${encodeURIComponent(cardAccountId)}`, { method: "DELETE", schema: z.object({ deleted: z.boolean() }) }),
   registerPush: (token: string, platform: "ios" | "android") =>
     http.request("/api/push/register", { method: "POST", body: { token, platform }, schema: z.object({ ok: z.boolean() }) }),
   /** Streams narration then a draft (or an error with a code). */

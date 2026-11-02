@@ -45,6 +45,13 @@ describe("swiggySummary", () => {
     expect(s.foodBudget).toBeNull();
   });
 
+  it("gives the last 7 IST days, oldest first, ending today, for the Home chart", () => {
+    const days = swiggySummary(ORDERS, "2026-11", NOW).last7Days;
+    expect(days.map((d) => d.date)).toEqual(["2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-20", "2026-11-21", "2026-11-22"]);
+    expect(days.map((d) => d.total)).toEqual([420, 0, 515, 465, 0, 700, 0]);
+    expect(days.reduce((s, d) => s + d.food + d.instamart, 0)).toBe(2100);
+  });
+
   it("is in the financial state only when Swiggy is connected, and drives swiggy_pattern", () => {
     const base = { now: NOW, cardAccounts: [], statements: [], transactions: [], budget: { totalLimit: 28000, categoryLimits: { food_delivery: 5000 } }, goals: [] };
     expect(buildFinancialState(base).swiggy).toBeNull();

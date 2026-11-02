@@ -71,7 +71,7 @@ export function ExploreList({ header }: { header?: ReactNode }) {
               </Text>
             ) : null}
             <LeakageBanner leakage={data.result.leakage} />
-            {showTop ? <TopPickCard card={top!} explanation={explanation} working={emberStep} /> : null}
+            {showTop ? <TopPickCard card={top!} explanation={explanation} working={emberStep} onToggleHeld={(held) => setHeld.mutate({ cardId: top!.cardId, held })} /> : null}
             <Segmented<SortMode>
               value={sort}
               onChange={setSort}

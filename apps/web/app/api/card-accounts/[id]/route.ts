@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
-import { cardAccounts, db, statements } from "@perq/db";
+import { cardAccounts, chatMessages, db, nudges, statements } from "@perq/db";
 import { cardAccountPatchSchema } from "@perq/shared";
 import { isAuthed, requireAuth } from "@/lib/auth";
 import { invalidateState, logActivity } from "@/lib/money/activity";
@@ -9,6 +9,7 @@ import { loadCatalogue } from "@/lib/recommender/catalog";
 import { setHeld } from "@/lib/recommender/service";
 import { cardAccountDetail } from "@/lib/money/accounts";
 import { nowFor } from "@/lib/money/clock";
+import { refreshSyncedSpend } from "@/lib/recommender/spendSync";
 
 export const dynamic = "force-dynamic";
 
@@ -64,4 +65,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   for (const e of events) await logActivity(auth.id, "card_account_updated", e, { table: "card_accounts", id });
   await afterMoneyWrite(auth.id, p.markPaid !== undefined ? "marked_paid" : p.currentBalance !== undefined ? "balance_updated" : "statement_confirmed");
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * DELETE /api/card-accounts/:id: removes the card from My cards with its statements and
+ * transactions (cascade), its nudges and its Ember thread, and unticks "I have this card".
+ */
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAuth(req);
+  if (!isAuthed(auth)) return auth;
+  const { id } = await params;
+  const [account] = await db.select().from(cardAccounts).where(and(eq(cardAccounts.id, id), eq(cardAccounts.userId, auth.id))).limit(1);
+  if (!account) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  await db.delete(nudges).where(and(eq(nudges.userId, auth.id), eq(nudges.cardAccountId, id)));
+  await db.delete(chatMessages).where(and(eq(chatMessages.userId, auth.id), eq(chatMessages.threadRef, `card:${id}`)));
+  await db.delete(cardAccounts).where(eq(cardAccounts.id, id));
+  // No other account is that card: it's no longer one you hold.
+  if (account.cardId) {
+    const [other] = await db.select({ id: cardAccounts.id }).from(cardAccounts).where(and(eq(cardAccounts.userId, auth.id), eq(cardAccounts.cardId, account.cardId))).limit(1);
+    if (!other) await setHeld(auth.id, account.cardId, false);
+  }
+  await refreshSyncedSpend(auth.id);
+  await invalidateState(auth.id);
+  await logActivity(auth.id, "card_account_deleted", `Removed your ${account.cardLabel} card and its statements`);
+  await afterMoneyWrite(auth.id, "statement_deleted");
+  return NextResponse.json({ deleted: true });
 }
