@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { swiggySummarySchema } from "./swiggy";
 import { txnCategorySchema } from "./money";
 
 // Card accounts, transactions and the financial state as the apps read them
@@ -68,6 +69,8 @@ export const financialStateSchema = z
     goals: z.array(
       z.object({ id: z.string(), name: z.string(), target: z.number(), saved: z.number(), pctDone: z.number(), monthlyNeeded: n, expectedSaved: n, behindBy: z.number(), targetDate: z.string().nullable() })
     ),
+    /** Step 4: present when Swiggy is connected. */
+    swiggy: swiggySummarySchema.nullish(),
   })
   .passthrough();
 export type FinancialStateView = z.infer<typeof financialStateSchema>;

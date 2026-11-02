@@ -58,9 +58,9 @@ const run = (i: StateInput, history: NudgeHistoryEntry[] = []) => evaluateRules(
 const byRule = (c: NudgeCandidate[], id: string) => c.filter((x) => x.ruleId === id);
 
 describe("nudge rules (§7.2): each fires, doesn't fire, and keeps a stable dedupe key", () => {
-  it("has exactly the 11 locked rules", () => {
+  it("has exactly the 11 locked rules, plus Step 4's swiggy_pattern", () => {
     expect(NUDGE_RULES.map((r) => r.id).sort()).toEqual(
-      ["budget_pace", "due_soon", "due_today", "fee_waiver_pace", "fees_charged", "goal_progress", "high_utilisation", "min_due_trap", "missed_rewards", "points_value", "statement_upload"].sort()
+      ["budget_pace", "due_soon", "due_today", "fee_waiver_pace", "fees_charged", "goal_progress", "high_utilisation", "min_due_trap", "missed_rewards", "points_value", "statement_upload", "swiggy_pattern"].sort()
     );
   });
 

@@ -2,6 +2,8 @@ import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type {
   activityEvents,
   purchasePlans,
+  swiggyCarts,
+  swiggyOrders,
   agentRuns,
   budgets,
   cardAccounts,
@@ -59,3 +61,5 @@ export type FinancialStateCacheRow = InferSelectModel<typeof financialStateCache
 
 export type PurchasePlanRow = InferSelectModel<typeof purchasePlans>;
 export type NewPurchasePlanRow = InferInsertModel<typeof purchasePlans>;
+export type SwiggyOrderRow = InferSelectModel<typeof swiggyOrders>;
+export type SwiggyCartRow = InferSelectModel<typeof swiggyCarts>;

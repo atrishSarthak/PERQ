@@ -11,12 +11,13 @@ import {
 import { buildFinancialState, istDate, type CardTerms, type FinancialState, type StateInput } from "@perq/finance-engine";
 import type { CatalogCard } from "@perq/shared";
 import { loadCatalogue } from "@/lib/recommender/catalog";
+import { loadSwiggyOrders } from "@/lib/swiggy/service";
 
 // Server side of the financial state (handoff §6): load the user's rows,
 // build with finance-engine, cache per user per IST day.
 
 /** Bump when buildFinancialState's output shape changes. */
-export const STATE_VERSION = 2;
+export const STATE_VERSION = 3; // 3: Step 4 adds `swiggy`
 
 export function cardTerms(c: CatalogCard): CardTerms {
   return {
@@ -31,7 +32,7 @@ export function cardTerms(c: CatalogCard): CardTerms {
 
 export async function loadStateInput(userId: string, now: Date): Promise<StateInput> {
   const month = istDate(now).slice(0, 7);
-  const [catalogue, accounts, stmts, txns, budgetRows, goalRows] = await Promise.all([
+  const [catalogue, accounts, stmts, txns, budgetRows, goalRows, swiggyOrders] = await Promise.all([
     loadCatalogue(),
     db.select().from(cardAccounts).where(eq(cardAccounts.userId, userId)),
     db.select().from(statements).where(eq(statements.userId, userId)),
@@ -41,6 +42,7 @@ export async function loadStateInput(userId: string, now: Date): Promise<StateIn
       .from(budgets)
       .where(and(eq(budgets.userId, userId), or(eq(budgets.month, month), isNull(budgets.month)))),
     db.select().from(savingsGoals).where(eq(savingsGoals.userId, userId)),
+    loadSwiggyOrders(userId),
   ]);
   const byId = new Map(catalogue.map((c) => [c.id, c]));
   // A budget for this month wins over the recurring default.
@@ -102,6 +104,7 @@ export async function loadStateInput(userId: string, now: Date): Promise<StateIn
       status: g.status,
       createdAt: g.createdAt.toISOString(),
     })),
+    swiggyOrders,
   };
 }
 

@@ -750,3 +750,19 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      dark; `#971211` on light) is for red text: Ember labels, ₹ highlights, links, the selected tab's
      label and the verdict chip. `#E8221F` passes AA on black (4.7:1) but only AA-large on `#252525`
      (3.4:1), and the token test now checks that. On the web, `text-ember` became `text-ember-text`.
+176. **Step 4 Swiggy Lite is mock-only.** `SWIGGY_MODE=mock` (the default) runs `MockSwiggyClient` over
+     `fixtures/swiggy/*.json`. `LiveSwiggyClient` is skipped: `createSwiggyClient` throws for `live`,
+     and connecting in live mode is refused before anything is saved. The mock client moves fixture
+     dates by whole days, so the anchor (2026-11-22) lands on the user's IST day and the demo numbers
+     stay the same on any date.
+177. **Carts are kept in a `swiggy_carts` table.** This goes beyond the handoff's two tables. A cart
+     Ember prepares is stored with status `prepared`, `placed` or `cancelled`, so the chat card
+     re-renders from history: the reply is stored with a `[cart:<id>]` marker, like `[plan:<id>]`.
+     The model never sees the marker; history replaces it with a note. `placeSwiggyOrder` is level 4,
+     so a chat run (level 3) refuses it. Only `POST /api/swiggy/carts/:id/checkout` with
+     `{confirm: true}`, sent by the card's Confirm button, places an order, and only once.
+178. **`swiggy_pattern` (priority 55) is in-app only.** Like `plan_purchase_match`, it skips the daily
+     cap and quiet hours, is never pushed and isn't in the upcoming-nudge preview. The food budget is
+     the budget's `food_delivery` limit, set against Swiggy food spend only (not Instamart groceries).
+     The financial state gained `swiggy`, so `STATE_VERSION` is 3. `/api/swiggy/*` was added to the
+     CORS matcher for the web preview.

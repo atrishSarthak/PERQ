@@ -156,6 +156,9 @@ importers:
       '@perq/statements':
         specifier: workspace:*
         version: link:../../packages/statements
+      '@perq/swiggy':
+        specifier: workspace:*
+        version: link:../../packages/connectors/swiggy
       '@perq/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -280,6 +283,22 @@ importers:
         version: 2.1.9(@types/node@26.2.0)(jsdom@25.0.1)(lightningcss@1.33.0)(terser@5.51.2)
 
   packages/config: {}
+
+  packages/connectors/swiggy:
+    dependencies:
+      '@perq/shared':
+        specifier: workspace:*
+        version: link:../../shared
+    devDependencies:
+      '@perq/config':
+        specifier: workspace:*
+        version: link:../../config
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@26.2.0)(jsdom@25.0.1)(lightningcss@1.33.0)(terser@5.51.2)
 
   packages/db:
     dependencies:

@@ -1,6 +1,6 @@
 import { buildFinancialState, istDate, type StateInput } from "../state";
 import { NUDGE_CONFIG, type NudgeConfig } from "./config";
-import { evaluateRules, nextSendTime, planNudges, type QueuedNudge } from "./engine";
+import { evaluateRules, IN_APP_ONLY_RULES, nextSendTime, planNudges, type QueuedNudge } from "./engine";
 import type { NudgeCandidate, NudgeHistoryEntry } from "./types";
 
 // The Expo Go fallback (handoff §7.3): remote push isn't available, so the
@@ -52,7 +52,8 @@ export function simulateUpcoming(
       seen.push({ ruleId: c.ruleId, dedupeKey: c.dedupeKey, status: "queued", sentAt: null, dismissedAt: null, actedAt: null, createdAt: at.toISOString() });
     }
     for (const c of plan.sendFresh) {
-      out.push({ ruleId: c.ruleId, dedupeKey: c.dedupeKey, at: at.toISOString(), title: c.templateTitle, body: c.templateBody });
+      // In-app-only nudges go to the inbox, never to a notification.
+      if (!IN_APP_ONLY_RULES.has(c.ruleId)) out.push({ ruleId: c.ruleId, dedupeKey: c.dedupeKey, at: at.toISOString(), title: c.templateTitle, body: c.templateBody });
       seen.push({ ruleId: c.ruleId, dedupeKey: c.dedupeKey, status: "sent", sentAt: at.toISOString(), dismissedAt: null, actedAt: null, createdAt: at.toISOString() });
     }
     at = nextSendTime(new Date(Date.parse(`${istDate(at)}T23:59:00+05:30`)), config);

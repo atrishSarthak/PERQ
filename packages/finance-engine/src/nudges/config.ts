@@ -18,6 +18,8 @@ export const NUDGE_CONFIG = {
   budgetPacePct: 0.8,
   budgetPaceMinDaysLeft: 7,
   goalBehindPct: 0.15,
+  swiggyLateNightMin: 3, // late-night food orders in 7 days
+  swiggyFeeSharePct: 0.25, // fees as a share of food spend this month
   suppression: { dismissals: 3, windowDays: 30, penalty: 30 },
   priorities: {
     due_today: 95,
@@ -34,6 +36,7 @@ export const NUDGE_CONFIG = {
     high_utilisation_info: 40,
     goal_progress: 35,
     plan_buy_window: 80,
+    swiggy_pattern: 55,
   },
 } as const;
 export type NudgeConfig = typeof NUDGE_CONFIG;

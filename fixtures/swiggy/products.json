@@ -1,0 +1,443 @@
+[
+ {
+  "id": "milk-amul-1l",
+  "name": "Amul Taaza Toned Milk",
+  "category": "dairy",
+  "unit": "1 L",
+  "price": 56,
+  "keywords": [
+   "milk"
+  ]
+ },
+ {
+  "id": "milk-nandini-1l",
+  "name": "Nandini Toned Milk",
+  "category": "dairy",
+  "unit": "1 L",
+  "price": 52,
+  "keywords": [
+   "milk"
+  ]
+ },
+ {
+  "id": "curd-amul-400",
+  "name": "Amul Masti Dahi",
+  "category": "dairy",
+  "unit": "400 g",
+  "price": 35,
+  "keywords": [
+   "curd",
+   "dahi",
+   "yogurt"
+  ]
+ },
+ {
+  "id": "curd-nandini-500",
+  "name": "Nandini Curd",
+  "category": "dairy",
+  "unit": "500 g",
+  "price": 32,
+  "keywords": [
+   "curd",
+   "dahi"
+  ]
+ },
+ {
+  "id": "paneer-amul-200",
+  "name": "Amul Malai Paneer",
+  "category": "dairy",
+  "unit": "200 g",
+  "price": 95,
+  "keywords": [
+   "paneer"
+  ]
+ },
+ {
+  "id": "butter-amul-100",
+  "name": "Amul Butter",
+  "category": "dairy",
+  "unit": "100 g",
+  "price": 58,
+  "keywords": [
+   "butter"
+  ]
+ },
+ {
+  "id": "cheese-amul-slices",
+  "name": "Amul Cheese Slices",
+  "category": "dairy",
+  "unit": "200 g",
+  "price": 145,
+  "keywords": [
+   "cheese"
+  ]
+ },
+ {
+  "id": "eggs-12",
+  "name": "Farm Fresh Eggs",
+  "category": "eggs",
+  "unit": "12 pcs",
+  "price": 96,
+  "keywords": [
+   "eggs",
+   "egg"
+  ]
+ },
+ {
+  "id": "eggs-6",
+  "name": "Farm Fresh Eggs",
+  "category": "eggs",
+  "unit": "6 pcs",
+  "price": 52,
+  "keywords": [
+   "eggs",
+   "egg"
+  ]
+ },
+ {
+  "id": "bread-modern-white",
+  "name": "Modern White Bread",
+  "category": "bakery",
+  "unit": "400 g",
+  "price": 45,
+  "keywords": [
+   "bread"
+  ]
+ },
+ {
+  "id": "bread-britannia-brown",
+  "name": "Britannia Brown Bread",
+  "category": "bakery",
+  "unit": "400 g",
+  "price": 55,
+  "keywords": [
+   "bread",
+   "brown bread"
+  ]
+ },
+ {
+  "id": "atta-aashirvaad-5",
+  "name": "Aashirvaad Whole Wheat Atta",
+  "category": "staples",
+  "unit": "5 kg",
+  "price": 265,
+  "keywords": [
+   "atta",
+   "flour",
+   "wheat"
+  ]
+ },
+ {
+  "id": "atta-pillsbury-5",
+  "name": "Pillsbury Chakki Atta",
+  "category": "staples",
+  "unit": "5 kg",
+  "price": 249,
+  "keywords": [
+   "atta",
+   "flour",
+   "wheat"
+  ]
+ },
+ {
+  "id": "rice-sonamasoori-5",
+  "name": "Sona Masoori Rice",
+  "category": "staples",
+  "unit": "5 kg",
+  "price": 389,
+  "keywords": [
+   "rice"
+  ]
+ },
+ {
+  "id": "rice-indiagate-basmati-1",
+  "name": "India Gate Basmati Rice",
+  "category": "staples",
+  "unit": "1 kg",
+  "price": 145,
+  "keywords": [
+   "rice",
+   "basmati"
+  ]
+ },
+ {
+  "id": "toor-dal-1",
+  "name": "Tata Sampann Toor Dal",
+  "category": "staples",
+  "unit": "1 kg",
+  "price": 179,
+  "keywords": [
+   "dal",
+   "toor dal",
+   "lentils"
+  ]
+ },
+ {
+  "id": "moong-dal-500",
+  "name": "Moong Dal",
+  "category": "staples",
+  "unit": "500 g",
+  "price": 82,
+  "keywords": [
+   "dal",
+   "moong dal",
+   "lentils"
+  ]
+ },
+ {
+  "id": "oil-fortune-1l",
+  "name": "Fortune Sunflower Oil",
+  "category": "staples",
+  "unit": "1 L",
+  "price": 155,
+  "keywords": [
+   "oil",
+   "cooking oil",
+   "sunflower oil"
+  ]
+ },
+ {
+  "id": "oil-goldwinner-1l",
+  "name": "Gold Winner Sunflower Oil",
+  "category": "staples",
+  "unit": "1 L",
+  "price": 149,
+  "keywords": [
+   "oil",
+   "cooking oil",
+   "sunflower oil"
+  ]
+ },
+ {
+  "id": "sugar-1",
+  "name": "Sugar",
+  "category": "staples",
+  "unit": "1 kg",
+  "price": 48,
+  "keywords": [
+   "sugar"
+  ]
+ },
+ {
+  "id": "salt-tata-1",
+  "name": "Tata Salt",
+  "category": "staples",
+  "unit": "1 kg",
+  "price": 28,
+  "keywords": [
+   "salt"
+  ]
+ },
+ {
+  "id": "tea-redlabel-250",
+  "name": "Brooke Bond Red Label Tea",
+  "category": "beverages",
+  "unit": "250 g",
+  "price": 145,
+  "keywords": [
+   "tea",
+   "chai"
+  ]
+ },
+ {
+  "id": "coffee-bru-100",
+  "name": "Bru Instant Coffee",
+  "category": "beverages",
+  "unit": "100 g",
+  "price": 210,
+  "keywords": [
+   "coffee"
+  ]
+ },
+ {
+  "id": "onion-1",
+  "name": "Onion",
+  "category": "vegetables",
+  "unit": "1 kg",
+  "price": 42,
+  "keywords": [
+   "onion",
+   "onions"
+  ]
+ },
+ {
+  "id": "tomato-1",
+  "name": "Tomato",
+  "category": "vegetables",
+  "unit": "1 kg",
+  "price": 38,
+  "keywords": [
+   "tomato",
+   "tomatoes"
+  ]
+ },
+ {
+  "id": "potato-1",
+  "name": "Potato",
+  "category": "vegetables",
+  "unit": "1 kg",
+  "price": 36,
+  "keywords": [
+   "potato",
+   "potatoes"
+  ]
+ },
+ {
+  "id": "carrot-500",
+  "name": "Carrot",
+  "category": "vegetables",
+  "unit": "500 g",
+  "price": 34,
+  "keywords": [
+   "carrot",
+   "carrots",
+   "vegetables"
+  ]
+ },
+ {
+  "id": "spinach-250",
+  "name": "Spinach (Palak)",
+  "category": "vegetables",
+  "unit": "250 g",
+  "price": 25,
+  "keywords": [
+   "spinach",
+   "palak",
+   "greens",
+   "vegetables"
+  ]
+ },
+ {
+  "id": "capsicum-500",
+  "name": "Green Capsicum",
+  "category": "vegetables",
+  "unit": "500 g",
+  "price": 44,
+  "keywords": [
+   "capsicum",
+   "vegetables"
+  ]
+ },
+ {
+  "id": "ginger-garlic-200",
+  "name": "Ginger Garlic Paste",
+  "category": "staples",
+  "unit": "200 g",
+  "price": 42,
+  "keywords": [
+   "ginger garlic",
+   "ginger",
+   "garlic"
+  ]
+ },
+ {
+  "id": "banana-6",
+  "name": "Robusta Banana",
+  "category": "fruits",
+  "unit": "6 pcs",
+  "price": 45,
+  "keywords": [
+   "banana",
+   "bananas",
+   "fruit"
+  ]
+ },
+ {
+  "id": "apple-4",
+  "name": "Shimla Apple",
+  "category": "fruits",
+  "unit": "4 pcs",
+  "price": 149,
+  "keywords": [
+   "apple",
+   "apples",
+   "fruit"
+  ]
+ },
+ {
+  "id": "orange-1",
+  "name": "Nagpur Orange",
+  "category": "fruits",
+  "unit": "1 kg",
+  "price": 89,
+  "keywords": [
+   "orange",
+   "oranges",
+   "fruit"
+  ]
+ },
+ {
+  "id": "oats-quaker-1",
+  "name": "Quaker Oats",
+  "category": "breakfast",
+  "unit": "1 kg",
+  "price": 199,
+  "keywords": [
+   "oats"
+  ]
+ },
+ {
+  "id": "poha-500",
+  "name": "Thick Poha",
+  "category": "breakfast",
+  "unit": "500 g",
+  "price": 39,
+  "keywords": [
+   "poha"
+  ]
+ },
+ {
+  "id": "maggi-4",
+  "name": "Maggi 2-Minute Noodles",
+  "category": "snacks",
+  "unit": "4 pack",
+  "price": 56,
+  "keywords": [
+   "maggi",
+   "noodles"
+  ]
+ },
+ {
+  "id": "biscuits-goodday",
+  "name": "Britannia Good Day",
+  "category": "snacks",
+  "unit": "250 g",
+  "price": 40,
+  "keywords": [
+   "biscuits",
+   "cookies"
+  ]
+ },
+ {
+  "id": "chips-lays",
+  "name": "Lay's Classic Salted",
+  "category": "snacks",
+  "unit": "90 g",
+  "price": 30,
+  "keywords": [
+   "chips"
+  ]
+ },
+ {
+  "id": "detergent-surf-1",
+  "name": "Surf Excel Easy Wash",
+  "category": "household",
+  "unit": "1 kg",
+  "price": 130,
+  "keywords": [
+   "detergent",
+   "washing powder"
+  ]
+ },
+ {
+  "id": "dishwash-vim-500",
+  "name": "Vim Dishwash Gel",
+  "category": "household",
+  "unit": "500 ml",
+  "price": 105,
+  "keywords": [
+   "dishwash",
+   "vim"
+  ]
+ }
+]

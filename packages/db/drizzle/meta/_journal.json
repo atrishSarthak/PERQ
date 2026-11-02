@@ -92,6 +92,13 @@
       "when": 1793544769134,
       "tag": "0012_purchase_planner",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793589932761,
+      "tag": "0013_swiggy_lite",
+      "breakpoints": true
     }
   ]
 }

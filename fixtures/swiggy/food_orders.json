@@ -1,0 +1,784 @@
+[
+ {
+  "id": "sw-food-001",
+  "service": "food",
+  "orderedAt": "2026-10-11T07:35:00.000Z",
+  "restaurant": "Meghana Foods",
+  "items": [
+   {
+    "name": "Paneer Biryani",
+    "qty": 1,
+    "price": 295
+   },
+   {
+    "name": "Chicken 65",
+    "qty": 1,
+    "price": 86
+   }
+  ],
+  "itemTotal": 381,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 410
+ },
+ {
+  "id": "sw-food-002",
+  "service": "food",
+  "orderedAt": "2026-10-12T15:10:00.000Z",
+  "restaurant": "Domino's Pizza",
+  "items": [
+   {
+    "name": "Farmhouse Pizza (Medium)",
+    "qty": 1,
+    "price": 459
+   },
+   {
+    "name": "Peppy Paneer (Medium)",
+    "qty": 1,
+    "price": 122
+   }
+  ],
+  "itemTotal": 581,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 620
+ },
+ {
+  "id": "sw-food-003",
+  "service": "food",
+  "orderedAt": "2026-10-14T17:50:00.000Z",
+  "restaurant": "McDonald's",
+  "items": [
+   {
+    "name": "McSpicy Chicken Burger",
+    "qty": 1,
+    "price": 219
+   },
+   {
+    "name": "McAloo Tikki",
+    "qty": 1,
+    "price": 91
+   }
+  ],
+  "itemTotal": 310,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 380
+ },
+ {
+  "id": "sw-food-004",
+  "service": "food",
+  "orderedAt": "2026-10-16T08:00:00.000Z",
+  "restaurant": "Rameshwaram Cafe",
+  "items": [
+   {
+    "name": "Ghee Podi Idli",
+    "qty": 1,
+    "price": 90
+   },
+   {
+    "name": "Filter Coffee",
+    "qty": 1,
+    "price": 40
+   },
+   {
+    "name": "Ghee Podi Idli",
+    "qty": 1,
+    "price": 70
+   }
+  ],
+  "itemTotal": 200,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 210
+ },
+ {
+  "id": "sw-food-005",
+  "service": "food",
+  "orderedAt": "2026-10-18T15:40:00.000Z",
+  "restaurant": "Behrouz Biryani",
+  "items": [
+   {
+    "name": "Lazeez Bhuna Murgh Biryani",
+    "qty": 1,
+    "price": 399
+   },
+   {
+    "name": "Dum Gosht Biryani",
+    "qty": 1,
+    "price": 42
+   }
+  ],
+  "itemTotal": 441,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 470
+ },
+ {
+  "id": "sw-food-006",
+  "service": "food",
+  "orderedAt": "2026-10-20T14:15:00.000Z",
+  "restaurant": "EatFit",
+  "items": [
+   {
+    "name": "Paneer Tikka Bowl",
+    "qty": 1,
+    "price": 261
+   }
+  ],
+  "itemTotal": 261,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 300
+ },
+ {
+  "id": "sw-food-007",
+  "service": "food",
+  "orderedAt": "2026-10-21T19:00:00.000Z",
+  "restaurant": "Truffles",
+  "items": [
+   {
+    "name": "All American Cheese Burger",
+    "qty": 1,
+    "price": 259
+   },
+   {
+    "name": "Peri Peri Fries",
+    "qty": 1,
+    "price": 121
+   }
+  ],
+  "itemTotal": 380,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 450
+ },
+ {
+  "id": "sw-food-008",
+  "service": "food",
+  "orderedAt": "2026-10-24T14:45:00.000Z",
+  "restaurant": "Empire Restaurant",
+  "items": [
+   {
+    "name": "Chicken Kebab",
+    "qty": 1,
+    "price": 230
+   },
+   {
+    "name": "Ghee Rice",
+    "qty": 1,
+    "price": 150
+   },
+   {
+    "name": "Butter Naan",
+    "qty": 1,
+    "price": 90
+   }
+  ],
+  "itemTotal": 470,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 480
+ },
+ {
+  "id": "sw-food-009",
+  "service": "food",
+  "orderedAt": "2026-10-25T11:10:00.000Z",
+  "restaurant": "Theobroma",
+  "items": [
+   {
+    "name": "Overload Brownie",
+    "qty": 1,
+    "price": 135
+   },
+   {
+    "name": "Red Velvet Pastry",
+    "qty": 1,
+    "price": 156
+   }
+  ],
+  "itemTotal": 291,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 320
+ },
+ {
+  "id": "sw-food-010",
+  "service": "food",
+  "orderedAt": "2026-10-27T07:40:00.000Z",
+  "restaurant": "Chai Point",
+  "items": [
+   {
+    "name": "Masala Chai Flask",
+    "qty": 1,
+    "price": 160
+   },
+   {
+    "name": "Bun Maska",
+    "qty": 1,
+    "price": 51
+   }
+  ],
+  "itemTotal": 211,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 250
+ },
+ {
+  "id": "sw-food-011",
+  "service": "food",
+  "orderedAt": "2026-10-28T17:15:00.000Z",
+  "restaurant": "Meghana Foods",
+  "items": [
+   {
+    "name": "Chicken 65",
+    "qty": 1,
+    "price": 265
+   },
+   {
+    "name": "Chicken Boneless Biryani",
+    "qty": 1,
+    "price": 65
+   }
+  ],
+  "itemTotal": 330,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 400
+ },
+ {
+  "id": "sw-food-012",
+  "service": "food",
+  "orderedAt": "2026-10-30T15:00:00.000Z",
+  "restaurant": "Domino's Pizza",
+  "items": [
+   {
+    "name": "Farmhouse Pizza (Medium)",
+    "qty": 1,
+    "price": 459
+   },
+   {
+    "name": "Peppy Paneer (Medium)",
+    "qty": 1,
+    "price": 91
+   }
+  ],
+  "itemTotal": 550,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 560
+ },
+ {
+  "id": "sw-food-013",
+  "service": "food",
+  "orderedAt": "2026-10-31T15:35:00.000Z",
+  "restaurant": "Empire Restaurant",
+  "items": [
+   {
+    "name": "Chicken Kebab",
+    "qty": 1,
+    "price": 230
+   },
+   {
+    "name": "Butter Naan",
+    "qty": 1,
+    "price": 45
+   },
+   {
+    "name": "Chicken Kebab",
+    "qty": 1,
+    "price": 136
+   }
+  ],
+  "itemTotal": 411,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 440
+ },
+ {
+  "id": "sw-food-014",
+  "service": "food",
+  "orderedAt": "2026-11-02T07:50:00.000Z",
+  "restaurant": "Rameshwaram Cafe",
+  "items": [
+   {
+    "name": "Ghee Podi Idli",
+    "qty": 1,
+    "price": 90
+   },
+   {
+    "name": "Filter Coffee",
+    "qty": 1,
+    "price": 51
+   }
+  ],
+  "itemTotal": 141,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 180
+ },
+ {
+  "id": "sw-food-015",
+  "service": "food",
+  "orderedAt": "2026-11-04T14:40:00.000Z",
+  "restaurant": "EatFit",
+  "items": [
+   {
+    "name": "Paneer Tikka Bowl",
+    "qty": 1,
+    "price": 255
+   }
+  ],
+  "itemTotal": 255,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 300
+ },
+ {
+  "id": "sw-food-016",
+  "service": "food",
+  "orderedAt": "2026-11-06T18:10:00.000Z",
+  "restaurant": "McDonald's",
+  "items": [
+   {
+    "name": "Fries (Medium)",
+    "qty": 1,
+    "price": 119
+   },
+   {
+    "name": "McAloo Tikki",
+    "qty": 1,
+    "price": 106
+   }
+  ],
+  "itemTotal": 225,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 260
+ },
+ {
+  "id": "sw-food-017",
+  "service": "food",
+  "orderedAt": "2026-11-08T07:30:00.000Z",
+  "restaurant": "Chai Point",
+  "items": [
+   {
+    "name": "Masala Chai Flask",
+    "qty": 1,
+    "price": 160
+   },
+   {
+    "name": "Bun Maska",
+    "qty": 1,
+    "price": 41
+   }
+  ],
+  "itemTotal": 201,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 230
+ },
+ {
+  "id": "sw-food-018",
+  "service": "food",
+  "orderedAt": "2026-11-10T15:20:00.000Z",
+  "restaurant": "Meghana Foods",
+  "items": [
+   {
+    "name": "Chicken Boneless Biryani",
+    "qty": 1,
+    "price": 281
+   }
+  ],
+  "itemTotal": 281,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 320
+ },
+ {
+  "id": "sw-food-019",
+  "service": "food",
+  "orderedAt": "2026-11-11T10:45:00.000Z",
+  "restaurant": "Theobroma",
+  "items": [
+   {
+    "name": "Overload Brownie",
+    "qty": 1,
+    "price": 145
+   }
+  ],
+  "itemTotal": 145,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 190
+ },
+ {
+  "id": "sw-food-020",
+  "service": "food",
+  "orderedAt": "2026-11-13T08:05:00.000Z",
+  "restaurant": "Rameshwaram Cafe",
+  "items": [
+   {
+    "name": "Ghee Podi Idli",
+    "qty": 1,
+    "price": 90
+   },
+   {
+    "name": "Filter Coffee",
+    "qty": 1,
+    "price": 40
+   },
+   {
+    "name": "Ghee Podi Idli",
+    "qty": 1,
+    "price": 60
+   }
+  ],
+  "itemTotal": 190,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 200
+ },
+ {
+  "id": "sw-food-021",
+  "service": "food",
+  "orderedAt": "2026-11-15T03:00:00.000Z",
+  "restaurant": "Chai Point",
+  "items": [
+   {
+    "name": "Bun Maska",
+    "qty": 1,
+    "price": 70
+   },
+   {
+    "name": "Masala Chai Flask",
+    "qty": 1,
+    "price": 121
+   }
+  ],
+  "itemTotal": 191,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   }
+  ],
+  "total": 220
+ },
+ {
+  "id": "sw-food-022",
+  "service": "food",
+  "orderedAt": "2026-11-16T17:40:00.000Z",
+  "restaurant": "Behrouz Biryani",
+  "items": [
+   {
+    "name": "Lazeez Bhuna Murgh Biryani",
+    "qty": 1,
+    "price": 356
+   }
+  ],
+  "itemTotal": 356,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 29
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 420
+ },
+ {
+  "id": "sw-food-023",
+  "service": "food",
+  "orderedAt": "2026-11-17T19:10:00.000Z",
+  "restaurant": "Domino's Pizza",
+  "items": [
+   {
+    "name": "Garlic Breadsticks",
+    "qty": 1,
+    "price": 129
+   },
+   {
+    "name": "Peppy Paneer (Medium)",
+    "qty": 1,
+    "price": 316
+   }
+  ],
+  "itemTotal": 445,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 35
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 515
+ },
+ {
+  "id": "sw-food-024",
+  "service": "food",
+  "orderedAt": "2026-11-19T18:00:00.000Z",
+  "restaurant": "Empire Restaurant",
+  "items": [
+   {
+    "name": "Chicken Kebab",
+    "qty": 1,
+    "price": 230
+   },
+   {
+    "name": "Ghee Rice",
+    "qty": 1,
+    "price": 150
+   },
+   {
+    "name": "Butter Naan",
+    "qty": 1,
+    "price": 50
+   }
+  ],
+  "itemTotal": 430,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 0
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 465
+ },
+ {
+  "id": "sw-food-025",
+  "service": "food",
+  "orderedAt": "2026-11-20T19:45:00.000Z",
+  "restaurant": "Truffles",
+  "items": [
+   {
+    "name": "All American Cheese Burger",
+    "qty": 1,
+    "price": 259
+   },
+   {
+    "name": "Peri Peri Fries",
+    "qty": 1,
+    "price": 187
+   }
+  ],
+  "itemTotal": 446,
+  "fees": [
+   {
+    "label": "Delivery fee",
+    "amount": 19
+   },
+   {
+    "label": "Platform fee",
+    "amount": 10
+   },
+   {
+    "label": "Late night fee",
+    "amount": 25
+   }
+  ],
+  "total": 500
+ }
+]

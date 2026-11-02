@@ -2,6 +2,7 @@ import { z } from "zod";
 import { recommendationResultSchema } from "./recommendation";
 import { statementDraftSchema } from "./statementApi";
 import { partialPlanInputSchema, planResultSchema } from "./planner";
+import { swiggyCartSchema } from "./swiggy";
 
 // Request/response bodies for the recommender API (handoff §1.5) that
 // aren't covered by the domain schemas.
@@ -54,6 +55,8 @@ export const emberEventSchema = z.discriminatedUnion("type", [
     draft: z.lazy(() => partialPlanInputSchema),
     missing: z.array(z.enum(["price", "item"])),
   }),
+  // Swiggy (Step 4): a prepared Instamart cart, ordered only from its Confirm button.
+  z.object({ type: z.literal("swiggyCart"), cart: z.lazy(() => swiggyCartSchema) }),
   z.object({
     type: z.literal("plan"),
     planId: z.string(),

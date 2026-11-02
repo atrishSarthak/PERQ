@@ -11,6 +11,7 @@ import { Text } from "@/components/Text";
 import { Amount, CategoryBars, dueLine, monthName, shortDate } from "@/features/money/components";
 import { LeakageBanner } from "@/features/results/components";
 import { SpendSyncPrompt } from "@/features/results/SpendSync";
+import { SwiggyHomeCard, useSwiggySyncOnFocus } from "@/features/swiggy/HomeCard";
 import { useAuth } from "@/lib/auth";
 import { useMarkPaid, useMoneyState, useNudges } from "@/lib/moneyQueries";
 import { hasAskedForNotifications } from "@/lib/notifications";
@@ -34,6 +35,7 @@ export default function Home() {
   const nudges = useNudges();
   const markPaid = useMarkPaid();
   const plans = usePlans();
+  useSwiggySyncOnFocus(!!state.data?.swiggy);
 
   // First visit to Home after sign-in: explain notifications before any OS prompt.
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function Home() {
   const unread = nudges.data?.nudges.find((n) => n.status === "sent") ?? nudges.data?.nudges.find((n) => n.status === "opened");
   const unreadCount = nudges.data?.unread ?? 0;
   const openPlans = (plans.data?.plans ?? []).filter((p) => p.status === "planned" || p.status === "reminder_set");
+  const swiggyCard = s.swiggy ? <SwiggyHomeCard s={s.swiggy} daysLeft={s.month.daysLeft} /> : null;
   const dues = s.cards
     .filter((c) => c.latestStatement?.dueDate && c.latestStatement.totalDue !== null && (c.daysToDue ?? -1) >= 0)
     .sort((a, b) => (a.daysToDue ?? 99) - (b.daysToDue ?? 99));
@@ -76,6 +79,7 @@ export default function Home() {
           </Text>
         </Card>
         <Button label="Should I buy this?" kind="secondary" onPress={() => router.push("/plan/new")} accessibilityHint="Ember checks your cards and budget" />
+        {swiggyCard}
         </>
       ) : (
         <>
@@ -145,6 +149,8 @@ export default function Home() {
               </Card>
             </Pressable>
           ) : null}
+
+          {swiggyCard}
 
           <Card>
             <Text variant="heading">Upcoming dues</Text>

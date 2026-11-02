@@ -710,3 +710,52 @@ export const purchasePlans = pgTable(
     statusIdx: index("purchase_plans_user_status_idx").on(t.userId, t.status),
   })
 );
+
+// --- Step 4 Lite: Swiggy budget & order assistant ---
+
+/** One row per connected user. mode: mock | live (SWIGGY_MODE at connect time). */
+export const swiggyConnections = pgTable("swiggy_connections", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  mode: text("mode").notNull(),
+  connectedAt: timestamp("connected_at", { mode: "date" }).notNull().defaultNow(),
+});
+
+/** Synced food and Instamart orders, plus orders placed from a confirmed cart. */
+export const swiggyOrders = pgTable(
+  "swiggy_orders",
+  {
+    id: id(),
+    userId: userRef(),
+    externalId: text("external_id").notNull(), // Swiggy's order id (or the mock's)
+    service: text("service").notNull(), // food | instamart
+    orderedAt: timestamp("ordered_at", { mode: "date" }).notNull(),
+    restaurant: text("restaurant"),
+    items: jsonb("items").notNull().default([]), // { name, qty, price }[]
+    itemTotal: integer("item_total").notNull(),
+    fees: jsonb("fees").notNull().default([]), // { label, amount }[]
+    total: integer("total").notNull(),
+  },
+  (t) => ({
+    userExternal: uniqueIndex("swiggy_orders_user_external_idx").on(t.userId, t.externalId),
+    userIdx: index("swiggy_orders_user_idx").on(t.userId, t.orderedAt),
+  })
+);
+
+/** A prepared Instamart cart. Ordered only from the app's Confirm button. */
+export const swiggyCarts = pgTable("swiggy_carts", {
+  id: id(),
+  userId: userRef(),
+  externalCartId: text("external_cart_id").notNull(),
+  budget: integer("budget").notNull(),
+  lines: jsonb("lines").notNull().default([]), // { productId, name, unit, qty, price }[]
+  itemTotal: integer("item_total").notNull(),
+  fees: jsonb("fees").notNull().default([]),
+  total: integer("total").notNull(),
+  skipped: jsonb("skipped").notNull().default([]),
+  status: text("status").notNull().default("prepared"), // prepared | placed | cancelled
+  orderId: text("order_id"),
+  createdAt: createdAt(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
+});

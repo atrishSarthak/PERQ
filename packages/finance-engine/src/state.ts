@@ -1,4 +1,6 @@
+import type { SwiggyOrder, SwiggySummary } from "@perq/shared";
 import type { Category } from "./types";
+import { swiggySummary } from "./swiggy";
 
 // The financial state (handoff §6): computed on demand from the user's
 // statements, transactions, budgets and goals. Pure, with `now` injected
@@ -111,6 +113,8 @@ export interface StateInput {
   transactions: StateTransaction[];
   budget: StateBudget | null;
   goals: StateGoal[];
+  /** Step 4: Swiggy orders when Swiggy is connected; absent or null otherwise. */
+  swiggyOrders?: SwiggyOrder[] | null;
 }
 
 // ---- outputs ---------------------------------------------------------------
@@ -203,6 +207,8 @@ export interface FinancialState {
     behindBy: number;
     targetDate: string | null;
   }[];
+  /** Step 4: this month's Swiggy spend, when Swiggy is connected. */
+  swiggy?: SwiggySummary | null;
 }
 
 // ---- helpers used by rules and Ember tools -----------------------------------
@@ -469,5 +475,6 @@ export function buildFinancialState(input: StateInput): FinancialState {
     },
     missedRewardsLastCycle: { total: Math.round(items.reduce((s, i) => s + i.extra, 0)), items },
     goals,
+    swiggy: input.swiggyOrders ? swiggySummary(input.swiggyOrders, key, input.now, input.budget?.categoryLimits.food_delivery ?? null) : null,
   };
 }

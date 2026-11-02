@@ -42,5 +42,7 @@ export const config = {
     "/api/plans/:path*",
     "/api/me/:path*",
     "/api/demo/:path*",
+    "/api/swiggy",
+    "/api/swiggy/:path*",
   ],
 };

@@ -9,6 +9,7 @@ import { Text } from "@/components/Text";
 import { answerSummary } from "@/features/quiz/answerLabels";
 import { useAuth } from "@/lib/auth";
 import { useCatalogue, useResults, useSetHeld, useSyncSpend } from "@/lib/queries";
+import { useSwiggyConnection, useSwiggyStatus } from "@/lib/swiggyApi";
 import { useThemeContext, type ThemePreference } from "@/theme/ThemeProvider";
 
 const SHORT_TITLES: Record<QuizKey, string> = {
@@ -29,6 +30,8 @@ export default function Profile() {
   const catalogue = useCatalogue();
   const setHeld = useSetHeld();
   const syncSpend = useSyncSpend();
+  const swiggy = useSwiggyStatus();
+  const swiggyConn = useSwiggyConnection();
   const spendSync = results.data?.spendSync;
   const answers = results.data?.answers;
   const name = (id: string) => catalogue.data?.cards.find((c) => c.id === id)?.name ?? id;
@@ -60,6 +63,33 @@ export default function Profile() {
           />
         </Card>
       ) : null}
+
+      {/* Step 4: Swiggy (demo data unless SWIGGY_MODE=live on the server). */}
+      <Card>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+          <Text variant="heading">Swiggy</Text>
+          {swiggy.data?.connected ? (
+            <Text variant="caption" tone="success">
+              ● Connected{swiggy.data.mode === "mock" ? " · demo data" : ""}
+            </Text>
+          ) : null}
+        </View>
+        <Text variant="small" tone="muted">
+          {swiggy.data?.connected
+            ? "Ember tracks your food and Instamart spending and fees, and can build a grocery cart within a budget. Nothing is ordered without your tap."
+            : "Connect Swiggy so Ember can track food and grocery spending and fees, and plan grocery carts within your budget."}
+        </Text>
+        {swiggy.data?.connected ? (
+          <Button kind="ghost" label="Disconnect Swiggy" loading={swiggyConn.disconnect.isPending} onPress={() => swiggyConn.disconnect.mutate()} />
+        ) : (
+          <Button label="Connect Swiggy" loading={swiggyConn.connect.isPending || swiggy.isLoading} onPress={() => swiggyConn.connect.mutate()} />
+        )}
+        {swiggyConn.connect.error ? (
+          <Text variant="small" tone="danger">
+            {swiggyConn.connect.error.message}
+          </Text>
+        ) : null}
+      </Card>
 
       <Card>
         <Text variant="heading">Money</Text>

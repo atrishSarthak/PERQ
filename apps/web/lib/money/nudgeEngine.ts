@@ -3,6 +3,7 @@ import { cardAccounts, db, nudges } from "@perq/db";
 import {
   buildFinancialState,
   evaluateRules,
+  IN_APP_ONLY_RULES,
   planBuyWindowCandidates,
   planNudges,
   simulateUpcoming,
@@ -76,7 +77,7 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
     ...extra,
   });
 
-  const sent: { id: string; title: string; body: string }[] = [];
+  const sent: { id: string; ruleId: string; title: string; body: string }[] = [];
   for (const c of plan.sendFresh) {
     const copy = await writeNudgeCopy(c);
     const [inserted] = await db
@@ -84,7 +85,7 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
       .values(row(c, { status: "sent", sentAt: now, title: copy.title, body: copy.body, bodySource: copy.source }))
       .onConflictDoNothing()
       .returning({ id: nudges.id });
-    if (inserted) sent.push({ id: inserted.id, title: copy.title, body: copy.body });
+    if (inserted) sent.push({ id: inserted.id, ruleId: c.ruleId, title: copy.title, body: copy.body });
   }
   for (const q of plan.sendQueued) {
     // Today's candidate, so the payload, copy and "why" reflect today's state.
@@ -94,7 +95,7 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
       .update(nudges)
       .set({ status: "sent", sentAt: now, title: copy.title, body: copy.body, bodySource: copy.source, payload: c.payload, priority: c.priority, why: c.why, expiresAt: new Date(c.expiresAt) })
       .where(and(eq(nudges.userId, userId), eq(nudges.id, q.id)));
-    sent.push({ id: q.id, title: copy.title, body: copy.body });
+    sent.push({ id: q.id, ruleId: c.ruleId, title: copy.title, body: copy.body });
   }
   if (plan.queueFresh.length) {
     await db
@@ -106,7 +107,9 @@ export async function runNudgeEngine(userId: string, now: Date = new Date()): Pr
     await db.update(nudges).set({ status: "expired" }).where(and(eq(nudges.userId, userId), inArray(nudges.id, plan.expire)));
   }
   if (sent.length) {
-    await pushNudges(userId, sent);
+    // In-app-only nudges (Step 4's swiggy_pattern) wait in the inbox; they're never pushed.
+    const toPush = sent.filter((n) => !IN_APP_ONLY_RULES.has(n.ruleId));
+    if (toPush.length) await pushNudges(userId, toPush);
     await logActivity(userId, "nudge_sent", sent.length === 1 ? "Sent you 1 nudge" : `Sent you ${sent.length} nudges`);
   }
 

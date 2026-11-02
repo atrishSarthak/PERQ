@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { budgets, cardAccounts, db, savingsGoals, statements, transactions, users } from "@perq/db";
 import { PARSER_VERSION } from "@perq/statements";
 import { insertDemoPlans } from "@/lib/plans/demo";
+import { connectSwiggy } from "@/lib/swiggy/service";
 import { setHeld } from "@/lib/recommender/service";
 import { invalidateState, logActivity } from "./activity";
 import { setDemoClock } from "./clock";
@@ -187,6 +188,8 @@ export async function loadDemo(userId: string, at: Date = DEMO_DATE) {
   await invalidateState(userId);
   await logActivity(userId, "demo_loaded", `Loaded demo data: 3 cards, 6 statements, 3 purchase plans, ${ace.count + click.count} transactions`);
   const plans = await insertDemoPlans(userId, at);
+  // Step 4: mock Swiggy (always mock for the demo), so the Home card and the late-night nudge show.
+  await connectSwiggy(userId, at, "mock");
   const run = await runNudgeEngine(userId, at);
   return { cards: 3, plans: plans.length, statements: 6, transactions: ace.count + click.count, nudgesSent: run.sent.length, now: at.toISOString() };
 }

@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     "@perq/finance-engine",
     "@perq/shared",
     "@perq/statements",
+    "@perq/swiggy",
   ],
   // A stray lockfile outside this repo (in the user's home directory) makes
   // Next.js misdetect the workspace root — pin it explicitly to this repo.

@@ -9,6 +9,9 @@ import {
   nudges,
   purchasePlans,
   savingsGoals,
+  swiggyCarts,
+  swiggyConnections,
+  swiggyOrders,
   userMerchantOverrides,
   userProfile,
 } from "@perq/db";
@@ -23,6 +26,11 @@ export async function deleteFinancialData(userId: string): Promise<void> {
   // Plans first: a bought plan points at a transaction.
   await db.delete(purchasePlans).where(eq(purchasePlans.userId, userId));
   await db.delete(chatMessages).where(and(eq(chatMessages.userId, userId), like(chatMessages.content, "%[plan:%]")));
+  // Step 4: Swiggy connection, orders, carts and the chat cards showing carts.
+  await db.delete(chatMessages).where(and(eq(chatMessages.userId, userId), like(chatMessages.content, "%[cart:%]")));
+  await db.delete(swiggyCarts).where(eq(swiggyCarts.userId, userId));
+  await db.delete(swiggyOrders).where(eq(swiggyOrders.userId, userId));
+  await db.delete(swiggyConnections).where(eq(swiggyConnections.userId, userId));
   // card_accounts cascades to statements and transactions.
   await db.delete(cardAccounts).where(eq(cardAccounts.userId, userId));
   await db.delete(nudges).where(eq(nudges.userId, userId));

@@ -25,6 +25,7 @@
     "@perq/scoring-engine": "workspace:*",
     "@perq/shared": "workspace:*",
     "@perq/statements": "workspace:*",
+    "@perq/swiggy": "workspace:*",
     "@perq/ui": "workspace:*",
     "@radix-ui/react-scroll-area": "^1.4.0",
     "bcryptjs": "^2.4.3",

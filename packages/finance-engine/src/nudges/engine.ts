@@ -14,6 +14,7 @@ import { pointsValue } from "./pointsValue";
 import { PLAN_BUY_WINDOW_DESCRIPTION } from "./planBuyWindow";
 import { PLAN_PURCHASE_MATCH_DESCRIPTION } from "./planPurchaseMatch";
 import { statementUpload } from "./statementUpload";
+import { swiggyPattern } from "./swiggyPattern";
 import type { NudgeCandidate, NudgeHistoryEntry, NudgeRule } from "./types";
 
 export const NUDGE_RULES: NudgeRule[] = [
@@ -28,10 +29,14 @@ export const NUDGE_RULES: NudgeRule[] = [
   pointsValue,
   budgetPace,
   goalProgress,
+  swiggyPattern,
 ];
 
-/** Rules shown only in the app's inbox: never pushed and not counted against the daily cap (Step 3 §8). */
-export const IN_APP_ONLY_RULES = new Set(["plan_purchase_match"]);
+/**
+ * Rules shown only in the app's inbox (Step 3 §8, Step 4): never pushed, not
+ * counted against the daily cap, and not held back by it or by quiet hours.
+ */
+export const IN_APP_ONLY_RULES = new Set(["plan_purchase_match", "swiggy_pattern"]);
 
 export const RULE_DESCRIPTIONS: Record<string, string> = {
   ...Object.fromEntries(NUDGE_RULES.map((r) => [r.id, r.description])),
@@ -140,7 +145,10 @@ export function planNudges(input: {
     ...queued.map((item) => ({ kind: "queued" as const, item })),
   ].sort((a, b) => b.item.priority - a.item.priority || a.item.dedupeKey.localeCompare(b.item.dedupeKey));
 
-  const chosen = pool.slice(0, capRemaining);
+  // In-app-only nudges go straight to the inbox; the rest compete for the cap.
+  const inApp = pool.filter((p) => IN_APP_ONLY_RULES.has(p.item.ruleId));
+  const capped = pool.filter((p) => !IN_APP_ONLY_RULES.has(p.item.ruleId));
+  const chosen = [...inApp, ...capped.slice(0, capRemaining)];
   const later = nextSendTime(quietHours ? now : new Date(now.getTime() + 60_000), config);
   // When the cap is reached (not quiet hours), retry tomorrow at 09:00.
   const retryAt = quietHours ? later : nextSendTime(new Date(Date.parse(`${today}T23:59:00+05:30`)), config);
@@ -148,7 +156,7 @@ export function planNudges(input: {
   return {
     sendFresh: chosen.filter((p) => p.kind === "fresh").map((p) => p.item as (typeof fresh)[number]),
     sendQueued: chosen.filter((p) => p.kind === "queued").map((p) => p.item as QueuedNudge & { current: NudgeCandidate }),
-    queueFresh: pool
+    queueFresh: capped
       .slice(capRemaining)
       .filter((p) => p.kind === "fresh")
       .map((p) => ({ ...(p.item as (typeof fresh)[number]), scheduledFor: retryAt.toISOString() })),

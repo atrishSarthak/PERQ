@@ -7,9 +7,11 @@ import { moneyContext } from "@/lib/ember/money/context";
 import { NUDGE_CHIPS, nudgeOpening } from "@/lib/ember/money/nudgeThread";
 import { planChips, planOpening } from "@/lib/ember/plans/prompts";
 import { createPlanTools } from "@/lib/ember/plans/tools";
+import { createSwiggyTools } from "@/lib/ember/swiggy/tools";
+import { swiggyStatus } from "@/lib/swiggy/service";
 import { loadPlanContext } from "@/lib/plans/context";
 import { getPlanRow } from "@/lib/plans/service";
-import type { PartialPlanInput, PlanResult } from "@perq/shared";
+import type { PartialPlanInput, PlanResult, SwiggyCart } from "@perq/shared";
 import { chatTurn } from "@/lib/ember/money/run";
 import type { MoneyProposal } from "@/lib/ember/money/tools";
 import { formatInr } from "@perq/finance-engine";
@@ -104,7 +106,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "This conversation is at its length limit." }, { status: 429 });
   }
   const now = await nowFor(auth.id);
-  const [rec, money, nudgeRow, plan] = await Promise.all([recommenderContext(auth.id), moneyContext(auth.id, now), nudgeFor(auth.id, threadRef), planFor(auth.id, threadRef)]);
+  const [rec, money, nudgeRow, plan, swiggy] = await Promise.all([recommenderContext(auth.id), moneyContext(auth.id, now), nudgeFor(auth.id, threadRef), planFor(auth.id, threadRef), swiggyStatus(auth.id)]);
   if (threadRef?.startsWith("nudge:") && !nudgeRow) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (threadRef?.startsWith("plan:") && !plan) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const nudge = nudgeRow ? money?.nudges.find((n) => n.id === nudgeRow.id) ?? null : null;
@@ -114,11 +116,13 @@ export async function POST(req: Request) {
 
   const history = (await db.select({ role: chatMessages.role, content: chatMessages.content }).from(chatMessages).where(threadWhere(auth.id, threadRef)).orderBy(asc(chatMessages.createdAt)))
     .slice(-HISTORY_TURNS)
-    .map((m) => ({ role: m.role === "assistant" ? ("assistant" as const) : ("user" as const), content: m.content }));
+    // A cart card's marker is for the app; the model gets a note instead, so it doesn't copy the marker.
+    .map((m) => ({ role: m.role === "assistant" ? ("assistant" as const) : ("user" as const), content: m.content.replace(CART_MARKER, "\n\n(Showed an Instamart cart card. Ordered only if the user tapped Confirm.)") }));
 
   return sseResponse(async (emit) => {
     let proposal: MoneyProposal | null = null;
     let confirmCard: { draft: PartialPlanInput; missing: ("price" | "item")[] } | null = null;
+    let cart: SwiggyCart | null = null;
     const answer = await chatTurn({
       userId: auth.id,
       message: body.data.message,
@@ -138,6 +142,16 @@ export async function POST(req: Request) {
           emit({ type: "planConfirm", draft, missing });
         },
       }),
+      swiggyTools: swiggy.connected
+        ? createSwiggyTools({
+            userId: auth.id,
+            now,
+            onCart: (c) => {
+              cart = c;
+              emit({ type: "swiggyCart", cart: c });
+            },
+          })
+        : null,
       callModel: geminiCaller(),
       onLabel: (label) => emit({ type: "step", label }),
       onProposal: (p) => {
@@ -147,6 +161,7 @@ export async function POST(req: Request) {
       logRun: logAgentRun,
     });
     const thread = threadRef ? REF_THREAD : MAIN_THREAD;
+    const replyText = answer.text.replace(CART_MARKER, "").trim();
     await db.insert(chatMessages).values([
       { userId: auth.id, thread, threadRef, role: "user", content: body.data.message },
       // The proposal is stored with the reply so later turns (and history) know exactly what was offered.
@@ -155,7 +170,8 @@ export async function POST(req: Request) {
         thread,
         threadRef,
         role: "assistant",
-        content: [answer.text, proposal ? proposalLine(proposal) : null, confirmCard ? confirmLine(confirmCard) : null].filter(Boolean).join("\n\n"),
+        // A cart is kept as a [cart:<id>] marker last, so the thread re-shows its card.
+        content: [replyText, proposal ? proposalLine(proposal) : null, confirmCard ? confirmLine(confirmCard) : null, cart ? cartMarker(cart) : null].filter(Boolean).join("\n\n"),
       },
     ]);
     // Replying in a nudge thread counts as acting on it (§7.4).
@@ -164,7 +180,7 @@ export async function POST(req: Request) {
     }
     // Gemini's tool loop isn't token-streamed, so the finished reply is
     // re-emitted in small chunks to read like a live reply.
-    const words = answer.text.split(" ");
+    const words = replyText.split(" ");
     for (let i = 0; i < words.length; i += WORDS_PER_CHUNK) {
       const last = i + WORDS_PER_CHUNK >= words.length;
       emit({ type: "chunk", text: words.slice(i, i + WORDS_PER_CHUNK).join(" ") + (last ? "" : " ") });
@@ -185,3 +201,6 @@ function proposalLine(p: MoneyProposal): string {
   const cats = Object.entries(p.categories).map(([c, v]) => `${TXN_CATEGORY_LABELS[c as TxnCategory] ?? c} ${formatInr(v)}`);
   return `(Proposed budget: ${p.total ? `total ${formatInr(p.total)}; ` : ""}${cats.join(", ")}. Not saved until confirmed.)`;
 }
+
+const cartMarker = (c: SwiggyCart) => `[cart:${c.id}]`;
+const CART_MARKER = /\s*\[cart:[^\]]*\]/g;

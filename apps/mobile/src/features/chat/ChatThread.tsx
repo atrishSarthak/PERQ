@@ -11,6 +11,8 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { PlanConfirmCard, PlanResultCard } from "@/features/planner/ChatCards";
 import { splitPlanMarker } from "@/features/planner/chatMessage";
 import { plannerApi } from "@/lib/plannerApi";
+import { SwiggyCartCard } from "@/features/swiggy/CartCard";
+import { splitCartMarker } from "@/features/swiggy/cartMessage";
 
 // One Ember conversation (handoff §7.4, §8): the main thread, or a
 // `nudge:<id>` / `card:<id>` thread. Chips with an `action` are app buttons
@@ -29,11 +31,14 @@ interface Msg {
   planConfirm?: { draft: PartialPlanInput; missing: ("price" | "item")[] };
   /** A finished plan shown as a result card. */
   planId?: string | null;
+  /** An Instamart cart Ember prepared (Step 4), shown with Confirm / Edit / Cancel. */
+  cartId?: string | null;
 }
 
 const fromHistory = (m: Msg): Msg => {
-  const { text, planId } = splitPlanMarker(m.content);
-  return { ...m, content: text, planId };
+  const cart = splitCartMarker(m.content);
+  const { text, planId } = splitPlanMarker(cart.text);
+  return { ...m, content: text, planId, cartId: cart.cartId };
 };
 
 export function ChatThread({
@@ -68,7 +73,8 @@ export function ChatThread({
   const [step, setStep] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<Set<string>>(new Set());
   const listRef = useRef<FlatList<Msg>>(null);
-  const scrollToEnd = useCallback(() => setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 50), []);
+  // After the list has measured a card that just arrived or changed size.
+  const scrollToEnd = useCallback(() => setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 250), []);
   // Over a tab bar: the box sits on the bar (the bottom inset) until the keyboard
   // covers the bar, then on the keyboard. The list is padded by the box's height.
   const insets = useSafeAreaInsets();
@@ -104,6 +110,7 @@ export function ChatThread({
         if (e.type === "step") setStep(e.label);
         if (e.type === "proposal") update((x) => ({ ...x, proposal: e.proposal }));
         if (e.type === "planConfirm") update((x) => ({ ...x, planConfirm: { draft: e.draft, missing: e.missing } }));
+        if (e.type === "swiggyCart") update((x) => ({ ...x, cartId: e.cart.id }));
         if (e.type === "chunk") {
           setStep(null);
           update((x) => ({ ...x, content: x.content + e.text }));
@@ -183,6 +190,7 @@ export function ChatThread({
                 <PlanConfirmCard draft={item.planConfirm.draft} missing={item.planConfirm.missing} used={confirmed.has(item.id)} onPlan={(input) => planIt(item.id, input)} />
               ) : null}
               {item.planId ? <PlanResultCard planId={item.planId} onReady={item.id === messages.at(-1)?.id ? scrollToEnd : undefined} /> : null}
+              {item.cartId ? <SwiggyCartCard cartId={item.cartId} onEdit={() => setDraft("Change the cart: ")} onReady={item.id === messages.at(-1)?.id ? scrollToEnd : undefined} /> : null}
               {item.proposal && onConfirmProposal ? (
                 <View style={{ padding: t.spacing[3], borderRadius: t.radii.md, borderWidth: 1, borderColor: t.colors.ember, gap: t.spacing[2] }}>
                   <Text variant="bodyStrong">{item.proposal.kind === "budget" ? "Proposed budget" : "Proposed goal"}</Text>

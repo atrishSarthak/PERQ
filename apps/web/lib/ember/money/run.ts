@@ -9,6 +9,7 @@ import { cardThreadPrompt, MONEY_RULES, MONEY_TOOLS_GUIDE, nudgeContext, nudgeTh
 import { createMoneyTools, type MoneyNudge, type MoneyProposal, type MoneyToolContext } from "./tools";
 import type { PurchasePlanRow } from "@perq/db";
 import { PLAN_TOOLS_GUIDE, planThreadContext, planThreadPrompt } from "../plans/prompts";
+import { SWIGGY_TOOLS_GUIDE } from "../swiggy/prompts";
 
 // One Ember chat turn with whichever tool sets the user has data for:
 // recommender tools after the quiz, money tools after a statement upload.
@@ -34,6 +35,8 @@ export interface ChatTurnInput {
   planTools?: AnyEmberTool[] | null;
   /** A plan thread's plan (thread_ref plan:<id>). */
   plan?: PurchasePlanRow | null;
+  /** Step 4: Swiggy tools (createSwiggyTools), when Swiggy is connected. */
+  swiggyTools?: AnyEmberTool[] | null;
   callModel: ModelCaller | null;
   onLabel?: (label: string) => void;
   onProposal?: (p: MoneyProposal) => void;
@@ -43,11 +46,11 @@ export interface ChatTurnInput {
 const NO_STATEMENT = `
 The user hasn't uploaded a statement yet. For questions about bills, dues, utilisation or spending, say you need a statement and suggest "Upload a statement" on Home.`;
 
-export function systemPromptFor(input: Pick<ChatTurnInput, "recommender" | "money" | "nudge" | "card" | "planTools" | "plan">): string {
+export function systemPromptFor(input: Pick<ChatTurnInput, "recommender" | "money" | "nudge" | "card" | "planTools" | "plan" | "swiggyTools">): string {
   const base = input.recommender
     ? CHAT_SYSTEM_PROMPT
     : "You are Ember, PERQ's money assistant, helping a user with their credit cards, bills and spending.";
-  return [base, input.money ? MONEY_TOOLS_GUIDE + MONEY_RULES : NO_STATEMENT + MONEY_RULES, input.nudge ? nudgeThreadPrompt(input.nudge) : "", input.card ? cardThreadPrompt(input.card) : "", input.planTools?.length ? PLAN_TOOLS_GUIDE : "", input.plan ? planThreadPrompt(input.plan) : ""].join("\n");
+  return [base, input.money ? MONEY_TOOLS_GUIDE + MONEY_RULES : NO_STATEMENT + MONEY_RULES, input.nudge ? nudgeThreadPrompt(input.nudge) : "", input.card ? cardThreadPrompt(input.card) : "", input.planTools?.length ? PLAN_TOOLS_GUIDE : "", input.plan ? planThreadPrompt(input.plan) : "", input.swiggyTools?.length ? SWIGGY_TOOLS_GUIDE : ""].join("\n");
 }
 
 /** Deterministic answer when Gemini can't answer, or answered with an ungrounded number. */
@@ -66,6 +69,7 @@ export async function chatTurn(input: ChatTurnInput): Promise<EmberAnswer> {
     ...(input.recommender ? createRecommenderTools(input.recommender) : []),
     ...(input.money ? createMoneyTools(input.money, input.onProposal) : []),
     ...(input.planTools ?? []),
+    ...(input.swiggyTools ?? []),
   ];
   // The nudge's or plan's own figures are in the prompt, so they count as grounded.
   const toolOutputs: unknown[] = [...(input.nudge ? [nudgeContext(input.nudge)] : []), ...(input.plan ? [planThreadContext(input.plan)] : [])];
