@@ -28,6 +28,8 @@ export {
   amountToReachUtilisation,
   utilisationAfter,
   rewardCategoryOf,
+  chargesByMonth,
+  type Charges,
   istDate,
   daysBetween,
   addMonths,

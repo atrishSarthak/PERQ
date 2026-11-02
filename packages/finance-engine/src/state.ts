@@ -209,6 +209,44 @@ export interface FinancialState {
   }[];
   /** Step 4: this month's Swiggy spend, when Swiggy is connected. */
   swiggy?: SwiggySummary | null;
+  /** What statements charged to the cards: the last 6 months, and the latest month with charges by category. */
+  charges: Charges;
+}
+
+/**
+ * Charges on the cards by month, from statements: purchases net of refunds plus EMI instalments,
+ * fees and interest (everything but bill payments and transfers). Wider than `month.spendByCategory`,
+ * which budgets use and which leaves EMI and fees out.
+ */
+export interface Charges {
+  months: { key: string; total: number }[];
+  latest: { key: string; total: number; byCategory: Record<string, number> } | null;
+}
+
+const NOT_CHARGES = new Set(["transfers"]);
+
+export function chargesByMonth(txns: Pick<StateTransaction, "txnDate" | "amount" | "direction" | "kind" | "category">[], endKey: string, n = 6): Charges {
+  const byMonth = new Map<string, Record<string, number>>();
+  for (const t of txns) {
+    if (t.kind === "payment" || NOT_CHARGES.has(t.category)) continue;
+    const key = t.txnDate.slice(0, 7);
+    if (key > endKey) continue;
+    const m = byMonth.get(key) ?? {};
+    m[t.category] = (m[t.category] ?? 0) + (t.direction === "debit" ? t.amount : -t.amount);
+    byMonth.set(key, m);
+  }
+  const rounded = (m: Record<string, number> = {}) =>
+    Object.fromEntries(Object.entries(m).map(([c, v]) => [c, Math.max(0, Math.round(v))] as const).filter(([, v]) => v > 0));
+  const sum = (m: Record<string, number>) => Object.values(m).reduce((s, v) => s + v, 0);
+  const [y, mo] = endKey.split("-").map(Number) as [number, number];
+  const months = Array.from({ length: n }, (_, i) => {
+    const d = new Date(Date.UTC(y, mo - 1 - (n - 1 - i), 1));
+    const key = d.toISOString().slice(0, 7);
+    return { key, total: sum(rounded(byMonth.get(key))) };
+  });
+  const latestKey = [...byMonth.keys()].filter((k) => sum(rounded(byMonth.get(k))) > 0).sort().at(-1);
+  const latest = latestKey ? { key: latestKey, byCategory: rounded(byMonth.get(latestKey)), total: sum(rounded(byMonth.get(latestKey))) } : null;
+  return { months, latest };
 }
 
 // ---- helpers used by rules and Ember tools -----------------------------------
@@ -475,6 +513,7 @@ export function buildFinancialState(input: StateInput): FinancialState {
     },
     missedRewardsLastCycle: { total: Math.round(items.reduce((s, i) => s + i.extra, 0)), items },
     goals,
+    charges: chargesByMonth(input.transactions, key),
     swiggy: input.swiggyOrders ? swiggySummary(input.swiggyOrders, key, input.now, input.budget?.categoryLimits.food_delivery ?? null) : null,
   };
 }

@@ -104,7 +104,7 @@ export default function Home() {
               We read it once and delete the file. The password is never stored on our side.
             </Text>
           </Card>
-          <SpendOverview state={s} statements={false} />
+          <SpendOverview state={s} />
           <Row>
             <CanIBuyTile openPlans={openPlans.length} />
             {s.swiggy ? null : <ConnectSwiggyTile />}
@@ -129,7 +129,7 @@ export default function Home() {
             )}
           </Pressable>
 
-          <SpendOverview state={s} statements />
+          <SpendOverview state={s} />
 
           {unread ? <NudgeStrip id={unread.id} title={unread.title} body={unread.body} /> : null}
 

@@ -780,3 +780,9 @@ Working from `docs/specs/PERQ_Handoff_Step2_Money_Manager.md`.
      (0.25% base, 2.5% on Amazon/Flipkart/Swiggy capped at ₹625 a month) and excluded from ranking.
      Its terms still drive the user's own MoneyBack+ maths. The matcher reads "Plus" as "+".
      `build-cards.py` now writes `emiRewards` and the README's EMI section, which had been added by hand.
+182. **Home's top chart shows statement charges, EMI and fees included.** `chargesByMonth` (finance-engine)
+     adds up what statements charged to the cards each month: purchases net of refunds, EMI
+     instalments, fees and interest, leaving out bill payments and transfers. Home shows the last 6
+     months as bars and the latest month with charges as expense groups, so a statement that ended
+     last month, or is mostly EMI, still shows. `month.spendByCategory` (budgets, left to spend) still
+     counts purchases only. `STATE_VERSION` is 5.

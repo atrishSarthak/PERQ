@@ -69,6 +69,10 @@ export const financialStateSchema = z
     goals: z.array(
       z.object({ id: z.string(), name: z.string(), target: z.number(), saved: z.number(), pctDone: z.number(), monthlyNeeded: n, expectedSaved: n, behindBy: z.number(), targetDate: z.string().nullable() })
     ),
+    charges: z.object({
+      months: z.array(z.object({ key: z.string(), total: z.number() })),
+      latest: z.object({ key: z.string(), total: z.number(), byCategory: z.record(z.number()) }).nullable(),
+    }),
     /** Step 4: present when Swiggy is connected. */
     swiggy: swiggySummarySchema.nullish(),
   })

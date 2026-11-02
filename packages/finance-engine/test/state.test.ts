@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   amountToReachUtilisation,
   bestCardFor,
+  chargesByMonth,
   buildFinancialState,
   istDate,
   utilisationAfter,
@@ -131,5 +132,32 @@ describe("state helpers", () => {
   it("bestCardFor picks the highest rate among held cards", () => {
     expect(bestCardFor("food_delivery", 1000, [ace, millennia])).toMatchObject({ cardId: "hdfc-millennia", ratePct: 5, reward: 50 });
     expect(bestCardFor("transfers", 1000, [ace])).toBeNull();
+  });
+});
+
+describe("chargesByMonth", () => {
+  const tx = (txnDate: string, amount: number, kind: string, category: string, direction: "debit" | "credit" = "debit") => ({ txnDate, amount, kind, category, direction });
+
+  it("counts EMI, fees and purchases net of refunds, but not payments or transfers", () => {
+    const c = chargesByMonth(
+      [
+        tx("2026-09-19", 18, "fee", "fees_interest"),
+        tx("2026-10-15", 8509, "emi", "emi"),
+        tx("2026-10-18", 7191, "emi", "emi"),
+        tx("2026-10-19", 80, "interest", "emi"),
+        tx("2026-10-02", 1480, "payment", "transfers", "credit"),
+        tx("2026-10-05", 600, "purchase", "food_delivery"),
+        tx("2026-10-06", 100, "refund", "food_delivery", "credit"),
+        tx("2026-12-01", 999, "purchase", "travel"), // after the end month
+      ],
+      "2026-11"
+    );
+    expect(c.months.map((m) => m.key)).toEqual(["2026-06", "2026-07", "2026-08", "2026-09", "2026-10", "2026-11"]);
+    expect(c.months.map((m) => m.total)).toEqual([0, 0, 0, 18, 16280, 0]);
+    expect(c.latest).toEqual({ key: "2026-10", total: 16280, byCategory: { emi: 15780, food_delivery: 500 } });
+  });
+
+  it("is empty without statements", () => {
+    expect(chargesByMonth([], "2026-11").latest).toBeNull();
   });
 });

@@ -17,7 +17,7 @@ import { loadSwiggyOrders } from "@/lib/swiggy/service";
 // build with finance-engine, cache per user per IST day.
 
 /** Bump when buildFinancialState's output shape changes. */
-export const STATE_VERSION = 4; // 3: Step 4 adds `swiggy`; 4: `swiggy.last7Days`
+export const STATE_VERSION = 5; // 3: Step 4 adds `swiggy`; 4: `swiggy.last7Days`; 5: `charges`
 
 export function cardTerms(c: CatalogCard): CardTerms {
   return {
